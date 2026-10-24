@@ -41,7 +41,7 @@ const PATHS: Record<string, string> = {
   clock: "M8 2a6 6 0 100 12A6 6 0 008 2zM8 4.8V8l2.2 1.6",
   target: "M8 2a6 6 0 100 12A6 6 0 008 2zM8 5a3 3 0 100 6 3 3 0 000-6zM8 7.6v.8",
   grid: "M2.5 2.5h3v3h-3zM6.5 2.5h3v3h-3zM10.5 2.5h3v3h-3zM2.5 6.5h3v3h-3zM6.5 6.5h3v3h-3zM10.5 6.5h3v3h-3zM2.5 10.5h3v3h-3zM6.5 10.5h3v3h-3zM10.5 10.5h3v3h-3z",
-  large: "M2.5 2.5h11v8h-11zM2.5 13h11",
+  rows: "M2.5 3h3v3h-3zM8 4.5h5.5M2.5 10h3v3h-3zM8 11.5h5.5",
 };
 
 export type IconName = keyof typeof PATHS | ScoreKey;

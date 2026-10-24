@@ -272,6 +272,7 @@
 .panel {
   padding: 6px 16px 8px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   animation: panelIn 280ms var(--ease-out) both;
 }
@@ -937,7 +938,7 @@
   gap: 14px 8px;
 }
 .grid li,
-.large li {
+.rows li {
   animation: rise 420ms var(--ease-out) both;
   animation-delay: calc(var(--i, 0) * 30ms);
 }
@@ -987,49 +988,61 @@
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
-.large {
+.rows {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 24px;
 }
-.large button {
-  display: block;
+.rows button {
   width: 100%;
-  aspect-ratio: 1;
-  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  text-align: left;
+  border-bottom: 1px solid var(--bark);
+  transition: transform 160ms var(--ease-out);
+}
+.rows button:active {
+  transform: scale(0.985);
+}
+.rowThumb {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--sand);
 }
-.large button > * {
+.rowThumb > * {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.largeMeta {
-  margin: 10px 2px 0;
+.rowText {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  font-size: 14px;
-  color: var(--bark-2);
+  flex-direction: column;
+  gap: 2px;
 }
-.largeMeta b {
-  display: block;
-  font-size: 16px;
+.rowText b {
+  font-size: 15px;
   font-weight: 500;
   color: var(--bark);
 }
-.largeMeta strong {
-  font-size: 28px;
+.rowText small {
+  font-size: 12px;
+  color: var(--bark-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rowScore {
+  font-size: 26px;
   font-weight: 300;
   color: var(--bark);
   font-variant-numeric: tabular-nums;
-}
-.large .quote {
-  margin: 6px 2px 0;
 }
 .cmpArea {
   position: absolute;

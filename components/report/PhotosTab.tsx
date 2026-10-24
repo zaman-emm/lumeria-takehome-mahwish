@@ -9,9 +9,9 @@ import { Icon } from "./Visuals";
 import r from "./report.module.css";
 
 // The photos are the proof. Then and now of one spot under the same light,
-// then every scan, as a grid or as large photos with what you wrote.
+// then every scan, as a grid or as rows with what you wrote.
 
-type View = "grid" | "large";
+type View = "grid" | "rows";
 
 export function PhotosTab({ d, actions }: { d: Derived; actions: ReportActions }) {
   const [area, setArea] = useState<string | null>(null);
@@ -62,8 +62,8 @@ export function PhotosTab({ d, actions }: { d: Derived; actions: ReportActions }
             <button role="radio" aria-checked={view === "grid"} onClick={() => setView("grid")} aria-label="Grid">
               <Icon name="grid" size={16} />
             </button>
-            <button role="radio" aria-checked={view === "large"} onClick={() => setView("large")} aria-label="Large photos">
-              <Icon name="large" size={16} />
+            <button role="radio" aria-checked={view === "rows"} onClick={() => setView("rows")} aria-label="Rows">
+              <Icon name="rows" size={16} />
             </button>
           </div>
         </div>
@@ -87,20 +87,22 @@ export function PhotosTab({ d, actions }: { d: Derived; actions: ReportActions }
             ))}
           </ul>
         ) : (
-          <ul className={r.large} key={`l${area ?? "all"}`}>
-            {shown.map((s) => (
-              <li key={s.id}>
+          <ul className={r.rows} key={`r${area ?? "all"}`}>
+            {shown.map((s, i) => (
+              <li key={s.id} style={{ "--i": Math.min(i, 12) } as CSSProperties}>
                 <button onClick={() => actions.openScan(s)} aria-label={`${s.area}, ${when(s)}, overall ${s.scores.overall}`}>
-                  <ScanPhoto scan={s} alt="" />
-                </button>
-                <p className={r.largeMeta}>
-                  <span>
-                    <b>{when(s)}</b>
-                    {s.area}
+                  <span className={r.rowThumb}>
+                    <ScanPhoto scan={s} alt="" />
                   </span>
-                  <strong>{s.scores.overall}</strong>
-                </p>
-                {s.annotation?.note && <p className={r.quote}>“{s.annotation.note}”</p>}
+                  <span className={r.rowText}>
+                    <b>{when(s)}</b>
+                    <small>
+                      {s.area}
+                      {s.annotation?.note ? ` · “${s.annotation.note}”` : ""}
+                    </small>
+                  </span>
+                  <span className={r.rowScore}>{s.scores.overall}</span>
+                </button>
               </li>
             ))}
           </ul>
