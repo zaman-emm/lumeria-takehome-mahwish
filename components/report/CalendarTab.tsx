@@ -1,22 +1,32 @@
 "use client";
 
 import { useMemo, useState, type CSSProperties } from "react";
-import { METRICS, dayOf, fmtDay, fmtTime, score, scanTz, spansOn, type Derived } from "@/lib/insights";
+import { dayOf, fmtDay, fmtTime, previousSameArea, scanTz, signed, spansOn, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import type { ReportActions } from "./Report";
 import { ScanPhoto } from "./ScanPhoto";
 import { Icon } from "./Visuals";
 import r from "./report.module.css";
 
-// Every day you scanned, coloured by how your skin read, with the things that
-// were going on marked underneath. Pick a day to see it in full.
+// Every day you scanned, shaded by how your skin read, with the things that
+// were going on marked underneath. Pick a day to see its scans; tap a scan for
+// everything behind it.
 
 const DAY = 86_400_000;
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const monthName = (ym: string) =>
-  new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${ym}-15T12:00:00Z`));
+  new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${ym}-15T12:00:00Z`));
 const longDay = (day: string) =>
-  new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
+  new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${day}T12:00:00Z`));
 
 export function CalendarTab({ d, actions }: { d: Derived; actions: ReportActions }) {
   const byDay = useMemo(() => {
@@ -46,7 +56,8 @@ export function CalendarTab({ d, actions }: { d: Derived; actions: ReportActions
   // Weeks start on Sunday; days outside the report stay blank.
   const first = new Date(`${month}-01T12:00:00Z`);
   const cells: (string | null)[] = Array(first.getUTCDay()).fill(null);
-  for (let t = first.getTime(); new Date(t).getUTCMonth() === first.getUTCMonth(); t += DAY) cells.push(new Date(t).toISOString().slice(0, 10));
+  for (let t = first.getTime(); new Date(t).getUTCMonth() === first.getUTCMonth(); t += DAY)
+    cells.push(new Date(t).toISOString().slice(0, 10));
 
   const inMonth = [...byDay.entries()].filter(([day]) => day.startsWith(month));
   const best = inMonth.reduce<[string, Scan] | null>((b, [day, ss]) => {
@@ -109,9 +120,13 @@ export function CalendarTab({ d, actions }: { d: Derived; actions: ReportActions
         <div className={r.calKey}>
           {hi > lo && (
             <span className={r.ramp}>
-              {lo}
-              <i />
-              {hi}
+              Lower score
+              <span className={r.rampDots} aria-hidden>
+                {[18, 41, 64, 88].map((k) => (
+                  <i key={k} style={{ "--k": `${k}%` } as CSSProperties} />
+                ))}
+              </span>
+              Higher score
             </span>
           )}
           {d.moments.length > 0 && (
@@ -137,14 +152,18 @@ export function CalendarTab({ d, actions }: { d: Derived; actions: ReportActions
           </li>
           {best && inMonth.length > 1 && (
             <li>
-              <b>{best[1].scores.overall}</b>
-              <small>best, {fmtDay(best[0])}</small>
+              <button onClick={() => setPicked(best[0])} aria-pressed={picked === best[0]}>
+                <b>{best[1].scores.overall}</b>
+                <small>Best · {fmtDay(best[0])}</small>
+              </button>
             </li>
           )}
           {low && inMonth.length > 1 && (
             <li>
-              <b>{low[1].scores.overall}</b>
-              <small>lowest, {fmtDay(low[0])}</small>
+              <button onClick={() => setPicked(low[0])} aria-pressed={picked === low[0]}>
+                <b>{low[1].scores.overall}</b>
+                <small>Lowest · {fmtDay(low[0])}</small>
+              </button>
             </li>
           )}
         </ul>
@@ -158,92 +177,67 @@ export function CalendarTab({ d, actions }: { d: Derived; actions: ReportActions
 function DayCard({ d, day, scans, actions }: { d: Derived; day: string; scans: Scan[]; actions: ReportActions }) {
   const spans = spansOn(d, day);
   const started = d.spans.filter((sp) => sp.start === day && sp.kind === "product");
+  const period = d.moments.some((m) => m.day === day);
   return (
     <section className={r.card} key={day}>
-      <header className={r.cardHead}>
-        <span className="label">{longDay(day)}</span>
-        {spans.length > 0 && <span className={r.cardMeta}>{spans.map((sp) => sp.short).join(" · ")}</span>}
-      </header>
-      {scans.length === 0 && (
-        <p className={r.hint}>
-          No scan this day. Rest days are part of the rhythm{d.moments.some((m) => m.day === day) ? ", and your period started" : ""}.
-        </p>
-      )}
-      {started.length > 0 && (
-        <p className={r.dayNote}>
-          <Icon name="product" size={14} />
-          Started {started.map((sp) => sp.label).join(" and ")}
-        </p>
-      )}
-      {scans.map((s) => {
-        const tz = scanTz(s) ?? d.tz;
-        const sleep = s.health?.sleepHours ?? s.checkin?.sleepHours;
-        const env = s.location?.environment;
-        return (
-          <div key={s.id} className={r.dayScan}>
-            <div className={r.dayTop}>
-              <button className={r.thumb} onClick={() => actions.explore(s.id)} aria-label="Open in the explorer">
-                <ScanPhoto scan={s} alt="" />
-              </button>
-              <span className={r.dayWho}>
-                <b>{s.area}</b>
-                <small>
-                  {fmtTime(s.takenAt, tz)}
-                  {s.location && ` · ${s.location.city}`}
-                </small>
+      <h2 className={r.dayTitle}>{longDay(day)}</h2>
+      {(spans.length > 0 || period) && (
+        <p className={r.dayMarks}>
+          {started.map((sp) => (
+            <span key={sp.id}>
+              <Icon name="product" size={14} />
+              Started {sp.label}
+            </span>
+          ))}
+          {spans
+            .filter((sp) => sp.kind === "travel")
+            .map((sp) => (
+              <span key={sp.id}>
+                <Icon name="travel" size={14} />
+                {sp.short}
               </span>
-              <b className={r.dayScore}>{s.scores.overall}</b>
-            </div>
-            <ul className={r.bars}>
-              {METRICS.map((m) => {
-                const v = score(s, m.key);
-                return (
-                  <li key={m.key}>
-                    <span>{m.label}</span>
-                    <i>
-                      <i style={{ transform: `scaleX(${(v ?? 0) / 100})` }} />
-                    </i>
-                    <b>{v ?? "–"}</b>
-                  </li>
-                );
-              })}
-            </ul>
-            {s.annotation?.note && <p className={r.quote}>“{s.annotation.note}”</p>}
-            <div className={r.ctx}>
-              {sleep != null && (
-                <span>
-                  <Icon name="sleep" size={12} />
-                  {sleep}h sleep
-                </span>
-              )}
-              {env && (
-                <span>
-                  <Icon name="climate" size={12} />
-                  {env.humidityPct}% humidity · UV {env.uvIndexMax}
-                </span>
-              )}
-              {s.health?.cycleDay != null && (
-                <span>
-                  <Icon name="period" size={12} />
-                  Cycle day {s.health.cycleDay}
-                </span>
-              )}
-              {s.annotation?.tags.map((t) => (
-                <span key={t}>{t}</span>
-              ))}
-            </div>
-            <div className={r.dayActions}>
-              <button className={r.pillBtn} onClick={() => actions.explore(s.id)}>
-                Open in explorer
-              </button>
-              <button className={r.textBtn} onClick={() => actions.openScan(s)}>
-                Full details
-                <Icon name="chevronR" size={12} />
-              </button>
-            </div>
-          </div>
-        );
-      })}
+            ))}
+          {period && (
+            <span>
+              <Icon name="period" size={14} />
+              Period started
+            </span>
+          )}
+        </p>
+      )}
+      {scans.length === 0 ? (
+        <p className={r.hint}>No scan this day.</p>
+      ) : (
+        <ul className={r.dayList}>
+          {scans.map((s) => {
+            const tz = scanTz(s) ?? d.tz;
+            const prev = previousSameArea(d, s);
+            return (
+              <li key={s.id}>
+                <button
+                  className={r.dayRow}
+                  onClick={() => actions.openScan(s)}
+                  aria-label={`${s.area} at ${fmtTime(s.takenAt, tz)}, overall ${s.scores.overall}. Open the scan.`}
+                >
+                  <span className={r.thumb}>
+                    <ScanPhoto scan={s} alt="" />
+                  </span>
+                  <span className={r.dayWho}>
+                    <b>{s.area}</b>
+                    <small>{fmtTime(s.takenAt, tz)}</small>
+                  </span>
+                  <span className={r.dayScore}>
+                    <b>{s.scores.overall}</b>
+                    {prev && <small>{signed(s.scores.overall - prev.scores.overall)}</small>}
+                  </span>
+                  <Icon name="chevronR" size={14} className={r.dayGo} />
+                </button>
+                {s.annotation?.note && <p className={r.quote}>“{s.annotation.note}”</p>}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }

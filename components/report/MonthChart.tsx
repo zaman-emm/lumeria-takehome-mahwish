@@ -174,7 +174,7 @@ export function MonthChart({
               {grid.map((g) => (
                 <g key={g}>
                   <line x1={padX} x2={W - padX} y1={y(g)} y2={y(g)} stroke="rgba(46,38,32,.1)" strokeWidth="1" />
-                  <text x={padX} y={y(g) - 4} fontSize="10" fill="var(--bark-3)">
+                  <text x={padX} y={y(g) - 4} fontSize="12" fill="var(--bark-2)">
                     {g}
                   </text>
                 </g>
@@ -196,10 +196,10 @@ export function MonthChart({
               ))}
               <line x1={a.x} x2={a.x} y1={padT - 6} y2={H - padB} stroke="var(--bark)" strokeWidth="1" opacity=".35" />
               <circle cx={a.x} cy={a.y} r="6" fill="var(--forest)" stroke="var(--bone)" strokeWidth="2.5" />
-              <text x={padX} y={H - 4} fontSize="10" fill="var(--bark-3)">
+              <text x={padX} y={H - 4} fontSize="12" fill="var(--bark-2)">
                 {fmtDay(d.start)}
               </text>
-              <text x={W - padX} y={H - 4} fontSize="10" fill="var(--bark-3)" textAnchor="end">
+              <text x={W - padX} y={H - 4} fontSize="12" fill="var(--bark-2)" textAnchor="end">
                 {fmtDay(d.end)}
               </text>
             </svg>

@@ -144,8 +144,8 @@
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
-  font-size: 11px;
-  opacity: 0.6;
+  font-size: 12px;
+  opacity: 0.8;
 }
 .grid {
   display: grid;
@@ -158,4 +158,148 @@
 .grid i {
   aspect-ratio: 1;
   border-radius: 3px;
+}
+
+/* ------------------------------------------------ tick bar */
+
+.ticks {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 26px;
+  padding-bottom: 8px;
+}
+.ticks i {
+  position: relative;
+  flex: none;
+  width: 3px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--sand-deep);
+}
+.ticks i[data-gap="true"] {
+  margin-left: 6px;
+}
+.ticks i[data-on="true"] {
+  background: var(--forest);
+  animation: tickOn 360ms var(--ease-out) both;
+  animation-delay: var(--d);
+}
+.ticks i[data-now="true"] {
+  height: 18px;
+}
+.ticks i[data-was="true"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--bark-2);
+}
+@keyframes tickOn {
+  from {
+    background: var(--sand-deep);
+  }
+}
+.tickAxis {
+  position: relative;
+  display: block;
+  height: 16px;
+  font-size: 12px;
+  color: var(--bark-2);
+  font-variant-numeric: tabular-nums;
+}
+.tickAxis span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+.tickAxis span:first-child {
+  transform: none;
+}
+.tickAxis span:last-child {
+  transform: translateX(-100%);
+}
+
+/* ------------------------------------------------ face map */
+
+.face {
+  margin: 0;
+}
+.face svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.fHead {
+  fill: var(--sand);
+  stroke: var(--sand-deep);
+  stroke-width: 1.5;
+}
+.fZone {
+  stroke: var(--bark-2);
+  stroke-width: 0.75;
+  stroke-opacity: 0.4;
+}
+.fGoodBg {
+  fill: var(--forest-soft);
+}
+.fGoodInk {
+  fill: var(--forest);
+}
+.fWatchBg {
+  fill: var(--clay-soft);
+}
+.fWatchInk {
+  stroke: var(--clay);
+  stroke-width: 1.6;
+}
+.fLine {
+  fill: none;
+  stroke: var(--bark-2);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fSpot {
+  fill: none;
+  stroke: var(--bark);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+.fLeader {
+  fill: none;
+  stroke: var(--bark);
+  stroke-width: 1;
+}
+.fPin {
+  fill: var(--bark);
+}
+.fSwatch {
+  stroke: var(--bark-2);
+  stroke-width: 0.75;
+}
+.fLabel {
+  font-size: 15px;
+  font-weight: 500;
+  fill: var(--bark);
+}
+.face figcaption {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+.fSpotKey {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--bark);
 }

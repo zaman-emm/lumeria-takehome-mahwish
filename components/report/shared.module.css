@@ -134,9 +134,7 @@
 .noPhoto {
   display: grid;
   place-items: center;
-  background:
-    repeating-linear-gradient(45deg, rgba(128, 96, 31, 0.07) 0 1px, transparent 1px 9px),
-    var(--sand);
+  background: repeating-linear-gradient(45deg, rgba(128, 96, 31, 0.07) 0 1px, transparent 1px 9px), var(--sand);
   color: var(--bark-2);
   font-size: 12px;
   font-weight: 500;
@@ -247,7 +245,7 @@
 .detailHead h2 span {
   font-size: 14px;
   font-weight: 400;
-  color: var(--bark-3);
+  color: var(--bark-2);
 }
 .detailPhoto {
   aspect-ratio: 4 / 3;
@@ -274,12 +272,13 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--bark-2);
-  transition: background-color 160ms ease, color 160ms ease;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
 }
 .lightSwitch button[aria-checked="true"] {
-  background: var(--bone);
+  background: var(--paper);
   color: var(--bark);
-  box-shadow: 0 1px 2px rgba(46, 38, 32, 0.12);
 }
 .lightNote {
   margin: -8px 4px 0;
@@ -305,23 +304,32 @@
   font-weight: 500;
 }
 .detailScore span {
-  font-size: 13px;
-  color: var(--bark-3);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--bark-2);
   font-variant-numeric: tabular-nums;
+}
+.detailScore b {
+  font-weight: 600;
+  color: var(--bark);
 }
 .detailMetrics {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 12px;
+  gap: 4px;
 }
-.detailMetrics li {
+.detailMetrics li,
+.axisRow {
   display: grid;
-  grid-template-columns: 92px 1fr 28px 34px;
+  grid-template-columns: 88px 1fr 28px 34px;
   align-items: center;
   gap: 10px;
   font-size: 14px;
+}
+.axisRow > * {
+  grid-column: 2;
 }
 .mName {
   color: var(--bark-2);
@@ -346,14 +354,23 @@
 }
 .mDelta {
   text-align: right;
-  font-size: 12px;
-  color: var(--bark-3);
+  font-size: 13px;
+  color: var(--bark-2);
   font-variant-numeric: tabular-nums;
 }
 .fine {
-  margin: -8px 0 0;
+  margin: 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
-  color: var(--bark-3);
+  color: var(--bark-2);
+}
+.wasKey {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--bark-2);
 }
 .detailBlock :global(.label) {
   margin: 0 0 8px;
@@ -369,19 +386,21 @@
   line-height: 1.5;
 }
 .tip {
-  padding: 16px 18px;
-  border-radius: var(--radius-m);
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border-radius: 16px;
   background: var(--forest);
   color: var(--bone);
-}
-.tip :global(.label) {
-  margin: 0 0 6px;
-  color: var(--bronze-soft);
-}
-.tip p:last-child {
-  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 15px;
-  line-height: 1.5;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.tip svg {
+  flex: none;
+  color: var(--bronze-soft);
 }
 .quote {
   margin: 0;
@@ -391,17 +410,9 @@
   font-style: italic;
 }
 .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-.tags span {
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--sand);
-  font-size: 12px;
-  font-weight: 500;
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--bark-2);
 }
 .context {
   margin: 0;
@@ -410,13 +421,13 @@
   gap: 6px;
 }
 .context div {
-  background: rgba(232, 223, 206, 0.55);
+  background: var(--paper);
   border-radius: var(--radius-s);
   padding: 10px 12px;
 }
 .context dt {
-  font-size: 11px;
-  color: var(--bark-3);
+  font-size: 12px;
+  color: var(--bark-2);
 }
 .context dd {
   margin: 2px 0 0;
@@ -432,9 +443,18 @@
   font-size: 14px;
   font-weight: 500;
 }
+.routine li {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  column-gap: 10px;
+  align-items: center;
+}
+.routine svg {
+  color: var(--forest);
+}
 .routine span {
-  display: block;
+  grid-column: 2;
   font-weight: 400;
-  font-size: 12px;
-  color: var(--bark-3);
+  font-size: 13px;
+  color: var(--bark-2);
 }

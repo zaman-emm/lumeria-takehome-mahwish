@@ -3,18 +3,21 @@
 import { useState } from "react";
 import {
   METRICS,
-  band,
   dayOf,
+  faceMarks,
   fmtDay,
   fmtTime,
+  obsLabel,
   previousSameArea,
   scanTz,
+  shortTip,
   signed,
   spansOn,
   type Derived,
 } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { LIGHTS, ScanPhoto, type Light } from "./ScanPhoto";
+import { FaceMap, Icon, TickAxis, TickBar, onFace } from "./Visuals";
 import s from "./shared.module.css";
 
 /** Everything behind one scan. Shared by the sheets in Story and Journal. */
@@ -28,11 +31,15 @@ export function ScanDetail({ d, scan }: { d: Derived; scan: Scan }) {
   const water = scan.health?.waterGlasses ?? scan.checkin?.waterGlasses;
   const stress = a?.stress ?? scan.checkin?.stress;
   const env = scan.location?.environment;
+  const marks = faceMarks(scan.summary.observations);
 
   const context = [
     sleep != null && { k: "Sleep", v: `${sleep} h` },
     water != null && { k: "Water", v: `${water} glasses` },
-    stress != null && { k: "Stress", v: ["", "Relaxed", "Low", "Some", "High", "Very high"][stress] ?? `${stress}/5` },
+    stress != null && {
+      k: "Stress",
+      v: ["", "Relaxed", "Low", "Some", "High", "Very high"][stress] ?? `${stress}/5`,
+    },
     scan.health && { k: "Cycle", v: `Day ${scan.health.cycleDay}` },
     env && { k: "Humidity", v: `${env.humidityPct}%` },
     env && { k: "UV", v: `${env.uvIndexMax}` },
@@ -63,69 +70,73 @@ export function ScanDetail({ d, scan }: { d: Derived; scan: Scan }) {
           ))}
         </div>
       )}
-      {scan.photos && <p className={s.lightNote}>{LIGHTS.find((l) => l.key === light)!.body}</p>}
 
       <div className={s.detailScore}>
         <strong>{scan.scores.overall}</strong>
-        <div>
-          <p>{scan.summary.headline}</p>
+        <span>
+          Overall
           {prev && (
-            <span>
-              {signed(scan.scores.overall - prev.scores.overall)} vs {fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)}
-            </span>
+            <>
+              <br />
+              <b>{signed(scan.scores.overall - prev.scores.overall)}</b> since {fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)}
+            </>
           )}
-        </div>
+        </span>
       </div>
 
-      <ul className={s.detailMetrics}>
-        {METRICS.map((m) => {
-          const v = scan.scores[m.key as keyof Scan["scores"]];
-          const pv = prev?.scores[m.key as keyof Scan["scores"]];
-          return (
-            <li key={m.key}>
-              <span className={s.mName}>{m.label}</span>
-              <span className={s.mBar} aria-hidden>
-                <i style={{ transform: `scaleX(${(v ?? 0) / 100})` }} data-tone={band(v).tone} />
-              </span>
-              <span className={s.mVal}>{v ?? "–"}</span>
-              <span className={s.mDelta}>{v != null && pv != null ? signed(v - pv) : ""}</span>
-            </li>
-          );
-        })}
-      </ul>
-      {scan.scores.oiliness == null && <p className={s.fine}>We couldn’t read oil balance on this scan.</p>}
+      <div>
+        <ul className={s.detailMetrics}>
+          {METRICS.map((m) => {
+            const v = scan.scores[m.key as keyof Scan["scores"]];
+            const pv = prev?.scores[m.key as keyof Scan["scores"]];
+            return (
+              <li key={m.key} aria-label={`${m.label} ${v ?? "not read"}${v != null && pv != null ? `, ${signed(v - pv)}` : ""}`}>
+                <span className={s.mName}>{m.label}</span>
+                <TickBar value={v} prev={pv} />
+                <span className={s.mVal}>{v ?? "–"}</span>
+                <span className={s.mDelta}>{v != null && pv != null ? signed(v - pv) : ""}</span>
+              </li>
+            );
+          })}
+        </ul>
+        <div className={s.axisRow}>
+          <TickAxis />
+        </div>
+        {prev && (
+          <p className={s.fine}>
+            <i className={s.wasKey} aria-hidden />
+            Last scan of this spot, {fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)}
+          </p>
+        )}
+      </div>
+      {scan.scores.oiliness == null && <p className={s.fine}>Oil balance couldn’t be read on this scan.</p>}
 
       <section className={s.detailBlock}>
-        <p className="label">What we saw</p>
-        <ul className={s.obs}>
-          {scan.summary.observations.map((o, i) => (
-            <li key={i}>{o}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className={s.tip}>
-        <p className="label">Try this</p>
-        <p>{scan.summary.tip}</p>
+        {onFace(scan.area) && marks.length > 0 ? (
+          <FaceMap marks={marks} area={scan.area} />
+        ) : (
+          <ul className={s.obs}>
+            {scan.summary.observations.map(obsLabel).map((o) => (
+              <li key={o}>{o}</li>
+            ))}
+          </ul>
+        )}
+        <p className={s.tip}>
+          <Icon name="spark" size={16} />
+          {shortTip(scan.summary.tip)}
+        </p>
+        <p className={s.fine}>Read from your photo. Not a diagnosis.</p>
       </section>
 
       {a && (a.note || a.tags.length > 0) && (
         <section className={s.detailBlock}>
-          <p className="label">You wrote</p>
           {a.note && <blockquote className={s.quote}>“{a.note}”</blockquote>}
-          {a.tags.length > 0 && (
-            <div className={s.tags}>
-              {a.tags.map((t) => (
-                <span key={t}>{t}</span>
-              ))}
-            </div>
-          )}
+          {a.tags.length > 0 && <p className={s.tags}>{a.tags.join(" · ")}</p>}
         </section>
       )}
 
       {context.length > 0 && (
         <section className={s.detailBlock}>
-          <p className="label">That day</p>
           <dl className={s.context}>
             {context.map((c) => (
               <div key={c.k}>
@@ -139,10 +150,10 @@ export function ScanDetail({ d, scan }: { d: Derived; scan: Scan }) {
 
       {routine.length > 0 && (
         <section className={s.detailBlock}>
-          <p className="label">In your routine</p>
           <ul className={s.routine}>
             {routine.map((r) => (
               <li key={r.id}>
+                <Icon name="product" size={16} />
                 {r.label}
                 <span>{r.product?.usage}</span>
               </li>

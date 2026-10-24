@@ -5,7 +5,7 @@
 }
 .areas {
   display: flex;
-  gap: 6px;
+  gap: 18px;
   margin: 0 -18px 10px;
   padding: 0 18px;
   overflow-x: auto;
@@ -13,27 +13,22 @@
 }
 .areas button {
   flex: none;
-  min-height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid var(--sand-deep);
-  font-size: 13px;
+  min-height: 40px;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
   font-weight: 500;
+  color: var(--bark-2);
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 .areas button small {
-  font-size: 11px;
-  color: var(--bark-3);
+  font-size: 12px;
+  color: var(--bark-2);
 }
 .areas button[aria-checked="true"] {
-  background: var(--bark);
-  border-color: var(--bark);
-  color: var(--bone);
-}
-.areas button[aria-checked="true"] small {
-  color: rgba(244, 239, 230, 0.6);
+  border-bottom-color: var(--bark);
+  color: var(--bark);
 }
 .chips {
   display: flex;
@@ -53,15 +48,15 @@
   flex: none;
   min-height: 34px;
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
   color: var(--bark-2);
   transition: background-color 160ms ease, color 160ms ease;
 }
 .chips button[aria-checked="true"] {
-  background: var(--sand);
-  color: var(--bark);
+  background: var(--bark);
+  color: var(--bone);
 }
 .plot {
   margin-top: 12px;
@@ -111,7 +106,7 @@
 }
 .band i span,
 .bandOut {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -125,8 +120,7 @@
   margin-top: 14px;
   padding: 14px 16px;
   border-radius: var(--radius-m);
-  background: var(--glass);
-  border: 1px solid var(--glass-edge);
+  background: var(--sand);
   text-align: left;
   display: grid;
   gap: 6px;
@@ -153,7 +147,7 @@
   margin-left: 6px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--bark-3);
+  color: var(--bark-2);
 }
 .readNote {
   font-size: 14px;

@@ -158,6 +158,8 @@ export interface Factor {
   when: string;
   change: Change;
   body: string;
+  /** The evidence in short form: what each end of the change compares, and the facts behind it. */
+  evidence: { from: string; to: string; facts: string[]; caveat?: string };
   spanId?: string;
 }
 
@@ -347,6 +349,9 @@ export function derive(report: SkinReport): Derived | null {
         body = bits.length ? `${capitalize(bits.join(" and "))}.` : `${capitalize(label)} dipped while you used it.`;
         if (overlap) body += ` It overlapped your ${overlap.short} trip, so it’s hard to say which did more.`;
       }
+      const facts = [c.delta < 0 && stings ? `Stinging noted ${stings}×` : null, !sp.ongoing ? `Stopped ${fmtDay(sp.end)}` : null].filter(
+        (x): x is string => x != null,
+      );
       factors.push({
         id: sp.id,
         direction: c.delta > 0 ? "helped" : "held",
@@ -355,6 +360,12 @@ export function derive(report: SkinReport): Derived | null {
         when: sp.start <= start && sp.ongoing ? "All month" : sp.ongoing ? `Since ${fmtDay(sp.start)}` : fmtRange(sp.start, sp.end),
         change: c,
         body,
+        evidence: {
+          from: fmtDay(day(base)),
+          to: fmtDay(day(last)),
+          facts,
+          caveat: c.delta < 0 && overlap ? `Overlaps the ${overlap.short} trip, so it’s hard to say which did more.` : undefined,
+        },
         spanId: sp.id,
       });
     }
@@ -385,6 +396,11 @@ export function derive(report: SkinReport): Derived | null {
         when: fmtRange(sp.start, sp.end),
         change: c,
         body: `The air there was much drier, around ${humAway}% humidity against ${humHome}% at home, with UV up to ${uv}.`,
+        evidence: {
+          from: "Week before",
+          to: `Low, ${fmtDay(day(during.reduce((lo, s) => ((score(s, c.key) ?? 101) < (score(lo, c.key) ?? 101) ? s : lo))))}`,
+          facts: [`Humidity ${humAway}% vs ${humHome}% at home`, `UV up to ${uv}`],
+        },
         spanId: sp.id,
       });
     }
@@ -417,6 +433,11 @@ export function derive(report: SkinReport): Derived | null {
           when: `Since ${fmtDay(day(recent[0]))}`,
           change: c,
           body: `You’ve averaged ${sRecent.toFixed(1)} hours of sleep lately, down from ${sPrior.toFixed(1)}. ${metricMeta(c.key).label} slipped at the same time.`,
+          evidence: {
+            from: `${fmtDay(day(prior[0]))}–${fmtDay(day(prior[prior.length - 1]))}`,
+            to: `${fmtDay(day(recent[0]))}–${fmtDay(day(recent[recent.length - 1]))}`,
+            facts: [`Sleep ${sPrior.toFixed(1)} h → ${sRecent.toFixed(1)} h`],
+          },
         });
       }
     }
@@ -499,6 +520,57 @@ export function band(value: number | null): { word: string; tone: "good" | "fair
   if (value >= 75) return { word: "Looking good", tone: "good" };
   if (value >= 60) return { word: "Steady", tone: "fair" };
   return { word: "Needs care", tone: "low" };
+}
+
+const TIPS: [RegExp, string][] = [
+  [/SPF/i, "Wear SPF daily, even when it’s cloudy."],
+  [/hot water/i, "Go easy on hot water and strong actives."],
+  [/damp/i, "Moisturize while skin is still damp."],
+  [/lightweight, oil-free/i, "Try a lightweight, oil-free moisturizer."],
+];
+
+/** A tip cut down to the one action in it. */
+export function shortTip(tip: string) {
+  const hit = TIPS.find(([re]) => re.test(tip));
+  if (hit) return hit[1];
+  const m = tip.match(/^(an?|the)\s+(.+?)\s+(can|could|may|will|should|might)\s/i);
+  return m ? `Try ${m[1].toLowerCase()} ${m[2]}.` : tip;
+}
+
+export type FaceRegion = "forehead" | "tzone" | "nose" | "cheeks" | "chin";
+
+const MARKS: [RegExp, FaceRegion, string, "good" | "watch"][] = [
+  [/shine.*T-zone/i, "tzone", "T-zone shine", "watch"],
+  [/more shine/i, "tzone", "More shine", "watch"],
+  [/redness is calm/i, "cheeks", "Redness calm", "good"],
+  [/redness, especially around the nose/i, "nose", "Redness by nose", "watch"],
+  [/more visible redness/i, "cheeks", "More redness", "watch"],
+  [/well hydrated/i, "cheeks", "Well hydrated", "good"],
+  [/drier/i, "cheeks", "Drier", "watch"],
+  [/patchier/i, "cheeks", "Patchier tone", "watch"],
+  [/dark spots/i, "cheeks", "Spots showing", "watch"],
+  [/tone looks even/i, "forehead", "Even tone", "good"],
+  [/texture looks smooth/i, "forehead", "Smooth texture", "good"],
+];
+
+export interface FaceMark {
+  region: FaceRegion;
+  label: string;
+  /** good reads as calm, watch as worth a look. Shown by pattern and label, never colour alone. */
+  tone: "good" | "watch";
+}
+
+/** One observation as its short label, or as written when we have no label for it. */
+export const obsLabel = (o: string) => MARKS.find(([re]) => re.test(o))?.[2] ?? o;
+
+/** What we saw, as short labels pinned to a part of the face. */
+export function faceMarks(observations: string[]): FaceMark[] {
+  const out: FaceMark[] = [];
+  for (const o of observations) {
+    const hit = MARKS.find(([re]) => re.test(o));
+    if (hit && !out.some((m) => m.region === hit[1])) out.push({ region: hit[1], label: hit[2], tone: hit[3] });
+  }
+  return out.slice(0, 3);
 }
 
 export const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : "±0");
