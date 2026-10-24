@@ -6,7 +6,9 @@
 
 import type { MetricKey, Product, Scan, SkinReport } from "./types";
 
-export type ScoreKey = MetricKey | "overall";
+/** Extra measures beyond the API. Mocked in lib/extended.ts. */
+export type ExtraKey = "radiance" | "pores" | "spots";
+export type ScoreKey = MetricKey | "overall" | ExtraKey;
 
 export interface MetricMeta {
   key: ScoreKey;
@@ -32,9 +34,48 @@ export const OVERALL: MetricMeta = {
   hint: "The average of everything we measured",
 };
 
-export const metricMeta = (key: ScoreKey) => (key === "overall" ? OVERALL : METRICS.find((m) => m.key === key)!);
+/**
+ * Extras, each with how it would be read. Radiance is derived from scores we
+ * already have; pores and spots assume a dedicated photo-analysis step.
+ */
+export const EXTRAS: (MetricMeta & { source: "derived" | "photo"; why: string })[] = [
+  {
+    key: "radiance",
+    label: "Radiance",
+    measures: "Radiance",
+    hint: "Derived from hydration and even tone",
+    source: "derived",
+    why: "Not a separate measurement. It blends hydration with even tone and texture, the two things that make skin look lit from within.",
+  },
+  {
+    key: "pores",
+    label: "Pores",
+    measures: "Pore visibility",
+    hint: "Higher means pores look smaller",
+    source: "photo",
+    why: "Assumes a photo-analysis step that reads pores from the UV image. Texture scores alone can’t measure them.",
+  },
+  {
+    key: "spots",
+    label: "Spots",
+    measures: "Spot count",
+    hint: "Higher means fewer separate spots",
+    source: "photo",
+    why: "Assumes photo analysis that counts separate marks. Clarity already follows overall tone; this follows the spots people point at.",
+  },
+];
 
-export const score = (scan: Scan, key: ScoreKey): number | null => scan.scores[key] ?? null;
+const EXTRA_KEYS = new Set<ScoreKey>(EXTRAS.map((m) => m.key));
+export const isExtra = (key: ScoreKey): key is ExtraKey => EXTRA_KEYS.has(key);
+
+export const metricMeta = (key: ScoreKey) =>
+  key === "overall" ? OVERALL : (METRICS.find((m) => m.key === key) ?? EXTRAS.find((m) => m.key === key)!);
+
+/** A scan as the app sees it: the API's scan plus any extras we read alongside it. */
+export type ScanExtras = Partial<Record<ExtraKey, number | null>>;
+
+export const score = (scan: Scan, key: ScoreKey): number | null =>
+  isExtra(key) ? ((scan as Scan & { extras?: ScanExtras }).extras?.[key] ?? null) : (scan.scores[key] ?? null);
 
 // ---------------------------------------------------------------- dates
 
@@ -479,4 +520,102 @@ export const spansOn = (d: Derived, day: string) => d.spans.filter((sp) => day >
 export function previousSameArea(d: Derived, scan: Scan) {
   const same = d.scans.filter((s) => s.area === scan.area && byTime(s, scan) < 0);
   return same[same.length - 1] ?? null;
+}
+
+// ---------------------------------------------------------------- rhythm
+
+export interface Milestone {
+  id: string;
+  label: string;
+  earned: boolean;
+  /** Short progress line for the next one, e.g. "3 to go". */
+  hint?: string;
+}
+
+export interface Rhythm {
+  scans: number;
+  /** Days in the period, inclusive. */
+  days: number;
+  /** One entry per day of the period: how many scans landed on it. */
+  calendar: { day: string; count: number }[];
+  scanDays: number;
+  /** Most consecutive days with a scan. */
+  longestRun: number;
+  /** Largest gap between two scans, in days. */
+  longestGap: number;
+  weeks: number;
+  weeksWithScan: number;
+  tone: "devoted" | "steady" | "building" | "starting";
+  title: string;
+  body: string;
+  milestones: Milestone[];
+}
+
+const COUNT_MILESTONES = [
+  { n: 1, label: "First scan" },
+  { n: 10, label: "10 scans" },
+  { n: 25, label: "25 scans" },
+  { n: 50, label: "50 scans" },
+];
+
+/**
+ * How regularly someone shows up, and what a kind big sister would say
+ * about it. Never guilt: sparse scanning gets a tip, not a telling-off.
+ */
+export function rhythm(d: Derived): Rhythm {
+  const counts = new Map<string, number>();
+  d.scans.forEach((s) => counts.set(dayOf(d, s), (counts.get(dayOf(d, s)) ?? 0) + 1));
+  const days = daysBetween(d.start, d.end) + 1;
+  const calendar = Array.from({ length: days }, (_, i) => {
+    const day = addDays(d.start, i);
+    return { day, count: counts.get(day) ?? 0 };
+  });
+  const scanDays = calendar.filter((c) => c.count).length;
+
+  let longestRun = 0;
+  let run = 0;
+  calendar.forEach((c) => {
+    run = c.count ? run + 1 : 0;
+    longestRun = Math.max(longestRun, run);
+  });
+  const sortedDays = [...counts.keys()].sort();
+  let longestGap = 0;
+  for (let i = 1; i < sortedDays.length; i++) longestGap = Math.max(longestGap, daysBetween(sortedDays[i - 1], sortedDays[i]));
+
+  const weeks = Math.ceil(days / 7);
+  const weeksWithScan = new Set(calendar.filter((c) => c.count).map((c) => Math.floor(daysBetween(d.start, c.day) / 7))).size;
+  const scans = d.scans.length;
+
+  let tone: Rhythm["tone"];
+  let title: string;
+  let body: string;
+  if (scans === 1) {
+    tone = "starting";
+    title = "Day one, done";
+    body = "The first scan is the hardest one, and you did it. Scan again in two or three days and your story starts.";
+  } else if (longestGap <= 2 && scanDays / days >= 0.6) {
+    tone = "devoted";
+    title = "You showed up for your skin";
+    body = `${scanDays} of ${days} days, and never more than ${longestGap} days apart. That rhythm is exactly why we could spot what changed. Proud of you.`;
+  } else if (weeksWithScan === weeks) {
+    tone = "steady";
+    title = `${weeks} weeks, not one missed`;
+    body = "Every few days is the sweet spot, and you’ve been right in it. That’s how the real trends show up.";
+  } else {
+    tone = "building";
+    title = "Little and often wins";
+    body = `Your scans have been up to ${longestGap} days apart. Once a week, say Sunday night, is enough to make your picture much clearer.`;
+  }
+
+  // The highest count reached, any streak worth naming, then the next goal so
+  // there's always something to reach for.
+  const shown: Milestone[] = [];
+  const reached = [...COUNT_MILESTONES].reverse().find((m) => scans >= m.n);
+  if (reached) shown.push({ id: `n${reached.n}`, label: reached.label, earned: true });
+  if (weeks >= 3 && weeksWithScan === weeks) shown.push({ id: "weeks", label: "Every week", earned: true });
+  if (longestRun >= 5) shown.push({ id: "run", label: `${longestRun}-day streak`, earned: true });
+  const next = COUNT_MILESTONES.find((m) => scans < m.n);
+  if (next) shown.push({ id: `n${next.n}`, label: next.label, earned: false, hint: `${next.n - scans} to go` });
+
+  return { scans, days, calendar, scanDays, longestRun, longestGap, weeks, weeksWithScan, tone, title, body, milestones: shown };
 }

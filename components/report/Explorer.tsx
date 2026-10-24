@@ -6,40 +6,42 @@ import {
   dayOf,
   fmtDay,
   fmtTime,
-  metricMeta,
   previousSameArea,
   scanTz,
   signed,
   spansOn,
-  trendSentence,
   type Derived,
 } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
-import type { ReportState } from "@/lib/useReport";
-import { LIGHTS, ScanPhoto, type Light } from "../../_shared/ScanPhoto";
-import { Sheet } from "../../_shared/Sheet";
-import { StateScreen } from "../../_shared/StateScreen";
-import { Trend } from "../../_shared/Trend";
-import s from "./lens.module.css";
+import { LIGHTS, ScanPhoto, type Light } from "./ScanPhoto";
+import { ScanDetail } from "./ScanDetail";
+import { Sheet } from "./Sheet";
+import { Icon } from "./Visuals";
+import s from "./explorer.module.css";
 
-// Direction 3, "Lens": the scope is the interface. One thumb scrubs a tape of
-// every scan along the bottom, and the lens, scores and that day's context
-// follow it. The month is something you move through, not read about.
+// The explorer: the scope is the interface. One thumb scrubs a tape of every
+// scan along the bottom, and the lens, scores and that day's context follow.
+// Opened from the report's photos, calendar or recap.
 
-export function Lens({ state }: { state: ReportState }) {
-  if (state.status !== "ready") return <StateScreen state={state} tone="dark" />;
-  return <LensReady d={state.data} />;
-}
-
-function LensReady({ d }: { d: Derived }) {
+export function Explorer({ d, startId, onClose }: { d: Derived; startId?: string; onClose: () => void }) {
   const [area, setArea] = useState<string | null>(null);
   const tape = useMemo(() => (area ? d.scans.filter((x) => x.area === area) : d.scans), [d.scans, area]);
-  const [idx, setIdx] = useState(tape.length - 1);
+  const [idx, setIdx] = useState(() => {
+    const i = d.scans.findIndex((x) => x.id === startId);
+    return i >= 0 ? i : d.scans.length - 1;
+  });
   const [light, setLight] = useState<Light>("ambient");
   const [prevLight, setPrevLight] = useState<Light | null>(null);
-  const [month, setMonth] = useState(false);
+  const [details, setDetails] = useState(false);
+  const first = useRef(true);
 
-  useEffect(() => setIdx(tape.length - 1), [tape]);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    setIdx(tape.length - 1);
+  }, [tape]);
 
   const scan = tape[Math.min(idx, tape.length - 1)];
   const tz = scanTz(scan) ?? d.tz;
@@ -52,13 +54,15 @@ function LensReady({ d }: { d: Derived }) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (month || (e.target as HTMLElement).closest("[role=slider]")) return;
+      if (details) return;
+      if (e.key === "Escape") onClose();
+      if ((e.target as HTMLElement).closest("[role=slider]")) return;
       if (e.key === "ArrowLeft") setIdx((i) => Math.max(0, i - 1));
       if (e.key === "ArrowRight") setIdx((i) => Math.min(tape.length - 1, i + 1));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [tape.length, month]);
+  }, [tape.length, details, onClose]);
 
   const pickLight = (l: Light) => {
     if (l === light) return;
@@ -77,10 +81,10 @@ function LensReady({ d }: { d: Derived }) {
   ].filter(Boolean) as { k: string; v: string }[];
 
   return (
-    <div className={s.root}>
+    <div className={s.root} role="dialog" aria-modal="true" aria-label="Explore your scans">
       <header className={s.top}>
         <div>
-          <p className="label">{d.firstName}’s lens</p>
+          <p className="label">Explore</p>
           <p className={s.when}>
             {fmtDay(scan.takenAt, tz)}
             <span>
@@ -88,9 +92,14 @@ function LensReady({ d }: { d: Derived }) {
             </span>
           </p>
         </div>
-        <button className={s.monthBtn} onClick={() => setMonth(true)}>
-          {d.trend ? "Month" : "About"}
-        </button>
+        <div className={s.topActions}>
+          <button className={s.detailsBtn} onClick={() => setDetails(true)}>
+            Details
+          </button>
+          <button className={s.closeBtn} onClick={onClose} aria-label="Close explorer">
+            <Icon name="close" size={14} />
+          </button>
+        </div>
       </header>
 
       <main className={s.main}>
@@ -204,8 +213,8 @@ function LensReady({ d }: { d: Derived }) {
 
       <Dock d={d} tape={tape} idx={idx} setIdx={setIdx} area={area} setArea={setArea} />
 
-      <Sheet open={month} onClose={() => setMonth(false)} label="Your month" tone="dark">
-        <MonthSheet d={d} />
+      <Sheet open={details} onClose={() => setDetails(false)} label="Scan details" scrollKey={scan.id}>
+        <ScanDetail d={d} scan={scan} />
       </Sheet>
     </div>
   );
@@ -329,57 +338,6 @@ function Dock({
         <span>{fmtDay(dayOf(d, tape[0]))}</span>
         <span>{n > 1 ? "Drag to move through your scans" : ""}</span>
         <span>{fmtDay(dayOf(d, tape[n - 1]))}</span>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------- month sheet
-
-function MonthSheet({ d }: { d: Derived }) {
-  if (!d.trend) {
-    return (
-      <div className={s.sheet}>
-        <p className="label">Your first scan</p>
-        <h2>This is your baseline</h2>
-        <p className={s.sheetBody}>
-          Scan your {d.latest.area.toLowerCase()} again in two or three days. Each new scan adds a bar to the tape, and the month view
-          fills in as you go.
-        </p>
-      </div>
-    );
-  }
-  return (
-    <div className={s.sheet}>
-      <p className="label">
-        {d.area} · {d.periodLabel}
-      </p>
-      <h2>{trendSentence(d)}</h2>
-      <div className={s.sheetChart}>
-        <Trend d={d} scans={d.areaScans} tone="dark" height={170} band={d.dip?.during ?? null} />
-      </div>
-      {d.factors.length > 0 && (
-        <>
-          <p className="label">What lined up with it</p>
-          <ul className={s.factors}>
-            {d.factors.map((f) => (
-              <li key={f.id} data-dir={f.direction}>
-                <span aria-label={f.direction === "helped" ? "Helped" : "Held back"}>{f.direction === "helped" ? "↑" : "↓"}</span>
-                <div>
-                  <b>{f.title}</b>
-                  <small>
-                    {f.when} · {metricMeta(f.change.key).label} {f.change.from} → {f.change.to}
-                  </small>
-                  <p>{f.body}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      <div className={s.sheetTip}>
-        <p className="label">One thing to try</p>
-        <p>{d.latest.summary.tip}</p>
       </div>
     </div>
   );

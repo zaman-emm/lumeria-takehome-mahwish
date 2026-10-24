@@ -1,0 +1,161 @@
+/* ------------------------------------------------ gauge */
+
+.gauge {
+  --track: rgba(46, 38, 32, 0.1);
+  --fill: var(--forest);
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+.gauge[data-tone="dark"] {
+  --track: rgba(244, 239, 230, 0.14);
+  --fill: var(--bronze);
+}
+.gauge svg {
+  position: absolute;
+  inset: 0;
+}
+.gTrack,
+.gValue {
+  fill: none;
+  stroke-width: 4;
+}
+.gTrack {
+  stroke: var(--track);
+}
+.gValue {
+  stroke: var(--fill);
+  stroke-linecap: round;
+  stroke-dashoffset: var(--off);
+  animation: fill 1000ms var(--ease-out) both;
+}
+@keyframes fill {
+  from {
+    stroke-dashoffset: 100;
+  }
+}
+.gauge b {
+  position: relative;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------ badge */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px 0 5px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(192, 145, 63, 0.14);
+  color: var(--bark);
+}
+.badge small {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bark-3);
+}
+.badgeMark {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bronze);
+  color: var(--bone);
+}
+.badge[data-earned="false"] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--sand-deep);
+  color: var(--bark-2);
+}
+.badge[data-earned="false"] .badgeMark {
+  background: var(--sand);
+  color: var(--bark-3);
+}
+.badge[data-tone="dark"] {
+  color: var(--bone);
+  background: rgba(192, 145, 63, 0.2);
+}
+.badge[data-tone="dark"] small {
+  color: rgba(244, 239, 230, 0.55);
+}
+.badge[data-tone="dark"][data-earned="false"] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, 0.18);
+  color: rgba(244, 239, 230, 0.75);
+}
+.badge[data-tone="dark"][data-earned="false"] .badgeMark {
+  background: rgba(244, 239, 230, 0.1);
+  color: rgba(244, 239, 230, 0.6);
+}
+
+/* ------------------------------------------------ rhythm strip */
+
+.strip,
+.grid {
+  --off: rgba(46, 38, 32, 0.1);
+  --on: var(--forest);
+  --ring: var(--bronze);
+}
+.strip[data-tone="dark"],
+.grid[data-tone="dark"] {
+  --off: rgba(244, 239, 230, 0.12);
+  --on: var(--bronze);
+  --ring: var(--bone);
+}
+.dots {
+  display: flex;
+  gap: 3px;
+}
+.dots i,
+.grid i {
+  flex: 1;
+  aspect-ratio: 1 / 2.6;
+  border-radius: 4px;
+  background: var(--off);
+  animation: pop 420ms var(--ease-out) both;
+  animation-delay: calc(200ms + var(--d));
+}
+.dots i[data-n="1"],
+.grid i[data-n="1"] {
+  background: var(--on);
+}
+.dots i[data-n="2"],
+.grid i[data-n="2"] {
+  background: var(--on);
+  box-shadow: inset 0 0 0 1.5px var(--ring);
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scaleY(0.4);
+  }
+}
+.stripAxis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  opacity: 0.6;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--w), 1fr);
+  grid-template-rows: repeat(7, auto);
+  grid-auto-flow: column;
+  gap: 3px;
+  max-width: calc(var(--w) * 22px);
+}
+.grid i {
+  aspect-ratio: 1;
+  border-radius: 3px;
+}

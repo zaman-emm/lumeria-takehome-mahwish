@@ -70,42 +70,62 @@
   color: var(--evergreen);
 }
 
-/* Three rings breathing like a scope finding focus. */
-.lens {
-  position: relative;
-  width: 88px;
-  height: 88px;
+/* The scope finding focus: rings turning against each other around a warm core. */
+.scope {
+  overflow: visible;
+  color: var(--bronze);
 }
-.lens span {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px solid var(--bronze);
-  opacity: 0.5;
-  animation: breathe 1.8s var(--ease-in-out) infinite;
+.scope line,
+.scope circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
 }
-.lens span:nth-child(2) {
-  inset: 14px;
-  animation-delay: 120ms;
-  opacity: 0.7;
+.scope line {
+  opacity: 0.35;
 }
-.lens span:nth-child(3) {
-  inset: 30px;
-  background: radial-gradient(circle at 40% 35%, var(--bronze-soft), var(--bronze));
-  border: 0;
-  animation-delay: 240ms;
-  opacity: 0.9;
+.r1,
+.r2,
+.r3 {
+  transform-origin: 60px 60px;
+  animation: spin 14s linear infinite;
 }
-.lens[data-still] span {
+.r1 {
+  opacity: 0.55;
+}
+.r2 {
+  opacity: 0.8;
+  stroke-width: 1.6;
+  animation-duration: 6s;
+  animation-direction: reverse;
+}
+.r3 {
+  opacity: 0.6;
+  animation-duration: 3.6s;
+}
+.scope .core {
+  fill: currentColor;
+  stroke: none;
+  transform-origin: 60px 60px;
+  animation: focus 1.8s var(--ease-in-out) infinite;
+}
+.scope[data-still="true"] * {
   animation: none;
 }
-@keyframes breathe {
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes focus {
   0%,
   100% {
-    transform: scale(0.94);
+    transform: scale(0.7);
+    opacity: 0.6;
   }
   50% {
     transform: scale(1);
+    opacity: 1;
   }
 }
 

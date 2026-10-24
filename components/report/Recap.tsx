@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import {
   METRICS,
   dayOf,
   fmtDay,
   fmtRange,
   metricMeta,
+  rhythm,
   scanTz,
   signed,
   trendSentence,
@@ -14,17 +15,14 @@ import {
   type Factor,
 } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
-import type { ReportState } from "@/lib/useReport";
-import { LIGHTS, ScanPhoto, type Light } from "../../_shared/ScanPhoto";
-import { ScanDetail } from "../../_shared/ScanDetail";
-import { Sheet } from "../../_shared/Sheet";
-import { StateScreen } from "../../_shared/StateScreen";
-import { Trend } from "../../_shared/Trend";
-import s from "./story.module.css";
+import { LIGHTS, ScanPhoto, type Light } from "./ScanPhoto";
+import { Trend } from "./Trend";
+import { Badge, Icon, RhythmStrip } from "./Visuals";
+import s from "./recap.module.css";
 
-// Direction 1, "Story": the month as a short tap-through story. Each chapter
-// answers one question, so a person can get the whole picture in eight taps
-// and dig into any scan from the end card.
+// The recap: the month as a short tap-through story, opened from the report.
+// Each chapter answers one question, so a person gets the whole picture in a
+// few taps, then lands in the explorer to dig into any scan.
 
 type Theme = "dark" | "light" | "sand";
 interface Chapter {
@@ -41,17 +39,10 @@ const In = ({ i, children, className }: { i: number; children: ReactNode; classN
   </div>
 );
 
-export function Story({ state }: { state: ReportState }) {
-  if (state.status !== "ready") return <StateScreen state={state} tone="dark" />;
-  return <StoryReady d={state.data} />;
-}
-
-function StoryReady({ d }: { d: Derived }) {
+export function Recap({ d, onClose, onExplore }: { d: Derived; onClose: () => void; onExplore: () => void }) {
   const chapters = useMemo(() => buildChapters(d), [d]);
   const [i, setI] = useState(0);
   const [dir, setDir] = useState(1);
-  const [list, setList] = useState(false);
-  const [scan, setScan] = useState<Scan | null>(null);
 
   const go = useCallback(
     (to: number) => {
@@ -63,23 +54,23 @@ function StoryReady({ d }: { d: Derived }) {
   );
 
   useEffect(() => {
-    if (list) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight" || e.key === " ") {
         e.preventDefault();
         go(i + 1);
       }
       if (e.key === "ArrowLeft") go(i - 1);
+      if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [go, i, list]);
+  }, [go, i, onClose]);
 
   const ch = chapters[i];
   const last = i === chapters.length - 1;
 
   return (
-    <div className={s.stage} data-theme={ch.theme}>
+    <div className={s.stage} data-theme={ch.theme} role="dialog" aria-modal="true" aria-label="Your recap">
       <div className={s.progress} aria-hidden>
         {chapters.map((c, n) => (
           <span key={c.id}>
@@ -88,9 +79,9 @@ function StoryReady({ d }: { d: Derived }) {
         ))}
       </div>
       <header className={s.top}>
-        <span className="label">Lumeria</span>
-        <button className={s.allScans} onClick={() => setList(true)}>
-          All scans
+        <span className="label">Recap</span>
+        <button className={s.close} onClick={onClose} aria-label="Close recap">
+          <Icon name="close" size={14} />
         </button>
       </header>
 
@@ -107,7 +98,7 @@ function StoryReady({ d }: { d: Derived }) {
         {ch.id === "end" ? (
           <EndCard
             d={d}
-            onAll={() => setList(true)}
+            onExplore={onExplore}
             onReplay={() => {
               setDir(-1);
               setI(0);
@@ -126,30 +117,6 @@ function StoryReady({ d }: { d: Derived }) {
           </svg>
         </p>
       )}
-
-      <Sheet
-        open={list}
-        onClose={() => {
-          setList(false);
-          setScan(null);
-        }}
-        label={scan ? "Scan details" : "All scans"}
-        scrollKey={scan?.id ?? "list"}
-      >
-        {scan ? (
-          <>
-            <button className={s.back} onClick={() => setScan(null)}>
-              <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden>
-                <path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-              All scans
-            </button>
-            <ScanDetail d={d} scan={scan} />
-          </>
-        ) : (
-          <ScanList d={d} onPick={setScan} />
-        )}
-      </Sheet>
     </div>
   );
 }
@@ -262,6 +229,38 @@ function buildChapters(d: Derived): Chapter[] {
       </div>
     ),
   });
+
+  const rh = rhythm(d);
+  if (rh.scans > 1) {
+    out.push({
+      id: "rhythm",
+      theme: "dark",
+      title: "You showed up",
+      body: (
+        <div className={s.rhythm}>
+          <In i={0}>
+            <p className="label">You showed up</p>
+          </In>
+          <In i={1} className={s.bigStat}>
+            <b>{rh.scans}</b>
+            <span>scans in {rh.days} days</span>
+          </In>
+          <In i={2}>
+            <RhythmStrip r={rh} tone="dark" />
+          </In>
+          <In i={3}>
+            <h2 className={s.h2}>{rh.title}</h2>
+            <p className={s.body}>{rh.body}</p>
+          </In>
+          <In i={4} className={s.badgeRow}>
+            {rh.milestones.map((m) => (
+              <Badge key={m.id} m={m} tone="dark" />
+            ))}
+          </In>
+        </div>
+      ),
+    });
+  }
 
   if (d.trend) {
     // Up: the three biggest gains. Down or flat: the three biggest movers, either way.
@@ -524,7 +523,7 @@ function LightsChapter({ d, scan }: { d: Derived; scan: Scan }) {
   );
 }
 
-function EndCard({ d, onAll, onReplay }: { d: Derived; onAll: () => void; onReplay: () => void }) {
+function EndCard({ d, onExplore, onReplay }: { d: Derived; onExplore: () => void; onReplay: () => void }) {
   return (
     <div className={s.end}>
       <In i={0}>
@@ -543,43 +542,13 @@ function EndCard({ d, onAll, onReplay }: { d: Derived; onAll: () => void; onRepl
         </p>
       </In>
       <In i={3} className={s.endActions}>
-        <button className={s.primary} onClick={onAll}>
-          {d.scans.length === 1 ? "See your scan" : `See all ${d.scans.length} scans`}
+        <button className={s.primary} onClick={onExplore}>
+          {d.scans.length === 1 ? "Explore your scan" : `Explore all ${d.scans.length} scans`}
         </button>
         <button className={s.secondary} onClick={onReplay}>
           Watch again
         </button>
       </In>
-    </div>
-  );
-}
-
-function ScanList({ d, onPick }: { d: Derived; onPick: (s: Scan) => void }) {
-  const rows = [...d.scans].reverse();
-  const listRef = useRef<HTMLUListElement>(null);
-  return (
-    <div className={s.list}>
-      <h2 className={s.listTitle}>All scans</h2>
-      <p className={s.listSub}>Newest first. Tap one to see everything behind it.</p>
-      <ul ref={listRef}>
-        {rows.map((scan) => (
-          <li key={scan.id}>
-            <button onClick={() => onPick(scan)}>
-              <span className={s.thumb}>
-                <ScanPhoto scan={scan} alt="" />
-              </span>
-              <span className={s.rowText}>
-                <b>{fmtDay(scan.takenAt, scanTz(scan) ?? d.tz)}</b>
-                <small>
-                  {scan.area}
-                  {scan.annotation?.note ? ` · “${scan.annotation.note}”` : ""}
-                </small>
-              </span>
-              <span className={s.rowScore}>{scan.scores.overall}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

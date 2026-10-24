@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { extend } from "./extended";
 import { derive, type Derived } from "./insights";
 import type { SkinReport } from "./types";
 
@@ -24,7 +25,7 @@ export function useReport(id: string, fail: boolean): ReportState {
         if (res.status === 404) return setState({ status: "error", kind: "missing", retry });
         if (!res.ok) return setState({ status: "error", kind: "failed", retry });
         const report = (await res.json()) as SkinReport;
-        const data = derive(report);
+        const data = derive(extend(report));
         setState(data ? { status: "ready", data } : { status: "empty", firstName: report.person.firstName });
       })
       .catch((err) => {

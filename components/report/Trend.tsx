@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { dayOf, fmtDay, scanTz, type Derived, type ScoreKey, type Span } from "@/lib/insights";
+import { dayOf, fmtDay, scanTz, score, type Derived, type ScoreKey, type Span } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 
 /**
@@ -35,7 +35,7 @@ export function Trend({
   const padX = 14;
 
   const pts = scans
-    .map((s) => ({ s, t: new Date(s.takenAt).getTime(), v: s.scores[metric as keyof Scan["scores"]] }))
+    .map((s) => ({ s, t: new Date(s.takenAt).getTime(), v: score(s, metric) }))
     .filter((p): p is { s: Scan; t: number; v: number } => p.v != null);
   if (pts.length < 2) return null;
 

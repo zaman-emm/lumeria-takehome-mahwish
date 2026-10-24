@@ -1,0 +1,187 @@
+/* MonthChart: one score over the period, with what was going on underneath. */
+
+.chart {
+  margin-top: 4px;
+}
+.areas {
+  display: flex;
+  gap: 6px;
+  margin: 0 -18px 10px;
+  padding: 0 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.areas button {
+  flex: none;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--sand-deep);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.areas button small {
+  font-size: 11px;
+  color: var(--bark-3);
+}
+.areas button[aria-checked="true"] {
+  background: var(--bark);
+  border-color: var(--bark);
+  color: var(--bone);
+}
+.areas button[aria-checked="true"] small {
+  color: rgba(244, 239, 230, 0.6);
+}
+.chips {
+  display: flex;
+  gap: 4px;
+  margin: 0 -18px;
+  padding: 0 18px 2px;
+  scroll-padding-inline: 18px;
+  position: relative;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chips::-webkit-scrollbar,
+.areas::-webkit-scrollbar {
+  display: none;
+}
+.chips button {
+  flex: none;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bark-2);
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.chips button[aria-checked="true"] {
+  background: var(--sand);
+  color: var(--bark);
+}
+.plot {
+  margin-top: 12px;
+  touch-action: pan-y;
+}
+.plot svg {
+  display: block;
+  overflow: visible;
+  cursor: crosshair;
+  outline: none;
+}
+.plot svg:focus-visible {
+  outline: 2px solid var(--bronze);
+  outline-offset: 4px;
+}
+.drawn {
+  animation: trendDraw 900ms var(--ease-in-out) both;
+}
+.bands {
+  margin-top: 6px;
+  display: grid;
+  gap: 4px;
+}
+.band {
+  position: relative;
+  height: 20px;
+}
+.band i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 6px;
+  background: var(--forest-soft);
+  color: var(--forest);
+  display: flex;
+  align-items: center;
+  padding: 0 7px;
+  font-style: normal;
+}
+.band[data-kind="travel"] i {
+  background: var(--clay-soft);
+  color: #8e3b27;
+}
+.band i[data-stopped="true"] {
+  background: var(--sand);
+  color: var(--bark-2);
+}
+.band i span,
+.bandOut {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.bandOut {
+  position: absolute;
+  top: 3px;
+  color: var(--bark-2);
+}
+.reading {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-m);
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  text-align: left;
+  display: grid;
+  gap: 6px;
+  transition: transform 160ms var(--ease-out);
+}
+.reading:active {
+  transform: scale(0.985);
+}
+.readTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark-2);
+}
+.readVal {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--bark);
+  font-variant-numeric: tabular-nums;
+}
+.readVal small {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark-3);
+}
+.readNote {
+  font-size: 14px;
+  line-height: 1.45;
+  min-height: 2.9em;
+}
+.readMore {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--forest);
+}
+.band .moment {
+  width: 10px;
+  height: 10px;
+  top: 5px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--bronze);
+}
+
+/* Sparkline: a quiet line, the latest point in forest. */
+.spark {
+  display: block;
+  flex: none;
+}
+.sub {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--bark-2);
+}

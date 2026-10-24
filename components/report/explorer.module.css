@@ -15,6 +15,31 @@
     radial-gradient(120% 70% at 50% 110%, var(--evergreen-2), transparent),
     var(--evergreen);
   overflow: hidden;
+  z-index: 45;
+  animation: rootIn 420ms var(--ease-drawer) both;
+}
+@keyframes rootIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+}
+.topActions {
+  display: flex;
+  gap: 8px;
+}
+.closeBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--glass-dark);
+  border: 1px solid var(--glass-dark-edge);
+  transition: transform 160ms var(--ease-out);
+}
+.closeBtn:active {
+  transform: scale(0.94);
 }
 .root :global(.label) {
   margin: 0;
@@ -45,7 +70,7 @@
   font-weight: 400;
   color: var(--ink-3);
 }
-.monthBtn {
+.detailsBtn {
   height: 36px;
   padding: 0 16px;
   border-radius: 999px;
@@ -57,7 +82,7 @@
   -webkit-backdrop-filter: blur(12px);
   transition: transform 160ms var(--ease-out);
 }
-.monthBtn:active {
+.detailsBtn:active {
   transform: scale(0.96);
 }
 
@@ -451,86 +476,6 @@
   opacity: 0.7;
 }
 
-/* ------------------------------------------------ month sheet */
-
-.sheet h2 {
-  margin: 8px 0 0;
-  font-size: 26px;
-  font-weight: 300;
-  line-height: 1.2;
-}
-.sheet :global(.label) {
-  margin: 0;
-  color: var(--bronze-soft);
-}
-.sheetBody {
-  margin: 12px 0 0;
-  font-size: 15px;
-  line-height: 1.55;
-  color: rgba(244, 239, 230, 0.75);
-}
-.sheetChart {
-  margin: 30px 0 22px;
-}
-.factors {
-  list-style: none;
-  margin: 10px 0 0;
-  padding: 0;
-}
-.factors li {
-  display: grid;
-  grid-template-columns: 28px 1fr;
-  gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid rgba(244, 239, 230, 0.1);
-}
-.factors li > span {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 13px;
-  font-weight: 600;
-  background: rgba(223, 230, 220, 0.14);
-  color: #b9d1bd;
-}
-.factors li[data-dir="held"] > span {
-  background: rgba(231, 165, 143, 0.16);
-  color: #e7a58f;
-}
-.factors b {
-  display: block;
-  font-size: 15px;
-  font-weight: 500;
-}
-.factors small {
-  display: block;
-  margin-top: 2px;
-  font-size: 12px;
-  color: rgba(244, 239, 230, 0.55);
-}
-.factors p {
-  margin: 6px 0 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: rgba(244, 239, 230, 0.75);
-}
-.sheetTip {
-  margin-top: 16px;
-  padding: 16px 18px;
-  border-radius: var(--radius-m);
-  background: var(--bone);
-  color: var(--evergreen);
-}
-.sheetTip :global(.label) {
-  color: var(--bronze-deep);
-}
-.sheetTip p:last-child {
-  margin: 6px 0 0;
-  font-size: 15px;
-  line-height: 1.5;
-}
 .dockArea {
   color: var(--ink-3);
   font-weight: 400;
