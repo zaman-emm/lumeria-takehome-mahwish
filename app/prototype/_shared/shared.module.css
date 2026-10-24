@@ -1,0 +1,420 @@
+/* ------------------------------------------------ states */
+
+.state {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 32px calc(48px + env(safe-area-inset-bottom));
+  gap: 10px;
+  background: var(--bone);
+  color: var(--bark);
+}
+.state[data-tone="dark"] {
+  background: radial-gradient(120% 80% at 50% 30%, var(--evergreen-2), var(--evergreen));
+  color: var(--bone);
+}
+.state :global(.label) {
+  color: var(--bronze-deep);
+  margin: 18px 0 0;
+}
+.state[data-tone="dark"] :global(.label) {
+  color: var(--bronze-soft);
+}
+.stateSub {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.6;
+}
+.stateTitle {
+  margin: 8px 0 0;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.stateBody {
+  margin: 0;
+  max-width: 290px;
+  font-size: 15px;
+  line-height: 1.55;
+  opacity: 0.75;
+  text-wrap: pretty;
+}
+.stateMark {
+  color: var(--bronze);
+}
+.stateButton {
+  margin-top: 18px;
+  min-height: 48px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 15px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  transition: transform 160ms var(--ease-out);
+}
+.stateButton:active {
+  transform: scale(0.97);
+}
+.state[data-tone="dark"] .stateButton {
+  background: var(--bone);
+  color: var(--evergreen);
+}
+
+/* Three rings breathing like a scope finding focus. */
+.lens {
+  position: relative;
+  width: 88px;
+  height: 88px;
+}
+.lens span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--bronze);
+  opacity: 0.5;
+  animation: breathe 1.8s var(--ease-in-out) infinite;
+}
+.lens span:nth-child(2) {
+  inset: 14px;
+  animation-delay: 120ms;
+  opacity: 0.7;
+}
+.lens span:nth-child(3) {
+  inset: 30px;
+  background: radial-gradient(circle at 40% 35%, var(--bronze-soft), var(--bronze));
+  border: 0;
+  animation-delay: 240ms;
+  opacity: 0.9;
+}
+.lens[data-still] span {
+  animation: none;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(0.94);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+
+/* ------------------------------------------------ photo fallback */
+
+.noPhoto {
+  display: grid;
+  place-items: center;
+  background:
+    repeating-linear-gradient(45deg, rgba(128, 96, 31, 0.07) 0 1px, transparent 1px 9px),
+    var(--sand);
+  color: var(--bark-2);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ------------------------------------------------ sheet */
+
+.sheetRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.sheetScrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 36, 26, 0.42);
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+.sheetRoot[data-shown="true"] .sheetScrim {
+  opacity: 1;
+}
+.sheet {
+  position: relative;
+  width: min(100%, var(--phone));
+  max-height: calc(100dvh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bone);
+  color: var(--bark);
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
+  box-shadow: 0 -12px 40px rgba(20, 36, 26, 0.18);
+  transform: translateY(100%);
+  transition: transform 220ms var(--ease-out);
+  outline: none;
+}
+.sheetRoot[data-shown="true"] .sheet {
+  transform: translateY(0);
+  transition: transform 420ms var(--ease-drawer);
+}
+.sheetRoot[data-tone="dark"] .sheet {
+  background: var(--evergreen-2);
+  color: var(--bone);
+}
+.sheetGrip {
+  position: relative;
+  flex: none;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  cursor: grab;
+}
+.sheetGrip > span {
+  width: 36px;
+  height: 4px;
+  border-radius: 4px;
+  background: currentColor;
+  opacity: 0.18;
+}
+.sheetClose {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(46, 38, 32, 0.06);
+  transition: transform 160ms var(--ease-out);
+}
+.sheetClose:active {
+  transform: scale(0.94);
+}
+.sheetRoot[data-tone="dark"] .sheetClose {
+  background: rgba(255, 255, 255, 0.08);
+}
+.sheetBody {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 20px calc(28px + env(safe-area-inset-bottom));
+}
+
+/* ------------------------------------------------ scan detail */
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.detailHead :global(.label) {
+  margin: 0;
+  color: var(--bronze-deep);
+}
+.detailHead h2 {
+  margin: 6px 0 0;
+  font-weight: 300;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.detailHead h2 span {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--bark-3);
+}
+.detailPhoto {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  background: var(--sand);
+}
+.detailPhoto > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lightSwitch {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--sand);
+  margin-top: -6px;
+}
+.lightSwitch button {
+  min-height: 36px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bark-2);
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.lightSwitch button[aria-checked="true"] {
+  background: var(--bone);
+  color: var(--bark);
+  box-shadow: 0 1px 2px rgba(46, 38, 32, 0.12);
+}
+.lightNote {
+  margin: -8px 4px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--bark-2);
+}
+.detailScore {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.detailScore strong {
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+}
+.detailScore p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+.detailScore span {
+  font-size: 13px;
+  color: var(--bark-3);
+  font-variant-numeric: tabular-nums;
+}
+.detailMetrics {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.detailMetrics li {
+  display: grid;
+  grid-template-columns: 92px 1fr 28px 34px;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.mName {
+  color: var(--bark-2);
+}
+.mBar {
+  height: 4px;
+  border-radius: 4px;
+  background: var(--sand);
+  overflow: hidden;
+}
+.mBar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--forest);
+  transform-origin: left;
+}
+.mVal {
+  text-align: right;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.mDelta {
+  text-align: right;
+  font-size: 12px;
+  color: var(--bark-3);
+  font-variant-numeric: tabular-nums;
+}
+.fine {
+  margin: -8px 0 0;
+  font-size: 12px;
+  color: var(--bark-3);
+}
+.detailBlock :global(.label) {
+  margin: 0 0 8px;
+  color: var(--bark-3);
+}
+.obs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.tip {
+  padding: 16px 18px;
+  border-radius: var(--radius-m);
+  background: var(--forest);
+  color: var(--bone);
+}
+.tip :global(.label) {
+  margin: 0 0 6px;
+  color: var(--bronze-soft);
+}
+.tip p:last-child {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.quote {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.45;
+  font-weight: 300;
+  font-style: italic;
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.tags span {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--sand);
+  font-size: 12px;
+  font-weight: 500;
+}
+.context {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.context div {
+  background: rgba(232, 223, 206, 0.55);
+  border-radius: var(--radius-s);
+  padding: 10px 12px;
+}
+.context dt {
+  font-size: 11px;
+  color: var(--bark-3);
+}
+.context dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+.routine {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.routine span {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--bark-3);
+}

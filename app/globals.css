@@ -1,0 +1,123 @@
+/* Lumeria tokens. Every variant reads from these; nothing hard-codes a brand hex. */
+:root {
+  --bone: #f4efe6;
+  --sand: #e8dfce;
+  --sand-deep: #d9ccb4;
+  --bronze: #c0913f;
+  --bronze-deep: #80601f;
+  --bronze-soft: #e6cf9f;
+  --forest: #2f4a35;
+  --forest-soft: #dfe6dc;
+  --evergreen: #14241a;
+  --evergreen-2: #1d3325;
+  --bark: #2e2620;
+  --bark-2: #5e5248;
+  --bark-3: #8a7d70;
+  --clay: #b8533a;
+  --clay-soft: #f1ddd3;
+
+  --glass: rgba(255, 252, 246, 0.62);
+  --glass-edge: rgba(255, 255, 255, 0.7);
+  --glass-dark: rgba(255, 255, 255, 0.06);
+  --glass-dark-edge: rgba(255, 255, 255, 0.1);
+
+  --radius-s: 12px;
+  --radius-m: 20px;
+  --radius-l: 28px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --font-sans: var(--font-montserrat), "Montserrat", system-ui, sans-serif;
+  --phone: 430px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--sand);
+  color: var(--bark);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--bronze);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Small caps label, the brand's signature. */
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* Shared chart motion: a line that draws once, then its wash and dots settle. */
+@keyframes trendDraw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes trendFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
