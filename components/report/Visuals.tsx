@@ -280,8 +280,9 @@ export function FaceMap({ marks, area }: { marks: FaceMark[]; area: string }) {
  */
 const TAB_ART: Record<string, { fill: string; line: string }> = {
   glance: {
-    fill: "M12 3.5c3.9 0 6.5 3 6.5 7.3 0 4.6-2.9 9.7-6.5 9.7s-6.5-5.1-6.5-9.7C5.5 6.5 8.1 3.5 12 3.5z",
-    line: "M12 3.5c3.9 0 6.5 3 6.5 7.3 0 4.6-2.9 9.7-6.5 9.7s-6.5-5.1-6.5-9.7C5.5 6.5 8.1 3.5 12 3.5zM9.6 10.2v.8M14.4 10.2v.8M9.6 14.6c1.3 1.1 3.5 1.1 4.8 0M20 1.8l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z",
+    // A small score ring, like the ones the tab opens on.
+    fill: "M12 2A10 10 0 1 1 2 12H6A6 6 0 1 0 12 6z",
+    line: "M12 2a10 10 0 100 20 10 10 0 000-20zM12 6a6 6 0 100 12 6 6 0 000-12zM2 12h4M12 2v4",
   },
   trends: {
     fill: "M3.5 19.5v-5l4.5-4 4 3 8.5-7v13z",
