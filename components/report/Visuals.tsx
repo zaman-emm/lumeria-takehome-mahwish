@@ -273,3 +273,36 @@ export function FaceMap({ marks, area }: { marks: FaceMark[]; area: string }) {
     </figure>
   );
 }
+
+/**
+ * The tab icons: bigger, illustrated, and two-tone. A line drawing at rest;
+ * the picked tab fills its shape in bronze, like a lit-up shelf label.
+ */
+const TAB_ART: Record<string, { fill: string; line: string }> = {
+  glance: {
+    fill: "M12 3.5c3.9 0 6.5 3 6.5 7.3 0 4.6-2.9 9.7-6.5 9.7s-6.5-5.1-6.5-9.7C5.5 6.5 8.1 3.5 12 3.5z",
+    line: "M12 3.5c3.9 0 6.5 3 6.5 7.3 0 4.6-2.9 9.7-6.5 9.7s-6.5-5.1-6.5-9.7C5.5 6.5 8.1 3.5 12 3.5zM9.6 10.2v.8M14.4 10.2v.8M9.6 14.6c1.3 1.1 3.5 1.1 4.8 0M20 1.8l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z",
+  },
+  trends: {
+    fill: "M3.5 19.5v-5l4.5-4 4 3 8.5-7v13z",
+    line: "M5 4.5h14a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 18V6A1.5 1.5 0 015 4.5zM3.5 14.5l4.5-4 4 3 8.5-7",
+  },
+  calendar: {
+    fill: "M5 5.5h14a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 19V7A1.5 1.5 0 015 5.5z",
+    line: "M5 5.5h14a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 19V7A1.5 1.5 0 015 5.5zM3.5 10h17M8 3v4.5M16 3v4.5M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01",
+  },
+  photos: {
+    fill: "M5 6.5h10a1.5 1.5 0 011.5 1.5v11a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 19V8A1.5 1.5 0 015 6.5z",
+    line: "M7 3.5h12a1.5 1.5 0 011.5 1.5v11M5 6.5h10a1.5 1.5 0 011.5 1.5v11a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 19V8A1.5 1.5 0 015 6.5zM3.5 19.5l4-4.8 3 2.8 2.2-2 3.8 4M8.3 10a1.3 1.3 0 100 2.6 1.3 1.3 0 000-2.6z",
+  },
+};
+
+export function TabIcon({ name, on }: { name: keyof typeof TAB_ART; on: boolean }) {
+  const art = TAB_ART[name];
+  return (
+    <svg className={v.tabIcon} data-on={on} viewBox="0 0 24 24" width={28} height={28} aria-hidden>
+      <path d={art.fill} className={v.tabFill} />
+      <path d={art.line} className={v.tabLine} />
+    </svg>
+  );
+}

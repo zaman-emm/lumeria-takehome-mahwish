@@ -14,7 +14,7 @@ import { ScanDetail } from "./ScanDetail";
 import { ScanPhoto } from "./ScanPhoto";
 import { Sheet } from "./Sheet";
 import { TrendsTab } from "./TrendsTab";
-import { Icon } from "./Visuals";
+import { Icon, TabIcon } from "./Visuals";
 import r from "./report.module.css";
 
 // The report home. A dark hero answers "how is my skin today?" on the first
@@ -32,10 +32,10 @@ export interface ReportActions {
 }
 
 const TABS = [
-  { id: "glance", label: "At a glance", icon: "glance" },
-  { id: "trends", label: "Trends", icon: "trend" },
-  { id: "calendar", label: "Calendar", icon: "calendar" },
-  { id: "photos", label: "Photos", icon: "camera" },
+  { id: "glance", label: "At a glance" },
+  { id: "trends", label: "Trends" },
+  { id: "calendar", label: "Calendar" },
+  { id: "photos", label: "Photos" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 
@@ -224,7 +224,7 @@ export function Report({ d }: { d: Derived }) {
               aria-controls={`panel-${t.id}`}
               onClick={() => setTab(t.id)}
             >
-              <Icon name={t.icon} size={20} />
+              <TabIcon name={t.id} on={t.id === tab} />
               {t.label}
             </button>
           ))}

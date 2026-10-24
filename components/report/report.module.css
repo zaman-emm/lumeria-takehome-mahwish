@@ -236,7 +236,7 @@
   bottom: -1px;
   left: 0;
   width: 25%;
-  height: 2px;
+  height: 3px;
   display: flex;
   justify-content: center;
   transform: translateX(calc(var(--i) * 100%));
@@ -244,14 +244,14 @@
 }
 .tabLine::after {
   content: "";
-  width: 56px;
-  border-radius: 2px;
+  width: 64px;
+  border-radius: 3px 3px 0 0;
   background: var(--bark);
 }
 .tabList button {
   position: relative;
-  min-height: 56px;
-  padding: 4px 0 8px;
+  min-height: 64px;
+  padding: 6px 0 10px;
   display: grid;
   justify-items: center;
   align-content: center;
@@ -265,9 +265,6 @@
 .tabList button[aria-selected="true"] {
   color: var(--bark);
   font-weight: 700;
-}
-.tabList button[aria-selected="true"] svg path {
-  stroke-width: 1.8;
 }
 
 /* ------------------------------------------------ panel & cards */
