@@ -40,6 +40,59 @@
   overflow-x: auto;
   scrollbar-width: none;
 }
+.rings {
+  display: flex;
+  gap: 2px;
+  margin: 0 -18px;
+  padding: 4px 18px 2px;
+  scroll-padding-inline: 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rings::-webkit-scrollbar {
+  display: none;
+}
+.rings button {
+  flex: none;
+  width: 70px;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+}
+.rings button[aria-checked="true"] {
+  color: var(--bark);
+  font-weight: 600;
+}
+.ringWrap {
+  position: relative;
+  padding: 3px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: border-color 160ms ease;
+}
+.rings button[aria-checked="true"] .ringWrap {
+  border-color: var(--forest);
+}
+.moved {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--forest);
+  color: var(--bone);
+  outline: 2px solid var(--paper);
+}
+.moved[data-dir="down"] {
+  background: var(--clay);
+}
 .chips::-webkit-scrollbar,
 .areas::-webkit-scrollbar {
   display: none;

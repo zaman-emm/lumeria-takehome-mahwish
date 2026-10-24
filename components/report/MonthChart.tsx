@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { EXTRAS, METRICS, OVERALL, dayOf, fmtDay, fmtTime, metricMeta, scanTz, score, signed, type Derived, type ScoreKey } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
+import { Gauge, Icon } from "./Visuals";
 import s from "./monthChart.module.css";
 
 // The period as one line: pick a score, scrub along it, and every point opens
@@ -68,7 +69,7 @@ export function MonthChart({
 
   useEffect(() => setActive(scans.length - 1), [scans.length, area]);
 
-  // Keep the picked score's chip in view, e.g. when the chart opens on "Spots".
+  // Keep the picked score's ring in view, e.g. when the chart opens on "Spots".
   const chipsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const row = chipsRef.current;
@@ -124,12 +125,32 @@ export function MonthChart({
           ))}
         </div>
       )}
-      <div className={s.chips} ref={chipsRef} role="radiogroup" aria-label="Score">
-        {metrics.map((m) => (
-          <button key={m.key} role="radio" aria-checked={m.key === metric} onClick={() => setMetric(m.key)}>
-            {m.label}
-          </button>
-        ))}
+      <div className={s.rings} ref={chipsRef} role="radiogroup" aria-label="Score">
+        {metrics.map((m) => {
+          // Each score as a ring: where it is now on this spot, and an arrow when it moved 10 or more.
+          const own = d.scans.filter((x) => x.area === area && score(x, m.key) != null);
+          const now = own.length ? (score(own[own.length - 1], m.key) as number) : null;
+          const moved = own.length > 1 && now != null ? now - (score(own[0], m.key) as number) : 0;
+          return (
+            <button
+              key={m.key}
+              role="radio"
+              aria-checked={m.key === metric}
+              onClick={() => setMetric(m.key)}
+              aria-label={`${m.label} ${now ?? "not read"}${Math.abs(moved) >= 10 ? `, ${signed(moved)}` : ""}`}
+            >
+              <span className={s.ringWrap}>
+                <Gauge value={now} size={48} />
+                {Math.abs(moved) >= 10 && (
+                  <i className={s.moved} data-dir={moved > 0 ? "up" : "down"}>
+                    <Icon name={moved > 0 ? "up" : "down"} size={10} />
+                  </i>
+                )}
+              </span>
+              {m.label}
+            </button>
+          );
+        })}
       </div>
 
       {pts.length < 2 ? (
