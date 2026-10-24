@@ -573,6 +573,44 @@ export function faceMarks(observations: string[]): FaceMark[] {
   return out.slice(0, 3);
 }
 
+export interface LumiQuestion {
+  id: string;
+  /** The pattern Lumi noticed, as evidence: a score from → to and when. */
+  seen: { key: ScoreKey; from: number; to: number; when: string };
+  ask: string;
+  answers: [string, string];
+}
+
+/**
+ * Lumi asks about patterns rather than explaining them: one question per
+ * clue, so the person's answer can sharpen the next read. Never diagnoses.
+ */
+export function lumiQuestions(d: Derived): LumiQuestion[] {
+  const qs = d.factors.slice(0, 4).map((f): LumiQuestion => {
+    const seen = { key: f.change.key, from: f.change.from, to: f.change.to, when: f.when };
+    if (f.kind === "travel")
+      return { id: f.id, seen, ask: "Do dry places usually leave your skin like this?", answers: ["Yes, usually", "Not that I’ve noticed"] };
+    if (f.kind === "sleep") return { id: f.id, seen, ask: "Have your nights been shorter lately?", answers: ["Yes", "Not really"] };
+    const name = f.title.replace(/\s[\d.]+%.*$/, "");
+    if (f.direction === "helped")
+      return { id: f.id, seen, ask: `Has your skin felt different since you started ${name}?`, answers: ["Yes, it has", "Not yet"] };
+    if (/^Since/.test(f.when) || f.when === "All month")
+      return { id: f.id, seen, ask: `Is ${name} still part of your routine?`, answers: ["Yes", "I stopped"] };
+    return { id: f.id, seen, ask: `Did your skin settle after you stopped ${name}?`, answers: ["Yes, it did", "Not really"] };
+  });
+  if (!qs.length) {
+    const c = d.changes.find((x) => Math.abs(x.delta) >= 3);
+    if (c)
+      qs.push({
+        id: "change",
+        seen: { key: c.key, from: c.from, to: c.to, when: d.trend ? `Since ${fmtDay(d.trend.from.takenAt, d.tz)}` : "" },
+        ask: "Did anything change in your routine around then?",
+        answers: ["Yes", "Nothing new"],
+      });
+  }
+  return qs;
+}
+
 export const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : "±0");
 
 /** One kind sentence answering "is it getting better?" */

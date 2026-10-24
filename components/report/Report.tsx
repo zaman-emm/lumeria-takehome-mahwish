@@ -6,6 +6,7 @@ import type { Scan } from "@/lib/types";
 import { CalendarTab } from "./CalendarTab";
 import { Explorer } from "./Explorer";
 import { Glance } from "./Glance";
+import { Lumi } from "./Lumi";
 import { MetricView } from "./MetricView";
 import { PhotosTab } from "./PhotosTab";
 import { Recap } from "./Recap";
@@ -31,15 +32,15 @@ export interface ReportActions {
 }
 
 const TABS = [
-  { id: "glance", label: "At a glance" },
-  { id: "trends", label: "Trends" },
-  { id: "calendar", label: "Calendar" },
-  { id: "photos", label: "Photos" },
+  { id: "glance", label: "At a glance", icon: "glance" },
+  { id: "trends", label: "Trends", icon: "trend" },
+  { id: "calendar", label: "Calendar", icon: "calendar" },
+  { id: "photos", label: "Photos", icon: "camera" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 
 type Overlay = { kind: "recap" } | { kind: "explore"; scanId?: string } | null;
-type SheetState = { kind: "scan"; scan: Scan } | { kind: "metric"; key: ScoreKey } | null;
+type SheetState = { kind: "scan"; scan: Scan } | { kind: "metric"; key: ScoreKey } | { kind: "lumi" } | null;
 
 /** The first line. Only claims "best" when the latest scan is the highest of its spot. */
 function headline(d: Derived) {
@@ -213,7 +214,7 @@ export function Report({ d }: { d: Derived }) {
 
       <div className={r.tabs} ref={tabsRef}>
         <div className={r.tabList} role="tablist" aria-label="Report sections" style={{ "--i": idx } as CSSProperties}>
-          <i className={r.tabPill} aria-hidden />
+          <i className={r.tabLine} aria-hidden />
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -223,6 +224,7 @@ export function Report({ d }: { d: Derived }) {
               aria-controls={`panel-${t.id}`}
               onClick={() => setTab(t.id)}
             >
+              <Icon name={t.icon} size={20} />
               {t.label}
             </button>
           ))}
@@ -253,14 +255,23 @@ export function Report({ d }: { d: Derived }) {
         </p>
       </footer>
 
+      {!overlay && (
+        <button className={r.lumiBtn} data-hidden={!!sheet} onClick={() => setSheet({ kind: "lumi" })} aria-label="Ask Lumi">
+          <Icon name="spark" size={22} />
+        </button>
+      )}
+
       <Sheet
         open={!!sheet}
         onClose={() => setSheet(null)}
-        label={sheet?.kind === "metric" ? `${metricMeta(sheet.key).label} trend` : "Scan details"}
-        scrollKey={sheet ? (sheet.kind === "scan" ? sheet.scan.id : sheet.key) : undefined}
+        label={
+          sheet?.kind === "metric" ? `${metricMeta(sheet.key).label} trend` : sheet?.kind === "lumi" ? "Lumi" : "Scan details"
+        }
+        scrollKey={sheet ? (sheet.kind === "scan" ? sheet.scan.id : sheet.kind === "metric" ? sheet.key : "lumi") : undefined}
       >
         {sheet?.kind === "scan" && <ScanDetail d={d} scan={sheet.scan} />}
         {sheet?.kind === "metric" && <MetricView d={d} metric={sheet.key} onOpen={(scan) => setSheet({ kind: "scan", scan })} />}
+        {sheet?.kind === "lumi" && <Lumi d={d} />}
       </Sheet>
 
       {overlay?.kind === "recap" && <Recap d={d} onClose={closeOverlay} onExplore={() => show({ kind: "explore" })} />}
