@@ -43,7 +43,7 @@ type Overlay = { kind: "recap" } | { kind: "explore"; scanId?: string } | null;
 type SheetState = { kind: "scan"; scan: Scan } | { kind: "metric"; key: ScoreKey } | { kind: "lumi" } | null;
 
 /** The first line. Only claims "best" when the latest scan is the highest of its spot. */
-function headline(d: Derived) {
+export function headline(d: Derived) {
   if (!d.trend) return "Your first read";
   if (d.trend.delta >= 3 && d.isBest) return d.isMonthly ? "Your best skin this month" : "Your best skin yet";
   return d.isMonthly ? "Your month in skin" : "Your skin so far";

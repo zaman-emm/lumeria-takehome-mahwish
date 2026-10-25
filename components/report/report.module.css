@@ -1503,3 +1503,21 @@
   font-size: 14px;
   color: var(--forest);
 }
+
+/* ------------------------------------------------ Oura-style variant */
+
+/* Over photos the light ink has to stay light when the tokens go dark. */
+:global([data-look="oura"]) .cmpArea,
+:global([data-look="oura"]) .cmpLabel {
+  color: #f6f4ef;
+}
+:global([data-look="oura"]) .handle,
+:global([data-look="oura"]) .handle i {
+  background: #f6f4ef;
+}
+:global([data-look="oura"]) .handle i::before {
+  border-right-color: #0f1012;
+}
+:global([data-look="oura"]) .handle i::after {
+  border-left-color: #0f1012;
+}
