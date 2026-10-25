@@ -1,0 +1,131 @@
+/* The report shell: a phone-width column, the sheet indent, the footer and
+   Lumi's button. View-transition rules for the tab morph live here too. */
+
+.root {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--evergreen);
+}
+
+.indentBg {
+  position: fixed;
+  inset: 0;
+  background: var(--evergreen);
+}
+
+/* The page scales back while a sheet is up, from the top of the screen. */
+.indent {
+  position: relative;
+  background: var(--sand);
+  transform-origin: 50% var(--origin, 0px);
+  transition:
+    transform 450ms var(--ease-drawer),
+    border-radius 300ms var(--ease-drawer);
+}
+
+.indent[data-active] {
+  transform: scale(calc(0.94 + 0.06 * var(--drawer-swipe-progress)));
+  border-radius: calc(16px * (1 - var(--drawer-swipe-progress)));
+  overflow: hidden;
+}
+
+.page {
+  position: relative;
+  width: 100%;
+  max-width: var(--phone);
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--white);
+  color: var(--bark);
+  padding-bottom: 104px;
+}
+
+/* The slim header stays put while its tab scrolls; tabs stick under it. */
+.page:not([data-tab="glance"]) > header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+}
+
+.page:not([data-tab="glance"]) {
+  --tabs-top: 72px;
+}
+
+.panel {
+  padding: 0 16px;
+  view-transition-name: skin-panel;
+}
+
+.foot {
+  padding: 24px 16px 0;
+}
+
+.cues {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cues li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: var(--sand);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--bark);
+}
+
+.disclaimer {
+  margin: 24px 8px 0;
+  font-size: 13px;
+  line-height: 20.2px;
+  color: var(--bark-2);
+  text-align: center;
+}
+
+.lumi {
+  position: fixed;
+  z-index: 30;
+  right: max(16px, calc((100vw - var(--phone)) / 2 + 16px));
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--gold);
+  box-shadow:
+    inset 0 0 0 1px var(--bark),
+    0 8px 24px rgba(20, 36, 26, 0.28);
+  transition:
+    transform 200ms var(--ease-out),
+    opacity 200ms var(--ease-out);
+}
+
+.lumi:active {
+  transform: scale(0.94);
+}
+
+.lumi[data-hidden="true"] {
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indent[data-active] {
+    transform: none;
+    border-radius: 0;
+  }
+  .lumi[data-hidden="true"] {
+    transform: none;
+  }
+}

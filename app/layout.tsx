@@ -4,7 +4,7 @@ import "./globals.css";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   style: ["normal", "italic"],
   variable: "--font-montserrat",
   display: "swap",
@@ -19,7 +19,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f4efe6",
+  themeColor: "#e6cf9f",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

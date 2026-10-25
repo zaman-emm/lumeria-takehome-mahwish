@@ -16,11 +16,12 @@ const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
 
 function extrasFor(s: Scan): ScanExtras {
   const { hydration, evenness, pigmentation, oiliness } = s.scores;
-  const hasPhoto = Boolean(s.photoUrl);
+  // Pores and spots need the real three-light photos, not a placeholder.
+  const hasPhoto = Boolean(s.photos);
   return {
     // Derived, not measured: shown with that label wherever it appears.
     radiance: Math.round((hydration + evenness) / 2),
-    // Stand-ins for a photo-analysis model. No photo, nothing to analyse.
+    // Stand-ins for a photo-analysis model. No real photo, nothing to analyse.
     pores: hasPhoto ? clamp(0.6 * (oiliness ?? evenness) + 0.4 * evenness - 4 + wobble(s.id, 2)) : null,
     spots: hasPhoto ? clamp(0.8 * pigmentation + 14 + wobble(s.id, 3)) : null,
   };

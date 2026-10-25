@@ -1,0 +1,361 @@
+/* The gold hero (At a glance) and the slim header the other tabs open on. */
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 24px 24px;
+  background:
+    radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
+    radial-gradient(150px 150px at 50% 345px, rgba(244, 239, 230, 0.55), transparent 100%),
+    var(--sunrise);
+  border-radius: 0 0 28px 28px;
+  color: var(--evergreen);
+  view-transition-name: skin-head;
+  overflow: hidden;
+}
+
+.logo {
+  width: 220px;
+  height: 41px;
+  color: var(--evergreen);
+}
+
+.hi {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--bark);
+}
+
+.title {
+  margin: 24px 0 0;
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 300;
+  letter-spacing: -0.6px;
+  text-align: center;
+}
+
+/* ------------------------------------------------ gauge */
+
+.gauge {
+  position: relative;
+  width: 100%;
+  max-width: 342px;
+  aspect-ratio: 342 / 240;
+  margin-top: 24px;
+}
+
+.gauge svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ray {
+  stroke: #80601f;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.ray[data-lit="true"] {
+  stroke-width: 3;
+}
+
+.track {
+  fill: none;
+  stroke: rgba(244, 239, 230, 0.5);
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+.arc {
+  fill: none;
+  stroke: url(#hero-arc);
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+.knob {
+  transform-box: view-box;
+  transform-origin: 171px 185px;
+  transform: rotate(var(--rot));
+}
+
+.knob circle {
+  fill: var(--bone);
+  stroke: var(--forest);
+  stroke-width: 4;
+  filter: drop-shadow(0 2px 4px rgba(20, 36, 26, 0.3));
+}
+
+.score {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 47%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.value {
+  display: block;
+  font-size: 104px;
+  line-height: 0.9;
+  font-weight: 300;
+  letter-spacing: -4.16px;
+  color: var(--evergreen);
+  font-variant-numeric: tabular-nums;
+  /* A touch of left room so the negative tracking stays centred. */
+  padding-left: 4px;
+}
+
+.label {
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--forest);
+}
+
+/* ------------------------------------------------ status card */
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 342px;
+  min-height: 113px;
+  margin-top: 12px;
+  padding: 16px 16px 16px 16px;
+  border-radius: 20px;
+  background: rgba(244, 239, 230, 0.38);
+  border: 1px solid rgba(244, 239, 230, 0.9);
+  box-shadow: 0 6px 18px rgba(128, 96, 31, 0.18);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--evergreen-2);
+  color: var(--bronze-soft);
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 500;
+}
+
+.change {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--evergreen);
+}
+
+.since {
+  font-size: 12px;
+  color: rgba(46, 38, 32, 0.8);
+}
+
+.scan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--bark);
+  transition: transform 160ms var(--ease-out);
+}
+
+.scan:active {
+  transform: scale(0.97);
+}
+
+.scanPhoto {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--bone);
+  box-shadow: 0 4px 12px rgba(128, 96, 31, 0.35);
+}
+
+/* ------------------------------------------------ first-load sequence */
+
+.hero[data-play="true"] .ray {
+  animation: rayIn 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 28ms);
+}
+
+.hero[data-play="true"] .arc {
+  animation: arcDraw 700ms var(--ease-out) 120ms both;
+}
+
+.hero[data-play="true"] .knob {
+  animation: knobRide 700ms var(--ease-out) 120ms both;
+}
+
+.hero[data-play="true"] .card {
+  animation: rise 500ms var(--ease-out) 520ms both;
+}
+
+.hero[data-play="true"] .label {
+  animation: fade 400ms var(--ease-out) 300ms both;
+}
+
+@keyframes rayIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes arcDraw {
+  from {
+    stroke-dashoffset: var(--v);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes knobRide {
+  from {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: the gauge is simply there; the card fades in softly. */
+.hero[data-reduce="true"] .card,
+.hero[data-reduce="true"] .gauge {
+  animation: fade 400ms ease both;
+}
+
+/* ------------------------------------------------ slim header */
+
+.slim {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 72px;
+  padding: 0 16px;
+  background:
+    radial-gradient(60px 45px at 50px 35px, rgba(244, 239, 230, 0.5), transparent 100%),
+    var(--sunrise-x);
+  border-radius: 0 0 20px 20px;
+  color: var(--evergreen);
+  view-transition-name: skin-head;
+}
+
+.slimLens {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  padding: 2px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--bronze);
+  flex: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.slimLens:active {
+  transform: scale(0.96);
+}
+
+.slimLens img,
+.slimLens > span {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--bone);
+}
+
+.slimScore {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.slimScore b {
+  font-size: 22px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.slimScore span {
+  font-size: 14px;
+}
+
+.slimScore em {
+  margin-left: 4px;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 14px;
+  background: rgba(244, 239, 230, 0.45);
+  border: 1px solid rgba(251, 248, 242, 0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bark);
+}
+
+.play {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--gold);
+  flex: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.play:active {
+  transform: scale(0.94);
+}

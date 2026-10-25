@@ -118,7 +118,7 @@ export function fmtRange(startDay: string, endDay: string) {
 
 export const daysBetween = (a: string, b: string) => Math.round((dayToDate(b).getTime() - dayToDate(a).getTime()) / DAY_MS);
 
-const addDays = (day: string, n: number) => new Date(dayToDate(day).getTime() + n * DAY_MS).toISOString().slice(0, 10);
+export const addDays = (day: string, n: number) => new Date(dayToDate(day).getTime() + n * DAY_MS).toISOString().slice(0, 10);
 
 // ---------------------------------------------------------------- model
 

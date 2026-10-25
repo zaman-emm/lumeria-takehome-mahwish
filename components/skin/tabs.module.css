@@ -1,0 +1,92 @@
+/* Chip tabs, sticky under the header, with the active colour clipped from a
+   duplicate row (see Tabs.tsx). */
+
+.bar {
+  position: sticky;
+  top: var(--tabs-top, 0px);
+  z-index: 5;
+  padding: 15px 0 16px;
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  backdrop-filter: saturate(1.4) blur(12px);
+  view-transition-name: skin-tabs;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  display: grid;
+  place-items: center;
+  flex: none;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: var(--sand);
+  color: var(--bark);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: transform 160ms var(--ease-out);
+}
+
+/* Reserve the bold width so both rows line up exactly. */
+.chip > span,
+.chip::after {
+  grid-area: 1 / 1;
+}
+
+.chip::after {
+  content: attr(data-label);
+  font-weight: 600;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+button.chip:active {
+  transform: scale(0.97);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+.active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.active[data-ready="true"] {
+  transition: clip-path 240ms var(--ease-in-out);
+}
+
+.active .chip {
+  background: var(--forest);
+  color: var(--bone);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .active[data-ready="true"] {
+    transition-duration: 0ms;
+  }
+}

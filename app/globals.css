@@ -16,6 +16,15 @@
   --clay: #b8533a;
   --clay-soft: #f1ddd3;
   --paper: #fbf8f2;
+  --sand-2: #ece4d6;
+  /* 2e: gold hero and forest accents on white. Gold is the logo's own. */
+  --gold: #d7b46f;
+  --gold-deep: #ad8235;
+  --green: #4d7a58;
+  --clay-ink: #7d3524;
+  --white: #ffffff;
+  --sunrise: linear-gradient(180deg, #e6cf9f 0%, #d7b46f 45%, #c0913f 100%);
+  --sunrise-x: linear-gradient(90deg, #e6cf9f 0%, #d7b46f 55%, #c0913f 100%);
 
   --glass: rgba(255, 252, 246, 0.62);
   --glass-edge: rgba(255, 255, 255, 0.7);
@@ -95,10 +104,12 @@ img {
   border: 0;
 }
 
+/* The older views get a blanket cut. The 2e report ([data-skin]) handles reduced
+   motion per component: gentler fades instead of no feedback at all. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  :not([data-skin], [data-skin] *),
+  :not([data-skin], [data-skin] *)::before,
+  :not([data-skin], [data-skin] *)::after {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
     transition-duration: 1ms !important;
@@ -120,5 +131,98 @@ img {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* ------------------------------------------------ 2e report view transitions (components/skin)
+   Header and score morph between the hero and the slim header; the panel
+   slides in from the side of the tab that was picked; the tab row is live
+   (its own clip animation shows through) and only moves. */
+
+::view-transition-group(*) {
+  animation-duration: 340ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+}
+
+::view-transition-old(skin-tabs) {
+  display: none;
+}
+
+::view-transition-new(skin-tabs) {
+  animation: none;
+}
+
+::view-transition-old(skin-score),
+::view-transition-new(skin-score),
+::view-transition-old(skin-photo),
+::view-transition-new(skin-photo) {
+  height: 100%;
+  object-fit: contain;
+}
+
+::view-transition-old(skin-head),
+::view-transition-new(skin-head) {
+  height: 100%;
+  width: 100%;
+  object-fit: none;
+  object-position: top;
+}
+
+html[data-vt="forward"]::view-transition-old(skin-panel) {
+  animation: 240ms var(--ease-out) both panelOutLeft;
+}
+html[data-vt="forward"]::view-transition-new(skin-panel) {
+  animation: 340ms var(--ease-drawer) both panelInRight;
+}
+html[data-vt="back"]::view-transition-old(skin-panel) {
+  animation: 240ms var(--ease-out) both panelOutRight;
+}
+html[data-vt="back"]::view-transition-new(skin-panel) {
+  animation: 340ms var(--ease-drawer) both panelInLeft;
+}
+
+@keyframes panelOutLeft {
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+@keyframes panelInRight {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+@keyframes panelOutRight {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes panelInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*) {
+    animation-duration: 0ms;
+  }
+  html[data-vt]::view-transition-old(skin-panel),
+  html[data-vt]::view-transition-new(skin-panel) {
+    animation: 180ms ease both vtFade;
+  }
+}
+
+@keyframes vtFade {
+  from {
+    opacity: 0;
   }
 }

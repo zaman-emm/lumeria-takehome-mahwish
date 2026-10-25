@@ -1,0 +1,328 @@
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+.card {
+  padding: 16px 12px 16px;
+  border-radius: 20px;
+  background: var(--paper);
+}
+
+.month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.month h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.month button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--bark);
+  transition: transform 160ms var(--ease-out);
+}
+
+.month button:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.month button:disabled {
+  color: rgba(46, 38, 32, 0.25);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 6px;
+  margin-top: 6px;
+}
+
+.weekday {
+  height: 24px;
+  font-size: 12px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--bark-2);
+  text-align: center;
+}
+
+.day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 45px;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.day > span {
+  position: relative;
+  z-index: 1;
+}
+
+.day[data-out="true"] {
+  color: rgba(46, 38, 32, 0.25);
+}
+
+.day[data-scan]::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 35px;
+  height: 35px;
+  margin: -17.5px 0 0 -17.5px;
+  border-radius: 50%;
+  background: var(--fill);
+  transition: transform 160ms var(--ease-out);
+}
+
+.day[data-scan] {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.day[data-scan]:active::before {
+  transform: scale(0.92);
+}
+
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 45px;
+  height: 45px;
+  margin: -22.5px 0 0 -22.5px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--bark);
+}
+
+.away {
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 16px;
+  height: 3px;
+  margin-left: -8px;
+  border-radius: 2px;
+  background: var(--clay);
+}
+
+.period {
+  position: absolute;
+  z-index: 2;
+  top: 4px;
+  right: calc(50% - 19px);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 1.5px var(--bone);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 4px;
+  margin-top: 14px;
+  padding: 0 4px;
+  font-size: 11px;
+  color: var(--bark-2);
+}
+
+.legend > i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.legend > span:first-child {
+  margin-right: 2px;
+}
+
+.legend > span:nth-of-type(2) {
+  margin-left: 2px;
+}
+
+.key {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 12px;
+}
+
+.keyDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.keyBar {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--clay);
+}
+
+/* ------------------------------------------------ stats */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-height: 77px;
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--paper);
+  text-align: left;
+  box-shadow: inset 0 0 0 2px transparent;
+  transition:
+    box-shadow 200ms ease,
+    transform 160ms var(--ease-out);
+}
+
+button.stat:active {
+  transform: scale(0.97);
+}
+
+.stat[data-on="true"] {
+  box-shadow: inset 0 0 0 2px var(--bark);
+}
+
+.stat b {
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat span {
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ day card */
+
+.dayCard {
+  padding: 16px 12px 16px;
+  border-radius: 20px;
+  background: var(--paper);
+  animation: dayIn 240ms var(--ease-out) both;
+}
+
+.dayCard h2 {
+  margin: 0 4px 6px;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+@keyframes dayIn {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 4px;
+  border-radius: 14px;
+  text-align: left;
+  transition: transform 160ms var(--ease-out);
+}
+
+.row:active {
+  transform: scale(0.98);
+}
+
+.rowPhoto {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.rowText span:first-child {
+  font-size: 15px;
+}
+
+.rowText span:last-child {
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.rowScore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rowScore b {
+  font-size: 30px;
+  line-height: 32px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+.rowScore span {
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+.rowChevron {
+  color: var(--bark-2);
+}
+
+.note {
+  margin: 8px 4px 0;
+  font-size: 16px;
+  line-height: 22px;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--bark-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dayCard {
+    animation-name: dayFade;
+  }
+}
+
+@keyframes dayFade {
+  from {
+    opacity: 0;
+  }
+}

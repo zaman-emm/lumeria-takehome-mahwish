@@ -1,0 +1,1007 @@
+/* Play your month. Full screen, user-paced. Each slide's pieces arrive in
+   order with a short stagger; the backgrounds crossfade underneath. */
+
+.stage {
+  --ink: var(--bone);
+  --ink-soft: rgba(244, 239, 230, 0.8);
+  --accent: #c0913f;
+  --glass: rgba(244, 239, 230, 0.08);
+  --line: var(--bone);
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--phone);
+  margin: 0 auto;
+  overflow: hidden;
+  color: var(--ink);
+  outline: 0;
+  touch-action: pan-y;
+  transition: color 300ms ease;
+}
+
+.stage[data-ink="dark"] {
+  --ink: var(--evergreen);
+  --ink-soft: rgba(20, 36, 26, 0.8);
+  --accent: var(--bronze-deep);
+  --glass: rgba(244, 239, 230, 0.4);
+  --line: var(--evergreen);
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+.bg[data-on="true"] {
+  opacity: 1;
+}
+
+.top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  margin-top: calc(12px + env(safe-area-inset-top, 0px));
+  padding: 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.iconBtn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: transform 160ms var(--ease-out);
+}
+
+.iconBtn:active {
+  transform: scale(0.9);
+}
+
+/* A thin strip on the left edge steps back, clear of anything tappable. */
+.backZone {
+  position: absolute;
+  z-index: 3;
+  top: 56px;
+  bottom: 84px;
+  left: 0;
+  width: 22px;
+  cursor: w-resize;
+}
+
+.backZone:disabled {
+  cursor: default;
+}
+
+/* ------------------------------------------------ the slide */
+
+.slide {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 16px 24px 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.slide::-webkit-scrollbar {
+  display: none;
+}
+
+.in {
+  animation: pieceIn 520ms var(--ease-out) both;
+  animation-delay: calc(80ms + var(--i) * 70ms);
+}
+
+@keyframes pieceIn {
+  from {
+    opacity: 0;
+    transform: translate(calc(var(--dir, 1) * 14px), 6px);
+    filter: blur(4px);
+  }
+}
+
+.middle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  padding: 18px 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 300;
+  letter-spacing: -0.2px;
+}
+
+.title b {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.stage[data-ink="dark"] .slide[data-kind="highs"] .title b {
+  color: var(--evergreen);
+}
+
+.slide[data-kind="helped"] .title b {
+  color: var(--sand);
+}
+
+.title[data-size="m"] {
+  font-size: 22px;
+  line-height: 30px;
+}
+
+.title[data-size="m"] b {
+  color: var(--ink);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 18px 0 0;
+}
+
+.stats dt,
+.tiles dt {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.stats dd,
+.tiles dd {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.slide[data-kind="highs"] .tiles dd,
+.slide[data-kind="rough"] .tiles dd {
+  color: var(--ink);
+}
+
+.slide[data-kind="helped"] .tiles dd {
+  color: var(--sand);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+
+.tiles > div,
+.glass,
+.pair > div {
+  border-radius: 16px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.tiles > div {
+  padding: 14px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 62px;
+  padding-bottom: 12px;
+  font-size: 14px;
+  line-height: 21px;
+  opacity: 0.92;
+}
+
+.body small {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ------------------------------------------------ controls */
+
+.controls {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  margin-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 0 24px;
+}
+
+.progress {
+  display: flex;
+  gap: 4px;
+}
+
+.progress span {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ink) 30%, transparent);
+  overflow: hidden;
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transform-origin: left;
+  transition: transform 300ms var(--ease-out);
+}
+
+.next,
+.done {
+  min-width: 80px;
+  height: 41px;
+  padding: 0 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 160ms var(--ease-out);
+}
+
+.next {
+  background: var(--glass);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 25%, transparent);
+}
+
+.done {
+  background: var(--forest);
+  color: var(--bone);
+}
+
+.next:active,
+.done:active {
+  transform: scale(0.97);
+}
+
+/* ------------------------------------------------ 1 · highs */
+
+.highs {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(244, 239, 230, 0.28);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.highsRing {
+  position: absolute;
+  inset: 3.75%;
+  overflow: visible;
+}
+
+.highsRing circle {
+  fill: none;
+  stroke: var(--evergreen);
+  stroke-width: 5;
+  stroke-linecap: round;
+  animation: ring 1100ms var(--ease-out) 300ms both;
+}
+
+@keyframes ring {
+  from {
+    stroke-dashoffset: var(--v);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.highsPhoto,
+.highs > span[role="img"] {
+  position: relative;
+  width: 79%;
+  height: 79%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sticker {
+  position: absolute;
+  top: -11%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin-left: -34px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 26px;
+  font-weight: 300;
+  box-shadow: 0 8px 20px rgba(20, 36, 26, 0.25);
+  animation: pop 420ms var(--ease-out) 900ms both;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+.caption {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ------------------------------------------------ 2 · showed up */
+
+.glass {
+  border-radius: 20px;
+}
+
+.cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px 0;
+  padding: 16px 12px;
+  justify-items: center;
+}
+
+.calHead {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(244, 239, 230, 0.7);
+}
+
+.calDay {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--evergreen);
+  animation: dot 360ms var(--ease-out) both;
+  animation-delay: calc(300ms + var(--k) * 16ms);
+}
+
+@keyframes dot {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.calDay[data-tone="good"] {
+  background: var(--bone);
+}
+
+.calDay[data-tone="fair"] {
+  background: #c0913f;
+}
+
+.calDay[data-tone="low"] {
+  background: var(--clay);
+}
+
+.calDay[data-tone="none"] {
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, 0.3);
+  color: rgba(244, 239, 230, 0.7);
+  font-weight: 500;
+}
+
+.miles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.miles ul {
+  display: flex;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.miles li {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgba(244, 239, 230, 0.3);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(244, 239, 230, 0.8);
+}
+
+.miles li[data-earned="true"] {
+  background: #c0913f;
+  box-shadow: none;
+  color: var(--evergreen);
+}
+
+.calKey {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(244, 239, 230, 0.85);
+}
+
+.calKey span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calKey i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.calKey i[data-tone="good"] {
+  background: var(--bone);
+}
+
+.calKey i[data-tone="fair"] {
+  background: #c0913f;
+}
+
+.calKey i[data-tone="low"] {
+  background: var(--clay);
+}
+
+/* ------------------------------------------------ 3 · scan time */
+
+.clock {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 12.5%;
+  border-radius: 28px;
+}
+
+.clock svg {
+  width: 100%;
+  overflow: visible;
+}
+
+.dial {
+  fill: rgba(244, 239, 230, 0.04);
+  stroke: rgba(244, 239, 230, 0.2);
+}
+
+.tick {
+  stroke: rgba(244, 239, 230, 0.5);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.num {
+  font-size: 12px;
+  font-weight: 500;
+  fill: rgba(244, 239, 230, 0.75);
+}
+
+.minute,
+.hour {
+  stroke-linecap: round;
+  transform-box: view-box;
+  transform-origin: 128px 128px;
+  transform: rotate(var(--a));
+}
+
+.minute {
+  stroke: #c0913f;
+  stroke-width: 1.5;
+  opacity: 0.85;
+  animation: sweep 900ms var(--ease-out) both;
+  animation-delay: calc(350ms + var(--k) * 30ms);
+}
+
+.hour {
+  stroke: var(--bone);
+  stroke-width: 4;
+  animation: sweep 1000ms var(--ease-out) 300ms both;
+}
+
+@keyframes sweep {
+  from {
+    transform: rotate(0deg);
+    opacity: 0;
+  }
+}
+
+.hub {
+  fill: var(--bone);
+}
+
+/* ------------------------------------------------ charts */
+
+.chart {
+  aspect-ratio: 342 / 226;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.axisText {
+  font-size: 12px;
+  font-weight: 500;
+  fill: currentColor;
+  opacity: 0.7;
+}
+
+.grid {
+  stroke: currentColor;
+  stroke-opacity: 0.15;
+  stroke-dasharray: 3 4;
+}
+
+.band {
+  fill: rgba(184, 83, 58, 0.12);
+}
+
+.bandLabel {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--clay);
+}
+
+.bandSoft {
+  fill: rgba(244, 239, 230, 0.08);
+}
+
+.bandLabelSoft {
+  font-size: 12px;
+  font-weight: 600;
+  fill: rgba(244, 239, 230, 0.85);
+}
+
+.line,
+.thinLine {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: draw 1100ms var(--ease-out) 420ms both;
+}
+
+.slide[data-kind="rough"] .line {
+  stroke: var(--evergreen);
+}
+
+.slide[data-kind="helped"] .line {
+  stroke: var(--sand);
+}
+
+.thinLine {
+  stroke: rgba(232, 223, 206, 0.9);
+  stroke-width: 2;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.mark {
+  fill: var(--forest);
+  animation: pop 360ms var(--ease-out) both;
+  animation-delay: calc(900ms + var(--k) * 120ms);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mark[data-tone="low"] {
+  fill: var(--clay);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.pair > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+}
+
+.pair span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.pair b {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.pair b[data-tone="low"] {
+  color: var(--clay);
+}
+
+.pair b[data-tone="good"] {
+  color: var(--forest);
+}
+
+/* ------------------------------------------------ 5 · rough patch */
+
+.big {
+  font-size: 112px;
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: -3px;
+  margin-left: -6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.slide[data-kind="rough"] .title {
+  margin-top: 4px;
+}
+
+.legendBox {
+  fill: rgba(244, 239, 230, 0.6);
+}
+
+.legendLine {
+  stroke: var(--evergreen);
+  stroke-width: 2.5;
+}
+
+.hbar {
+  fill: rgba(244, 239, 230, 0.3);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: grow 520ms var(--ease-out) both;
+  animation-delay: calc(300ms + var(--k) * 18ms);
+}
+
+.hbar[data-away="true"] {
+  fill: rgba(244, 239, 230, 0.95);
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0.05);
+  }
+}
+
+.lowDot {
+  fill: var(--evergreen);
+  stroke: var(--bone);
+  stroke-width: 2;
+  animation: fade 300ms var(--ease-out) 1300ms both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------ 6 · what helped */
+
+.sandDot {
+  fill: var(--sand);
+}
+
+.markIn {
+  animation: fade 300ms var(--ease-out) both;
+  animation-delay: calc(1000ms + var(--k) * 300ms);
+}
+
+.dotLabel {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--sand);
+}
+
+.spanText {
+  font-size: 12px;
+  font-weight: 500;
+  fill: rgba(244, 239, 230, 0.9);
+}
+
+.spanStop {
+  font-size: 12px;
+  font-weight: 500;
+  fill: rgba(244, 239, 230, 0.75);
+}
+
+.spanBar {
+  fill: rgba(244, 239, 230, 0.55);
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  animation: widen 600ms var(--ease-out) both;
+  animation-delay: calc(500ms + var(--k) * 120ms);
+}
+
+.spanBar[data-tone="held"] {
+  fill: var(--clay);
+}
+
+.spanBar[data-tone="helped"] {
+  fill: #c0913f;
+}
+
+@keyframes widen {
+  from {
+    transform: scaleX(0.02);
+  }
+}
+
+/* ------------------------------------------------ 7 · nights */
+
+.sbar {
+  fill: rgba(244, 239, 230, 0.32);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: grow 520ms var(--ease-out) both;
+  animation-delay: calc(200ms + var(--k) * 18ms);
+}
+
+.sbar[data-recent="true"] {
+  fill: #c0913f;
+}
+
+.dash {
+  stroke: rgba(232, 223, 206, 0.8);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.dashLabel {
+  font-size: 12px;
+  font-weight: 600;
+  fill: rgba(232, 223, 206, 0.9);
+}
+
+.divider {
+  stroke: rgba(244, 239, 230, 0.12);
+}
+
+.goldDot {
+  fill: #c0913f;
+  animation: fade 300ms var(--ease-out) both;
+  animation-delay: calc(1100ms + var(--k) * 90ms);
+}
+
+.goldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  fill: #c0913f;
+}
+
+/* ------------------------------------------------ 8 · scope */
+
+.scope {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px 18px;
+  border-radius: 28px;
+}
+
+.scopePhoto {
+  display: grid;
+  width: min(236px, 70%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.scopePhoto > * {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    opacity 320ms var(--ease-out),
+    filter 320ms var(--ease-out);
+}
+
+.scopePhoto > [data-on="false"] {
+  opacity: 0;
+  filter: blur(6px);
+}
+
+.lightRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.lightRow button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1.5px transparent;
+  color: rgba(244, 239, 230, 0.85);
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    box-shadow 200ms ease,
+    transform 160ms var(--ease-out);
+}
+
+.lightRow button:active {
+  transform: scale(0.97);
+}
+
+.lightRow button[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1.5px rgba(244, 239, 230, 0.7);
+  color: var(--bone);
+}
+
+.lightRow img,
+.lightRow button > span[role="img"] {
+  width: 81px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ------------------------------------------------ 9 · tip */
+
+.tipCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 44px 24px 28px;
+  border-radius: 28px;
+  background: rgba(244, 239, 230, 0.55);
+}
+
+.jar {
+  width: 190px;
+  overflow: visible;
+}
+
+.jarBody {
+  animation: rise 600ms var(--ease-out) 300ms both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.jarGlass {
+  fill: var(--bone);
+  filter: drop-shadow(0 6px 14px rgba(46, 38, 32, 0.12));
+}
+
+.jarLid {
+  fill: var(--forest);
+}
+
+.jarText {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  fill: var(--bark);
+}
+
+.drop {
+  fill: #c0913f;
+  animation: drip 700ms var(--ease-out) 650ms both;
+}
+
+@keyframes drip {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+}
+
+.chips span {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: var(--evergreen);
+  color: var(--bone);
+  font-size: 13px;
+  line-height: 32px;
+  font-weight: 600;
+  animation: pop 380ms var(--ease-out) both;
+  animation-delay: calc(900ms + var(--k) * 90ms);
+}
+
+/* ------------------------------------------------ reduced motion
+   Pieces fade in place; nothing sweeps, draws or grows. */
+
+@media (prefers-reduced-motion: reduce) {
+  .in {
+    animation-name: fade;
+    animation-duration: 260ms;
+    animation-delay: calc(var(--i) * 40ms);
+  }
+  .highsRing circle,
+  .line,
+  .thinLine {
+    animation: none;
+    stroke-dasharray: none;
+  }
+  .sticker,
+  .calDay,
+  .minute,
+  .hour,
+  .mark,
+  .hbar,
+  .sbar,
+  .spanBar,
+  .chips span,
+  .jarBody,
+  .drop {
+    animation-name: fade;
+    animation-duration: 200ms;
+  }
+  .minute,
+  .hour {
+    animation: none;
+  }
+}

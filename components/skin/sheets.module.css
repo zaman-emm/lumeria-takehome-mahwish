@@ -1,0 +1,459 @@
+.eyebrow {
+  margin: 0;
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 600;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--bronze-deep);
+}
+
+/* ------------------------------------------------ metric sheet */
+
+.metricHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 48px;
+  margin-bottom: 16px;
+}
+
+.metricName {
+  margin: 2px 0 0;
+  font-size: 26px;
+  line-height: 30px;
+  font-weight: 300;
+}
+
+.metricSub {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ scan sheet */
+
+.scan {
+  display: flex;
+  flex-direction: column;
+}
+
+.scanHead h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  padding-right: 48px;
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 300;
+}
+
+.scanHead h2 span {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--bark-2);
+}
+
+.scanSub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.scanSub p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 21px;
+}
+
+.place {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  font-size: 13px;
+  color: var(--bronze-deep);
+}
+
+.photo {
+  position: relative;
+  display: grid;
+  margin-top: 14px;
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 350 / 263;
+  background: var(--sand);
+}
+
+.photoImg {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo img[data-on] {
+  transition:
+    opacity 260ms var(--ease-out),
+    filter 260ms var(--ease-out);
+}
+
+.photo img[data-on="false"] {
+  opacity: 0;
+  filter: blur(4px);
+}
+
+.photo + .eyebrow {
+  margin-top: 12px;
+}
+
+.lights {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 44px;
+  margin-top: 12px;
+  padding: 4px;
+  border-radius: 22px;
+  background: var(--sand);
+}
+
+.lightKnob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc((100% - 8px) / 3);
+  height: 36px;
+  border-radius: 18px;
+  background: var(--white);
+  box-shadow: 0 2px 6px rgba(46, 38, 32, 0.08);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 260ms var(--ease-in-out);
+}
+
+.lights button {
+  position: relative;
+  font-size: 13px;
+  color: var(--bark-2);
+  transition: color 200ms ease;
+}
+
+.lights button[aria-checked="true"] {
+  color: var(--bark);
+}
+
+.overall {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.overall b {
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.overall > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+  color: var(--bark-2);
+}
+
+.since strong {
+  color: var(--bark);
+  font-weight: 600;
+}
+
+.tickTable {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.tickRow {
+  display: grid;
+  grid-template-columns: 84px auto 1fr 30px;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.tickLabel {
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.tickValue {
+  justify-self: end;
+  font-size: 15px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.tickDelta {
+  justify-self: end;
+  font-size: 13px;
+  color: var(--bark-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.tickRow:last-child > :last-child {
+  width: 116px;
+}
+
+.face {
+  margin-top: 18px;
+}
+
+.tip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.tip svg {
+  flex: none;
+  color: var(--gold);
+}
+
+.note {
+  margin: 22px 0 0;
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--bark-2);
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.stress {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--clay-soft);
+  color: var(--clay-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tiles,
+.weather {
+  display: grid;
+  gap: 6px;
+  margin: 18px 0 0;
+}
+
+.tiles {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.weather {
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 6px;
+}
+
+.tiles div,
+.weather div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.weather div {
+  background: var(--sand-2);
+}
+
+.tiles dt,
+.weather dt {
+  font-size: 12px;
+  color: var(--bark-2);
+  white-space: nowrap;
+}
+
+.tiles dd,
+.weather dd {
+  margin: 0;
+  font-size: 15px;
+  color: var(--bark);
+}
+
+.inUse {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inUse li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--bark-2);
+}
+
+.inUse li > span {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--bark);
+}
+
+/* ------------------------------------------------ Lumi */
+
+.lumiHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.lumiHead h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 300;
+}
+
+.lumiMark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--gold);
+}
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.question {
+  padding: 16px 14px 14px;
+  border-radius: 20px;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.seen {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+.seen > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.seen b {
+  color: var(--bark);
+}
+
+.ask {
+  margin: 8px 0 0;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 500;
+}
+
+.answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.answers button {
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: 12px;
+  background: var(--sand);
+  color: var(--bark);
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform 160ms var(--ease-out);
+}
+
+.answers button[data-primary="true"] {
+  background: var(--forest);
+  color: var(--bone);
+}
+
+.answers button:active {
+  transform: scale(0.97);
+}
+
+.noted {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--forest);
+}
+
+.lumiEmpty {
+  margin: 0;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--bark-2);
+}
+
+.lumiFoot {
+  margin: 20px 0 0;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--bark-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightKnob {
+    transition-duration: 0ms;
+  }
+  .photo img[data-on="false"] {
+    filter: none;
+  }
+}

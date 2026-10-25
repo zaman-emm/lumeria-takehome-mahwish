@@ -1,0 +1,72 @@
+"use client";
+
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
+import { useInView, useReducedMotion } from "motion/react";
+
+// Motion helpers shared by the report. Set pieces (the hero gauge, rings
+// drawing, bars growing) play once per page load, never on every tab visit.
+
+const played = new Set<string>();
+
+/** True the first time `key` mounts in this page load. */
+export function useFirstTime(key: string) {
+  const [first] = useState(() => !played.has(key));
+  useEffect(() => {
+    played.add(key);
+  }, [key]);
+  return first;
+}
+
+export type RevealState = "out" | "in" | "done";
+
+/**
+ * For a set piece that plays when it scrolls into view: "out" before, "in"
+ * once seen, "done" when it already played this load or motion is reduced.
+ * CSS reads it from a data-reveal attribute.
+ */
+export function useReveal<T extends Element>(key: string) {
+  const ref = useRef<T>(null);
+  const first = useFirstTime(key);
+  const reduce = useReducedMotion();
+  const inView = useInView(ref, { once: true, margin: "0px 0px -12% 0px" });
+  const state: RevealState = !first || reduce ? "done" : inView ? "in" : "out";
+  return [ref, state] as const;
+}
+
+type ViewTransitionDoc = Document & {
+  startViewTransition?: (cb: () => void) => { finished: Promise<void> };
+};
+
+/**
+ * Runs a state change inside a view transition when the browser has them, so
+ * shared elements (the score, the photo) morph between layouts. `dir` lands on
+ * <html> for the duration, which the CSS reads to slide panels the right way.
+ */
+export function withViewTransition(update: () => void, dir: "forward" | "back" | "none" = "none") {
+  const doc = document as ViewTransitionDoc;
+  if (!doc.startViewTransition) {
+    update();
+    return;
+  }
+  const root = document.documentElement;
+  root.dataset.vt = dir;
+  const vt = doc.startViewTransition(() => flushSync(update));
+  vt.finished.finally(() => {
+    delete root.dataset.vt;
+  });
+}
+
+/** An element's width, kept current. For charts drawn in real pixels. */
+export function useWidth<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [w, setW] = useState(0);
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    const ro = new ResizeObserver(([e]) => setW(e.contentRect.width));
+    ro.observe(ref.current);
+    setW(ref.current.getBoundingClientRect().width);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, w] as const;
+}

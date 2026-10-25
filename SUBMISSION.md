@@ -27,7 +27,10 @@ All extras are added on the client in `lib/extended.ts`. The API and `data/` are
 | **Under eyes (dark circles)** | Shown as *coming soon*. Cheek, forehead and chin scans can't support it, so it needs a future under-eye scan. | Under eyes would respond to sleep within days, so it would make the sleep connection visible quickly. |
 | **Food log** | Shown as a locked source in "What we can connect". | Diet changes are a common question, but the logging is complex, so it's left for later. |
 
-The streaks and milestones (`rhythm()` in `lib/insights.ts`) are computed from the existing scan timestamps. They need no extra data.
+| **Gentler swaps** | Mocked in `lib/routine.ts`: a short list of alternatives with a price tier, and a `$$` budget the report highlights. | When a product is stopped, the next question is what to use instead, at a price the person already pays. |
+| **14-day trial** | `TRIAL_DAYS` in `lib/routine.ts`: a product started in the last two weeks shows "day N of 14". | Two weeks is long enough to see a change and short enough to keep people scanning. |
+
+The streaks and milestones (`lib/weeks.ts`) and the Play your month slides (`lib/recap.ts`) are computed from the existing scans, products, factors and weather. They need no extra data, and a slide is skipped when its data is missing (jordan has one scan, so there is no recap).
 
 ## What I cut / would do next
 

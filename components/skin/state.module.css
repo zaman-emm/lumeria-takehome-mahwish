@@ -1,0 +1,130 @@
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: var(--phone);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 40px 32px;
+  background:
+    radial-gradient(160px 120px at 50% 0, rgba(243, 230, 200, 0.6), transparent),
+    var(--sunrise);
+  color: var(--evergreen);
+  text-align: center;
+}
+
+.logo {
+  width: 180px;
+  height: 34px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  animation: in 400ms var(--ease-out) both;
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.title {
+  margin: 12px 0 0;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 300;
+}
+
+.text {
+  max-width: 290px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--bark);
+}
+
+.button {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  margin-top: 12px;
+  padding: 0 24px;
+  border-radius: 14px;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.scope circle {
+  fill: none;
+  stroke: var(--evergreen);
+  stroke-width: 1.4;
+  transform-origin: 60px 60px;
+}
+
+.core {
+  fill: rgba(244, 239, 230, 0.6) !important;
+}
+
+.r1 {
+  animation: spin 9s linear infinite;
+}
+
+.r2 {
+  animation: spin 6s linear infinite reverse;
+}
+
+.r3 {
+  animation: spin 4s linear infinite;
+}
+
+.scope[data-still="true"] circle {
+  animation: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .r1,
+  .r2,
+  .r3 {
+    animation: none;
+  }
+  .core {
+    animation: breathe 1.6s ease-in-out infinite alternate;
+  }
+  .body {
+    animation-name: fadeOnly;
+  }
+}
+
+@keyframes breathe {
+  to {
+    opacity: 0.4;
+  }
+}
+
+@keyframes fadeOnly {
+  from {
+    opacity: 0;
+  }
+}

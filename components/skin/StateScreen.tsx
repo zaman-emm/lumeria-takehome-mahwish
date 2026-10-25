@@ -1,0 +1,64 @@
+"use client";
+
+import Link from "next/link";
+import type { ReportState } from "@/lib/useReport";
+import { Logo } from "./Logo";
+import st from "./state.module.css";
+
+// Loading, error and empty, in the report's own gold, written for a person
+// rather than a developer.
+
+export function StateScreen({ state }: { state: Exclude<ReportState, { status: "ready" }> }) {
+  return (
+    <div className={st.state} data-skin aria-live="polite">
+      <Logo className={st.logo} />
+      <div className={st.body}>
+        {state.status === "loading" && (
+          <>
+            <ScopeRings />
+            <p className={st.title}>Opening your report</p>
+          </>
+        )}
+        {state.status === "error" && state.kind === "failed" && (
+          <>
+            <ScopeRings still />
+            <h1 className={st.title}>We couldn’t open your report</h1>
+            <p className={st.text}>Your scans are safe. Something on our side didn’t load, so give it another try.</p>
+            <button className={st.button} onClick={state.retry}>
+              Try again
+            </button>
+          </>
+        )}
+        {state.status === "error" && state.kind === "missing" && (
+          <>
+            <ScopeRings still />
+            <h1 className={st.title}>We can’t find this report</h1>
+            <p className={st.text}>The link may be incomplete. Open it again from the Lumeria app.</p>
+            <Link className={st.button} href="/report/noor">
+              See an example report
+            </Link>
+          </>
+        )}
+        {state.status === "empty" && (
+          <>
+            <ScopeRings still />
+            <h1 className={st.title}>Your report starts with one scan</h1>
+            <p className={st.text}>Hi {state.firstName}. Hold the scope to your cheek for a few seconds and your first read appears here.</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** The scope finding focus: dashed rings turning at different speeds. */
+function ScopeRings({ still }: { still?: boolean }) {
+  return (
+    <svg className={st.scope} data-still={still} viewBox="0 0 120 120" width="112" height="112" aria-hidden>
+      <circle className={st.r1} cx="60" cy="60" r="52" strokeDasharray="1.5 5.5" />
+      <circle className={st.r2} cx="60" cy="60" r="40" strokeDasharray="22 9" />
+      <circle className={st.r3} cx="60" cy="60" r="28" strokeDasharray="4 4" />
+      <circle className={st.core} cx="60" cy="60" r="12" />
+    </svg>
+  );
+}
