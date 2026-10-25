@@ -34,10 +34,11 @@ import { TrendsTab } from "./TrendsTab";
 import { FaceMap, Icon, RhythmStrip, TabIcon, onFace } from "./Visuals";
 import o from "./oura.module.css";
 
-// The same report in an Oura-inspired look: dark and calm, the latest scan
-// blurred into an atmosphere behind the score, an arc gauge, a serif
-// headline, contributors as thin bars, and a floating dock for navigation.
-// Every tab and sheet underneath is the regular one, re-coloured by tokens.
+// The same report laid out the way Oura lays out readiness: the latest scan
+// blurred into an evergreen atmosphere behind an arc dial, score bubbles,
+// contributors as thin bars, and a floating dock for navigation. Colours and
+// type stay on the Lumeria brand; the tabs and sheets underneath are the
+// regular ones.
 
 const TABS = [
   { id: "glance", label: "Today" },
@@ -71,13 +72,7 @@ export function OuraReport({ d }: { d: Derived }) {
       if (!location.hash) setOverlay(null);
     };
     window.addEventListener("popstate", onPop);
-    // The page is dark edge to edge, overscroll included.
-    const prev = document.body.style.background;
-    document.body.style.background = "#0f1012";
-    return () => {
-      window.removeEventListener("popstate", onPop);
-      document.body.style.background = prev;
-    };
+    return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   const show = useCallback((ov: NonNullable<Overlay>) => {
@@ -330,7 +325,7 @@ function Today({ d, rh, actions }: { d: Derived; rh: Rhythm; actions: ReportActi
       </section>
 
       {rh.days > 1 && (
-        <section className={o.card} aria-label="Your scanning rhythm">
+        <section className={o.card} data-tone="dark" aria-label="Your scanning rhythm">
           <span className={o.kicker}>Rhythm</span>
           <RhythmStrip r={rh} tone="dark" />
           <dl className={o.stats}>

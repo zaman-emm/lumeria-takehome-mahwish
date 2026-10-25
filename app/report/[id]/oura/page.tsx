@@ -6,7 +6,7 @@ import { OuraReport } from "@/components/report/OuraReport";
 import { StateScreen } from "@/components/report/StateScreen";
 import { useReport } from "@/lib/useReport";
 
-// /report/:id/oura. The same report in an Oura-inspired look, to compare
+// /report/:id/oura. The same report in an Oura-inspired layout, to compare
 // against /report/:id side by side.
 
 export default function OuraReportPage({ params }: { params: Promise<{ id: string }> }) {
