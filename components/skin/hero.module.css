@@ -200,6 +200,74 @@
   box-shadow: 0 4px 12px rgba(128, 96, 31, 0.35);
 }
 
+/* ------------------------------------------------ play your month */
+
+.month {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 342px;
+  height: 56px;
+  margin-top: 12px;
+  padding: 0 18px 0 8px;
+  border-radius: 28px;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: 0 6px 18px rgba(20, 36, 26, 0.22);
+  transition: transform 160ms var(--ease-out);
+}
+
+.month:active {
+  transform: scale(0.97);
+}
+
+.monthPlay {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--evergreen);
+  transition: transform 160ms var(--ease-out);
+}
+
+.monthPlay svg {
+  transform: translateX(1px);
+}
+
+.month:active .monthPlay {
+  transform: scale(0.92);
+}
+
+/* One segment per slide, like the recap's own progress bar. */
+.segs {
+  display: flex;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.segs i {
+  position: relative;
+  width: 8px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(244, 239, 230, 0.28);
+  overflow: hidden;
+}
+
+.segs i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  opacity: 0;
+}
+
 /* ------------------------------------------------ first-load sequence */
 
 .hero[data-play="true"] .ray {
@@ -221,6 +289,25 @@
 
 .hero[data-play="true"] .label {
   animation: fade 400ms var(--ease-out) 300ms both;
+}
+
+.hero[data-play="true"] .month {
+  animation: rise 500ms var(--ease-out) 620ms both;
+}
+
+/* Once the button lands, a light runs along the segments: there's a story. */
+.hero[data-play="true"] .segs i::after {
+  animation: segRun 520ms var(--ease-out) both;
+  animation-delay: calc(1100ms + var(--i) * 70ms);
+}
+
+@keyframes segRun {
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes rayIn {
@@ -259,6 +346,7 @@
 
 /* Reduced motion: the gauge is simply there; the card fades in softly. */
 .hero[data-reduce="true"] .card,
+.hero[data-reduce="true"] .month,
 .hero[data-reduce="true"] .gauge {
   animation: fade 400ms ease both;
 }

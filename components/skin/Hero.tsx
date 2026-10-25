@@ -26,7 +26,20 @@ const polar = (deg: number, r: number) => {
   return [CX + r * Math.cos(a), CY - r * Math.sin(a)] as const;
 };
 
-export function Hero({ d, lens, onScan }: { d: Derived; lens: Scan; onScan: () => void }) {
+export function Hero({
+  d,
+  lens,
+  onScan,
+  slides,
+  onPlay,
+}: {
+  d: Derived;
+  lens: Scan;
+  onScan: () => void;
+  /** How many slides the month has; the button previews them as segments. */
+  slides: number;
+  onPlay?: (from: HTMLElement) => void;
+}) {
   const value = d.latest.scores.overall;
   const reduce = useReducedMotion();
   const first = useFirstTime("hero");
@@ -134,6 +147,20 @@ export function Hero({ d, lens, onScan }: { d: Derived; lens: Scan; onScan: () =
           <span>Your scan</span>
         </button>
       </div>
+
+      {onPlay && (
+        <button className={h.month} onClick={(e) => onPlay(e.currentTarget)}>
+          <span className={h.monthPlay}>
+            <Icon name="play" size={14} />
+          </span>
+          {d.isMonthly ? "Play your month" : "Play your story"}
+          <span className={h.segs} aria-hidden>
+            {Array.from({ length: slides }, (_, i) => (
+              <i key={i} style={{ "--i": i } as CSSProperties} />
+            ))}
+          </span>
+        </button>
+      )}
     </header>
   );
 }
@@ -150,7 +177,7 @@ export function SlimHeader({
   lens: Scan;
   streak: string;
   onScan: () => void;
-  onPlay?: () => void;
+  onPlay?: (from: HTMLElement) => void;
 }) {
   const tz = scanTz(lens) ?? d.tz;
   return (
@@ -168,7 +195,7 @@ export function SlimHeader({
         {streak}
       </span>
       {onPlay && (
-        <button className={h.play} onClick={onPlay} aria-label={d.isMonthly ? "Play your month" : "Play your story"}>
+        <button className={h.play} onClick={(e) => onPlay(e.currentTarget)} aria-label={d.isMonthly ? "Play your month" : "Play your story"}>
           <Icon name="play" size={14} />
         </button>
       )}

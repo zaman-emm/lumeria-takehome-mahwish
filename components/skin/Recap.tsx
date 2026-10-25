@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import NumberFlow from "@number-flow/react";
 import { motion, useReducedMotion } from "motion/react";
 import { band, fmtDay, scanTz } from "@/lib/insights";
@@ -97,7 +97,16 @@ const Stats = ({ stats, tiles }: { stats: Stat[]; tiles?: boolean }) => (
   </dl>
 );
 
-export function Recap({ onClose, label }: { onClose: () => void; label: string }) {
+export function Recap({
+  onClose,
+  label,
+  from,
+}: {
+  onClose: () => void;
+  label: string;
+  /** Where the play button sits on screen; the stage grows out of it. */
+  from?: { x: number; y: number } | null;
+}) {
   const { d } = useReportApi();
   const slides = useMemo(() => buildRecap(d), [d]);
   const [i, setI] = useState(0);
@@ -130,6 +139,12 @@ export function Recap({ onClose, label }: { onClose: () => void; label: string }
   useEffect(() => {
     dialog.current?.focus();
   }, []);
+  useLayoutEffect(() => {
+    const el = dialog.current;
+    if (!el || !from) return;
+    const left = (document.documentElement.clientWidth - el.offsetWidth) / 2;
+    el.style.transformOrigin = `${from.x - left}px ${from.y}px`;
+  }, [from]);
 
   const share = async () => {
     const url = location.href.replace(/#.*$/, "");
@@ -159,10 +174,14 @@ export function Recap({ onClose, label }: { onClose: () => void; label: string }
       aria-modal="true"
       aria-label={label}
       tabIndex={-1}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, transform: "scale(0.98)" }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, transform: from ? "scale(0.9)" : "scale(0.98)" }}
       animate={reduce ? { opacity: 1 } : { opacity: 1, transform: "scale(1)" }}
-      exit={{ opacity: 0, transition: { duration: 0.2 } }}
-      transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+      exit={
+        reduce
+          ? { opacity: 0, transition: { duration: 0.2 } }
+          : { opacity: 0, transform: from ? "scale(0.92)" : "scale(0.98)", transition: { duration: 0.22, ease: [0.23, 1, 0.32, 1] } }
+      }
+      transition={{ duration: from ? 0.4 : 0.3, ease: [0.32, 0.72, 0, 1] }}
       onPointerDown={(e) => {
         start.current = { x: e.clientX, y: e.clientY, t: performance.now() };
       }}

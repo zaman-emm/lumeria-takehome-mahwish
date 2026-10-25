@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Drawer } from "@base-ui/react/drawer";
 import { AnimatePresence } from "motion/react";
-import { fmtDay, metricMeta, scanTz, type Derived, type ScoreKey } from "@/lib/insights";
+import { fmtDay, lumiQuestions, metricMeta, scanTz, type Derived, type ScoreKey } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { buildRecap } from "@/lib/recap";
 import { weekStreak } from "@/lib/weeks";
@@ -13,6 +13,7 @@ import { Glance } from "./Glance";
 import { Hero, SlimHeader } from "./Hero";
 import { withViewTransition } from "./hooks";
 import { Icon } from "./Icon";
+import { LumiDock } from "./LumiDock";
 import { LumiSheet } from "./LumiSheet";
 import { MetricSheet } from "./MetricSheet";
 import { PhotosTab } from "./PhotosTab";
@@ -50,7 +51,10 @@ export function Report({ d }: { d: Derived }) {
   const [root, setRoot] = useState<HTMLDivElement | null>(null);
   const [origin, setOrigin] = useState(0);
   const streak = useMemo(() => weekStreak(d), [d]);
-  const hasRecap = useMemo(() => buildRecap(d).length > 0, [d]);
+  const slides = useMemo(() => buildRecap(d).length, [d]);
+  const questions = useMemo(() => lumiQuestions(d), [d]);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [recapFrom, setRecapFrom] = useState<{ x: number; y: number } | null>(null);
 
   // The photo the headers show: the newest real three-light photo of the
   // latest scan's spot, else the latest scan's own.
@@ -71,8 +75,13 @@ export function Report({ d }: { d: Derived }) {
       openScan: (scan: Scan) => open({ kind: "scan", scan }),
       openMetric: (key: ScoreKey, area?: string) => open({ kind: "metric", key, area: area ?? d.area }),
       openLumi: () => open({ kind: "lumi" }),
+      lumi: {
+        questions,
+        answers,
+        answer: (id: string, a: string) => setAnswers((s) => ({ ...s, [id]: a })),
+      },
     }),
-    [d, open],
+    [d, open, questions, answers],
   );
 
   const changeTab = (id: TabId) => {
@@ -101,7 +110,10 @@ export function Report({ d }: { d: Derived }) {
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
-  const playRecap = () => {
+  // The month opens out of the button that played it.
+  const playRecap = (from?: HTMLElement) => {
+    const r = from?.getBoundingClientRect();
+    setRecapFrom(r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null);
     history.pushState(null, "", "#month");
     recapOpen.current = true;
     setRecap(true);
@@ -130,9 +142,9 @@ export function Report({ d }: { d: Derived }) {
           <Drawer.Indent className={r.indent} style={{ "--origin": `${origin}px` } as CSSProperties}>
             <div className={r.page} data-tab={tab}>
               {tab === "glance" ? (
-                <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} />
+                <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} slides={slides} onPlay={slides ? playRecap : undefined} />
               ) : (
-                <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} onPlay={hasRecap ? playRecap : undefined} />
+                <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} />
               )}
 
               <Tabs tabs={TABS} active={tab} onChange={changeTab} />
@@ -164,15 +176,11 @@ export function Report({ d }: { d: Derived }) {
             </div>
           </Drawer.Indent>
 
-          <button
-            className={r.lumi}
-            data-hidden={Boolean(sheet) || recap}
-            onClick={api.openLumi}
-            aria-label="Ask Lumi"
-            tabIndex={sheet || recap ? -1 : 0}
-          >
-            <Icon name="spark" size={22} />
-          </button>
+          <LumiDock
+            hidden={Boolean(sheet) || recap}
+            open={questions.filter((q) => !answers[q.id]).length}
+            onOpen={api.openLumi}
+          />
 
           <Sheet
             open={Boolean(sheet)}
@@ -192,6 +200,7 @@ export function Report({ d }: { d: Derived }) {
             {recap && (
               <Recap
                 key="recap"
+                from={recapFrom}
                 onClose={closeRecap}
                 label={`${d.isMonthly ? "Your month" : "Your story"}, ${d.periodLabel}, up to ${fmtDay(d.latest.takenAt, latestTz)}`}
               />

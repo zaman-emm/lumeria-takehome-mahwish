@@ -1,0 +1,111 @@
+/* Lumi's tab on the right edge of the screen. The outer layer only moves up
+   and down (drag); the tab inside slides sideways (tuck, hide, lift). */
+
+.dock {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  right: max(0px, calc((100vw - var(--phone)) / 2));
+  touch-action: none;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 62px;
+  height: 60px;
+  padding-left: 14px;
+  border-radius: 30px 0 0 30px;
+  background: var(--forest);
+  box-shadow:
+    inset 1px 0 0 var(--bark),
+    inset 0 1px 0 var(--bark),
+    inset 0 -1px 0 var(--bark),
+    0 8px 24px rgba(20, 36, 26, 0.28);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition:
+    transform 280ms var(--ease-out),
+    opacity 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out);
+}
+
+/* The orb gives under the finger, the way the Figma press set does. */
+.face {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  transition: transform 120ms var(--ease-out);
+}
+
+.tab:active .face {
+  transform: scale(0.92);
+}
+
+.tab[data-tucked="true"] {
+  transform: translateX(38px);
+}
+
+/* Picked up: it comes off the edge a little and sits higher. */
+.tab[data-dragging="true"] {
+  cursor: grabbing;
+  transform: translateX(-8px) scale(1.04);
+  box-shadow:
+    inset 1px 0 0 var(--bark),
+    inset 0 1px 0 var(--bark),
+    inset 0 -1px 0 var(--bark),
+    0 14px 32px rgba(20, 36, 26, 0.34);
+}
+
+.dock[data-hidden="true"] .tab {
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
+}
+
+.count {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--white);
+  color: var(--evergreen);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  animation: countIn 260ms var(--ease-out) both;
+}
+
+@keyframes countIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab[data-tucked="true"],
+  .tab[data-dragging="true"],
+  .dock[data-hidden="true"] .tab {
+    transform: none;
+  }
+  .count {
+    animation-name: countFade;
+  }
+}
+
+@keyframes countFade {
+  from {
+    opacity: 0;
+  }
+}

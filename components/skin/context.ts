@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { Derived, ScoreKey } from "@/lib/insights";
+import type { Derived, LumiQuestion, ScoreKey } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 
 export type SheetState =
@@ -14,6 +14,13 @@ export interface ReportApi {
   openScan: (scan: Scan) => void;
   openMetric: (key: ScoreKey, area?: string) => void;
   openLumi: () => void;
+  /** Lumi's questions and the answers so far. They outlive the sheet, so the
+   *  dock can count what's still open. */
+  lumi: {
+    questions: LumiQuestion[];
+    answers: Record<string, string>;
+    answer: (id: string, answer: string) => void;
+  };
 }
 
 export const ReportContext = createContext<ReportApi | null>(null);
