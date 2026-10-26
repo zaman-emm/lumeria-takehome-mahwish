@@ -1,0 +1,56 @@
+/* The splash: evergreen night, the score big in the middle, gold blooming out
+   from behind it in three petals, then the gauge and the gold sheet fly up
+   into the hero. Everything here moves on transform, opacity or clip-path. */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  touch-action: none;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dark,
+.petal {
+  position: absolute;
+  inset: 0;
+}
+
+/* The loading screen is gold; the night fades in over it rather than cutting. */
+.dark {
+  background: var(--evergreen);
+  animation: nightIn 260ms var(--ease-out) both;
+}
+
+@keyframes nightIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The last petal is the hero's own gold, so it can shrink into it. */
+.petal[data-petal="0"] {
+  background: var(--bronze);
+}
+
+.petal[data-petal="1"] {
+  background: var(--gold);
+}
+
+.petal[data-petal="2"] {
+  background:
+    radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
+    linear-gradient(180deg, #e6cf9f 0, #d7b46f calc(var(--h) * 0.45), #c0913f var(--h), #c0913f 100%);
+}
+
+/* The hero's own gauge box, lifted out and scaled up from its top-left. */
+.gauge {
+  position: absolute;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.gauge[data-ready="false"] {
+  visibility: hidden;
+}

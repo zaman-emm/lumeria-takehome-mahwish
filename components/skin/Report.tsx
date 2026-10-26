@@ -21,6 +21,7 @@ import { ProductsTab } from "./ProductsTab";
 import { Recap } from "./Recap";
 import { ScanSheet } from "./ScanSheet";
 import { Sheet } from "./Sheet";
+import { Splash } from "./Splash";
 import { Tabs } from "./Tabs";
 import { TrendsTab } from "./TrendsTab";
 import r from "./report.module.css";
@@ -44,8 +45,16 @@ const sheetLabel = (s: SheetState) =>
   s.kind === "scan" ? "Scan details" : s.kind === "metric" ? `${metricMeta(s.key).label} trend` : "Lumi";
 const sheetKey = (s: SheetState) => (s.kind === "scan" ? s.scan.id : s.kind === "metric" ? `${s.key}-${s.area}` : "lumi");
 
+// The splash opens the first load of a page, never again, and never for
+// people who asked for less motion.
+let splashed = false;
+
 export function Report({ d }: { d: Derived }) {
   const [tab, setTab] = useState<TabId>("glance");
+  const [splash, setSplash] = useState<"wait" | "go" | "done">(() => {
+    if (splashed || typeof window === "undefined") return "done";
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "done" : "wait";
+  });
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [recap, setRecap] = useState(false);
   const [root, setRoot] = useState<HTMLDivElement | null>(null);
@@ -116,6 +125,17 @@ export function Report({ d }: { d: Derived }) {
     else setRecap(false);
   };
 
+  // The page holds still under the splash.
+  useEffect(() => {
+    if (splash === "done") return;
+    window.scrollTo({ top: 0 });
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prev;
+    };
+  }, [splash]);
+
   useEffect(() => {
     if (!recap) return;
     const prev = document.documentElement.style.overflow;
@@ -133,9 +153,9 @@ export function Report({ d }: { d: Derived }) {
         <div className={r.root} data-skin ref={setRoot}>
           <Drawer.IndentBackground className={r.indentBg} />
           <Drawer.Indent className={r.indent} style={{ "--origin": `${origin}px` } as CSSProperties}>
-            <div className={r.page} data-tab={tab}>
+            <div className={r.page} data-tab={tab} data-splash={splash === "done" ? undefined : splash}>
               {tab === "glance" ? (
-                <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} slides={slides} onPlay={slides ? playRecap : undefined} />
+                <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} slides={slides} onPlay={slides ? playRecap : undefined} splash={splash} />
               ) : (
                 <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} />
               )}
@@ -172,7 +192,7 @@ export function Report({ d }: { d: Derived }) {
           </Drawer.Indent>
 
           <LumiButton
-            hidden={Boolean(sheet) || recap}
+            hidden={Boolean(sheet) || recap || splash !== "done"}
             count={d.factors.length}
             month={d.isMonthly}
             onOpen={api.openLumi}
@@ -191,6 +211,13 @@ export function Report({ d }: { d: Derived }) {
             )}
             {sheet?.kind === "lumi" && <LumiSheet tab={sheet.tab} />}
           </Sheet>
+
+          {splash !== "done" && (
+            <Splash value={d.latest.scores.overall} onGo={() => {
+                splashed = true;
+                setSplash("go");
+              }} onDone={() => setSplash("done")} />
+          )}
 
           <AnimatePresence>
             {recap && (

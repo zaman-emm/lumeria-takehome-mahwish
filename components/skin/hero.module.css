@@ -40,12 +40,17 @@
 
 /* ------------------------------------------------ gauge */
 
-.gauge {
-  position: relative;
+.gaugeBox {
   width: 100%;
   max-width: 342px;
   aspect-ratio: 342 / 240;
   margin-top: 24px;
+}
+
+.gauge {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .gauge svg {
@@ -57,7 +62,7 @@
 }
 
 /* A white sun arc on the gold: warm white at the start, pure white at the tip. */
-.hero {
+.gauge {
   --arc-from: #fff6e4;
   --arc-to: #ffffff;
   --track: rgba(255, 255, 255, 0.3);
@@ -96,7 +101,6 @@
 
 .arc {
   fill: none;
-  stroke: url(#hero-arc);
   stroke-width: 30;
   stroke-linecap: round;
   filter: drop-shadow(0 0 14px rgba(255, 246, 222, 0.75));
@@ -302,12 +306,12 @@
 /* ------------------------------------------------ first-load sequence */
 
 /* The rays fade in dim; each lit one swells as the arc's tip passes it. */
-.hero[data-play="true"] .ray {
+.gauge[data-play="true"] .ray {
   animation: rayIn 360ms var(--ease-out) both;
   animation-delay: calc(var(--i) * 14ms);
 }
 
-.hero[data-play="true"] .ray[data-lit="true"] {
+.gauge[data-play="true"] .ray[data-lit="true"] {
   animation:
     rayIn 360ms var(--ease-out) both,
     ignite 420ms var(--ease-out) both;
@@ -315,12 +319,12 @@
 }
 
 /* The arc's ease is a cubic ease-out; the ray timings in Hero.tsx assume it. */
-.hero[data-play="true"] .arc {
-  animation: arcDraw 1100ms cubic-bezier(0.33, 1, 0.68, 1) 150ms both;
+.gauge[data-play="true"] .arc {
+  animation: arcDraw var(--draw, 1100ms) cubic-bezier(0.33, 1, 0.68, 1) var(--lead, 150ms) both;
 }
 
-.hero[data-play="true"] .digits {
-  animation: fade 300ms var(--ease-out) 150ms both;
+.gauge[data-play="true"] .digits {
+  animation: fade 300ms var(--ease-out) var(--lead, 150ms) both;
 }
 
 .hero[data-play="true"] .card {
@@ -399,8 +403,8 @@
 
 /* A backstop in case the reduced-motion setting reaches JS late. */
 @media (prefers-reduced-motion: reduce) {
-  .hero[data-play="true"] .ray,
-  .hero[data-play="true"] .arc,
+  .gauge[data-play="true"] .ray,
+  .gauge[data-play="true"] .arc,
   .hero[data-play="true"] .segs i::after {
     animation: none;
   }
@@ -409,8 +413,59 @@
 /* Reduced motion: the gauge is simply there; the card fades in softly. */
 .hero[data-reduce="true"] .card,
 .hero[data-reduce="true"] .month,
-.hero[data-reduce="true"] .gauge {
+.hero[data-reduce="true"] .gaugeBox {
   animation: fade 400ms ease both;
+}
+
+/* ------------------------------------------------ after the splash */
+
+/* The splash flies its own gauge in, so the hero holds everything back until
+   it lands, then the logo, greeting and headline rise, and the card, the month
+   button and the then-and-now photos follow. The gauge itself just appears,
+   exactly where the splash's copy lands. */
+.hero[data-splash="wait"] :is(.logo, .hi, .title, .card, .month),
+.hero:is([data-splash="wait"], [data-splash="go"]) .gaugeBox {
+  opacity: 0;
+}
+
+.hero[data-splash="go"] :is(.logo, .hi, .title, .card, .month) {
+  animation: rise 520ms var(--ease-out) both;
+  animation-delay: var(--at, 0ms);
+}
+
+.hero[data-splash="go"] .logo {
+  --at: 120ms;
+}
+
+.hero[data-splash="go"] .hi {
+  --at: 180ms;
+}
+
+.hero[data-splash="go"] .title {
+  --at: 240ms;
+}
+
+.hero[data-splash="go"] .card {
+  --at: 340ms;
+}
+
+.hero[data-splash="go"] .month {
+  --at: 400ms;
+}
+
+.hero[data-splash="go"] .pairItem[data-now="true"] {
+  animation: reveal 620ms var(--ease-out) 760ms both;
+}
+
+.hero[data-splash="go"] .segs i::after {
+  animation: segRun 520ms var(--ease-out) both;
+  animation-delay: calc(980ms + var(--i) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero[data-splash] :is(.logo, .hi, .title, .card, .month, .pairItem) {
+    animation: none;
+  }
 }
 
 /* ------------------------------------------------ slim header */

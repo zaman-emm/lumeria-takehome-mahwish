@@ -51,6 +51,28 @@
   --tabs-top: 72px;
 }
 
+/* Under the splash the tabs and what's beneath them wait, then rise behind the hero. */
+.page[data-splash="wait"] > :not(header) {
+  opacity: 0;
+}
+
+.page[data-splash="go"] > :not(header) {
+  animation: pageIn 520ms var(--ease-out) 460ms both;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page[data-splash="go"] > :not(header) {
+    animation: none;
+  }
+}
+
 .panel {
   padding: 0 16px;
   view-transition-name: skin-panel;

@@ -1,39 +1,21 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
 import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useFirstTime } from "./hooks";
+import { Gauge } from "./Gauge";
 import { Flame, Icon } from "./Icon";
 import { headline, sinceStart } from "@/lib/voice";
 import { Logo } from "./Logo";
 import { Photo } from "./ui";
 import h from "./hero.module.css";
 
-// The At a glance hero: the score as a sunrise gauge on gold. On first load
-// the thick arc draws to the score, each ray up to it swells as the tip
-// passes, and the number counts up on the same curve so it lands with the
-// tip. Once per load only.
-
-const CX = 171;
-const CY = 185;
-const R = 118;
-const RAYS = 25;
-/** How long the arc takes to draw, in ms; the rays and the count follow it. */
-const DRAW = 1100;
-/** Where the arc starts drawing, in ms. */
-const LEAD = 150;
-/** The arc's cubic ease-out, shared by the count so both land together. */
-const ease = (p: number) => 1 - (1 - p) ** 3;
-
-/** When the arc's tip reaches a share of its length, with the ease-out it draws on. */
-const reach = (share: number) => LEAD + DRAW * (1 - Math.cbrt(1 - Math.min(1, share)));
-
-const polar = (deg: number, r: number) => {
-  const a = (deg * Math.PI) / 180;
-  return [CX + r * Math.cos(a), CY - r * Math.sin(a)] as const;
-};
+// The At a glance hero: the score as a sunrise gauge on gold. On a first load
+// the splash flies the gauge in from the middle of the screen (splash "go"),
+// and the rest of the hero rises around it; with no splash the gauge draws in
+// place. Once per load only.
 
 /**
  * Then and now for the card: the first and newest real photos of the spot,
@@ -52,10 +34,13 @@ export function Hero({
   onScan,
   slides,
   onPlay,
+  splash,
 }: {
   d: Derived;
   lens: Scan;
   onScan: () => void;
+  /** Where the splash is: held back until it flies in, then rising around the gauge. */
+  splash?: "wait" | "go" | "done";
   /** How many slides the month has; the button previews them as segments. */
   slides: number;
   onPlay?: (from: HTMLElement) => void;
@@ -63,85 +48,21 @@ export function Hero({
   const value = d.latest.scores.overall;
   const reduce = useReducedMotion();
   const first = useFirstTime("hero");
-  const play = first && !reduce;
-  const digits = useRef<HTMLSpanElement>(null);
-  const arc = useRef<SVGPathElement>(null);
-
-  useEffect(() => {
-    if (!play || !digits.current) return;
-    const el = digits.current;
-    const start = performance.now() + LEAD;
-    let raf = 0;
-    // Read the arc's own clock when it has one, so the count never drifts from the tip.
-    const tick = (now: number) => {
-      const draw = arc.current?.getAnimations()[0];
-      const t = draw?.currentTime != null ? Number(draw.currentTime) - LEAD : now - start;
-      const p = Math.max(0, Math.min(1, t / DRAW));
-      el.textContent = String(Math.round(value * ease(p)));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    el.textContent = "0";
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf);
-      el.textContent = String(value);
-    };
-  }, [play, value]);
+  const play = first && !reduce && !splash; // with a splash, the splash plays it
 
   const pair = beforeAfter(d, lens);
-  const lit = Math.round((value / 100) * (RAYS - 1));
   const word = band(value).word;
   const tz = scanTz(d.latest) ?? d.tz;
   const dayOf = (s: Scan) => fmtDay(s.takenAt, scanTz(s) ?? d.tz);
 
   return (
-    <header className={h.hero} data-play={play} data-reduce={first && reduce}>
+    <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-skin-hero>
       <Logo className={h.logo} />
       <p className={h.hi}>Hi {d.firstName},</p>
       <h1 className={h.title}>{headline(d)}</h1>
 
-      <div className={h.gauge} role="img" aria-label={`Overall score ${value} out of 100, ${word.toLowerCase()}`}>
-        <svg viewBox="0 0 342 240" aria-hidden>
-          <defs>
-            <linearGradient id="hero-arc" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" className={h.arcFrom} />
-              <stop offset="1" className={h.arcTo} />
-            </linearGradient>
-          </defs>
-          {Array.from({ length: RAYS }, (_, i) => {
-            const deg = 180 - i * 7.5;
-            const [x1, y1] = polar(deg, 146);
-            const [x2, y2] = polar(deg, i % 2 ? 158 : 167);
-            return (
-              <line
-                key={i}
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
-                className={h.ray}
-                data-lit={i <= lit}
-                style={{ "--i": i, "--at": `${reach(i / (RAYS - 1) / (value / 100))}ms` } as CSSProperties}
-              />
-            );
-          })}
-          <path d={`M${CX - R} ${CY}A${R} ${R} 0 0 1 ${CX + R} ${CY}`} className={h.track} />
-          <path
-            d={`M${CX - R} ${CY}A${R} ${R} 0 0 1 ${CX + R} ${CY}`}
-            ref={arc}
-            className={h.arc}
-            pathLength={100}
-            strokeDasharray={`${value} 200`}
-            style={{ "--v": value } as CSSProperties}
-          />
-        </svg>
-        <div className={h.score}>
-          <span className={h.value} style={{ viewTransitionName: "skin-score" }}>
-            <span ref={digits} className={h.digits} aria-hidden>
-              {value}
-            </span>
-          </span>
-        </div>
+      <div className={h.gaugeBox} data-skin-gauge>
+        <Gauge value={value} play={play} named />
       </div>
 
       <div className={h.card}>
