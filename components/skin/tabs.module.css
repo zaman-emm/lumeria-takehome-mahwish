@@ -27,6 +27,24 @@
   box-shadow: 0 0.5px 0 rgba(46, 38, 32, 0.14);
 }
 
+/* Above a stuck bar, the status bar's strip is filled in to match, so the
+   page never shows behind the clock. */
+.bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: var(--top-inset);
+  background: rgba(var(--canvas-rgb), 0.96);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bar[data-stuck="true"]::after {
+  opacity: 1;
+}
+
 @media (prefers-reduced-transparency: reduce) {
   .bar[data-stuck="true"] {
     background-color: var(--canvas);

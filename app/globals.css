@@ -76,6 +76,10 @@
 
   --font-sans: var(--font-montserrat), "Montserrat", system-ui, sans-serif;
   --phone: 430px;
+  /* Room at the top for the status bar: the real one on a phone, the pretend
+     one (DeviceChrome) on a laptop. */
+  --chrome-top: 0px;
+  --top-inset: max(env(safe-area-inset-top, 0px), var(--chrome-top));
 }
 
 /* Reduce Transparency: the same surfaces, solid. */
@@ -287,5 +291,11 @@ html[data-vt="back"]::view-transition-new(skin-panel) {
 @keyframes vtFade {
   from {
     opacity: 0;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :root {
+    --chrome-top: 50px;
   }
 }

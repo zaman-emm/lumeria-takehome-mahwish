@@ -53,12 +53,16 @@
   transform: translateY(calc(-100% - 2px));
 }
 
+.page {
+  --tabs-top: var(--top-inset);
+}
+
 .page:not([data-tab="glance"]) {
-  --tabs-top: 72px;
+  --tabs-top: calc(72px + var(--top-inset));
 }
 
 .page:not([data-tab="glance"])[data-head="away"] {
-  --tabs-top: 0px;
+  --tabs-top: var(--top-inset);
 }
 
 @media (prefers-reduced-motion: reduce) {

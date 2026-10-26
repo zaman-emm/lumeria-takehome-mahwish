@@ -57,6 +57,7 @@ export function Hero({
 
   return (
     <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-skin-hero>
+      <BackButton />
       <Logo className={h.logo} />
       <p className={h.hi}>Hi {d.firstName},</p>
       <h1 className={h.title}>{headline(d)}</h1>
@@ -134,6 +135,7 @@ export function SlimHeader({
   const tz = scanTz(lens) ?? d.tz;
   return (
     <header className={h.slim}>
+      <BackButton />
       <button className={h.slimLens} onClick={onScan} aria-label={`Open your scan from ${fmtDay(lens.takenAt, tz)}`}>
         <Photo scan={lens} alt="" style={{ viewTransitionName: "skin-photo" }} />
       </button>
@@ -152,5 +154,14 @@ export function SlimHeader({
         </button>
       )}
     </header>
+  );
+}
+
+/** Back to the app the report opens from. That app isn't part of this build, so it only shows. */
+function BackButton() {
+  return (
+    <button type="button" className={h.back} aria-label="Back">
+      <Icon name="chevronL" size={18} stroke={2} />
+    </button>
   );
 }
