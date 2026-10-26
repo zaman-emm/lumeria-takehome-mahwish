@@ -18,9 +18,8 @@ import p from "./products.module.css";
 /** Gentler swaps: future scope, hidden for now. */
 const SHOW_SWAPS = false;
 
-/** How many days before a product starts its chart and "other changes" reach back. */
+/** How many days before a product starts its chart reaches back. */
 const LEAD_DAYS = 2;
-const CONTEXT_DAYS = 7;
 
 /** What an ingredient is, from a source she can check. Only ones we can cite. */
 const ABOUT: Record<string, { text: string; source: string; href: string }> = {
@@ -44,29 +43,16 @@ export function ProductsTab() {
       </div>
     );
   }
-  // The newest product still in use gets its context: what else changed, and what it is.
+  // The newest product still in use gets a word on what it is.
   const lead = products.find((x) => !x.endDate && x.startDate > d.start);
   const about = lead && lead.keyIngredients.map((k) => ABOUT[k.toLowerCase()]).find(Boolean);
-  const changes = lead ? otherChanges(d, lead) : [];
+  const factors = otherFactors(d);
 
   return (
     <div className={p.list}>
       {products.map((prod) => (
         <div key={prod.id} className={p.group}>
           <ProductCard d={d} product={prod} />
-          {prod === lead && changes.length > 0 && (
-            <Fold title="Other changes">
-              <ul className={p.changes}>
-                {changes.map((c) => (
-                  <li key={`${c.day}-${c.text}`}>
-                    <Icon name={c.icon} size={14} />
-                    <span className={p.changeDay}>{fmtDay(c.day)}</span>
-                    <span>{c.text}</span>
-                  </li>
-                ))}
-              </ul>
-            </Fold>
-          )}
           {prod === lead && about && (
             <Fold title={`About ${shortName(d, prod).toLowerCase()}`}>
               <p className={p.about}>{about.text}</p>
@@ -78,6 +64,21 @@ export function ProductsTab() {
           )}
         </div>
       ))}
+
+      {/* After the products: what else was going on that month that the cards don't cover. */}
+      {factors.length > 0 && (
+        <Fold title="Other factors">
+          <ul className={p.changes}>
+            {factors.map((c) => (
+              <li key={`${c.start}-${c.text}`}>
+                <Icon name={c.icon} size={14} />
+                <span className={p.changeDay}>{fmtRange(c.start, c.end)}</span>
+                <span>{c.text}</span>
+              </li>
+            ))}
+          </ul>
+        </Fold>
+      )}
 
       <footer className={p.foot}>
         <p className={p.disclaimer}>
@@ -91,23 +92,13 @@ export function ProductsTab() {
 
 const shortName = (d: Derived, prod: Product) => d.spans.find((s) => s.id === prod.id)?.short ?? prod.name;
 
-/** Trips and other products that started or ended from a week before this one began. */
-function otherChanges(d: Derived, prod: Product) {
-  const from = addDays(prod.startDate, -CONTEXT_DAYS);
-  const to = prod.endDate ?? d.end;
-  const within = (day: string) => day >= from && day <= to;
-  const out: { day: string; icon: IconName; text: string }[] = [];
-  for (const s of d.spans) {
-    if (s.id === prod.id) continue;
-    if (s.kind === "travel") {
-      if (within(s.start) && s.start > d.start) out.push({ day: s.start, icon: "plane", text: `${s.short} trip started` });
-      if (within(s.end)) out.push({ day: s.end, icon: "plane", text: `${s.short} trip ended` });
-    } else {
-      if (within(s.start) && s.start > d.start) out.push({ day: s.start, icon: "bottle", text: `${s.short} started` });
-      if (!s.ongoing && within(s.end)) out.push({ day: s.end, icon: "stop", text: `${s.short} stopped` });
-    }
-  }
-  return out.sort((a, b) => a.day.localeCompare(b.day));
+/** Everything in the month that isn't a product (the cards cover those): trips and periods, in date order. */
+function otherFactors(d: Derived) {
+  const out: { start: string; end: string; icon: IconName; text: string }[] = [
+    ...d.spans.filter((s) => s.kind === "travel").map((s) => ({ start: s.start, end: s.end, icon: "plane" as IconName, text: `${s.short} trip` })),
+    ...d.moments.map((m) => ({ start: m.day, end: m.end, icon: "drop" as IconName, text: m.label })),
+  ];
+  return out.sort((a, b) => a.start.localeCompare(b.start));
 }
 
 /** A card with a title that folds its body away. */
