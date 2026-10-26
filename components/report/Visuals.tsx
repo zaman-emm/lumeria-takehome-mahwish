@@ -1,11 +1,11 @@
 "use client";
 
-import { useId, type CSSProperties } from "react";
-import { fmtDay, type FaceMark, type FaceRegion, type Milestone, type Rhythm, type ScoreKey } from "@/lib/insights";
+import type { CSSProperties } from "react";
+import { fmtDay, type Milestone, type Rhythm, type ScoreKey } from "@/lib/insights";
 import v from "./visuals.module.css";
 
 // Small visual vocabulary shared by the report: icons, score rings, tick bars,
-// the face map, milestone badges and the scan-rhythm strip.
+// milestone badges and the scan-rhythm strip.
 
 const PATHS: Record<string, string> = {
   close: "M4 4l8 8M12 4l-8 8",
@@ -183,94 +183,6 @@ export function TickAxis() {
       <span style={{ left: "75%" }}>75</span>
       <span style={{ left: "100%" }}>100</span>
     </span>
-  );
-}
-
-// Face map geometry, in a 320 x 168 box: the face on the left, labels on the right.
-const REGION_SHAPES: Record<FaceRegion, string> = {
-  forehead: "M40 46a30 12 0 1060 0a30 12 0 10-60 0z",
-  tzone: "M38 37h64v15H79v50H61V52H38z",
-  nose: "M60 100a10 11 0 1020 0a10 11 0 10-20 0z",
-  cheeks: "M25 110a15 15 0 1030 0a15 15 0 10-30 0zM85 110a15 15 0 1030 0a15 15 0 10-30 0z",
-  chin: "M52 146a18 9 0 1036 0a18 9 0 10-36 0z",
-};
-const ANCHORS: Record<FaceRegion, [number, number]> = {
-  forehead: [86, 44],
-  tzone: [100, 44],
-  nose: [78, 100],
-  cheeks: [104, 110],
-  chin: [86, 146],
-};
-/** Body areas we can point at on the face. Left and right are the person's own, so they mirror. */
-const AREA_SPOTS: [RegExp, number, number][] = [
-  [/left cheek/i, 100, 110],
-  [/right cheek/i, 40, 110],
-  [/left jaw/i, 104, 134],
-  [/right jaw/i, 36, 134],
-  [/forehead/i, 70, 46],
-  [/chin/i, 70, 146],
-  [/nose/i, 70, 100],
-];
-export const onFace = (area: string) => AREA_SPOTS.some(([re]) => re.test(area));
-
-/**
- * What we saw, drawn on a face: each note is a short label on the zone it's
- * about, filled with a pattern (dots for calm, hatching for worth a look) so it
- * never leans on colour alone. A dashed ring marks the spot that was scanned.
- */
-export function FaceMap({ marks, area }: { marks: FaceMark[]; area: string }) {
-  const id = useId().replace(/:/g, "");
-  const spot = AREA_SPOTS.find(([re]) => re.test(area));
-  // Labels follow their zones top to bottom, nudged apart so none overlap.
-  const placed = [...marks]
-    .sort((a, b) => ANCHORS[a.region][1] - ANCHORS[b.region][1])
-    .reduce<(FaceMark & { y: number })[]>((acc, m) => {
-      const prevY = acc.length ? acc[acc.length - 1].y : -Infinity;
-      acc.push({ ...m, y: Math.max(ANCHORS[m.region][1], prevY + 34) });
-      return acc;
-    }, []);
-  const fill = (tone: FaceMark["tone"]) => `url(#${id}-${tone})`;
-
-  return (
-    <figure className={v.face}>
-      <svg viewBox="0 14 320 154" role="img" aria-label={`${marks.map((m) => m.label).join(", ")}. Scanned: ${area}.`}>
-        <defs>
-          <pattern id={`${id}-good`} width="6" height="6" patternUnits="userSpaceOnUse">
-            <rect width="6" height="6" className={v.fGoodBg} />
-            <circle cx="3" cy="3" r="1.3" className={v.fGoodInk} />
-          </pattern>
-          <pattern id={`${id}-watch`} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-            <rect width="5" height="5" className={v.fWatchBg} />
-            <line x1="1" y1="0" x2="1" y2="5" className={v.fWatchInk} />
-          </pattern>
-        </defs>
-        <path className={v.fHead} d="M70 20c34 0 50 30 50 66 0 42-24 72-50 72S20 128 20 86c0-36 16-66 50-66z" />
-        {marks.map((m) => (
-          <path key={m.region} d={REGION_SHAPES[m.region]} fill={fill(m.tone)} className={v.fZone} />
-        ))}
-        <path className={v.fLine} d="M45 80q8-5 16 0M79 80q8-5 16 0M70 86v20q-3 3-7 2M59 128q11 7 22 0" />
-        {spot && <circle cx={spot[1]} cy={spot[2]} r="19" className={v.fSpot} />}
-        {placed.map((m) => {
-          const [ax, ay] = ANCHORS[m.region];
-          return (
-            <g key={m.region}>
-              <path className={v.fLeader} d={`M${ax} ${ay}L140 ${m.y}H152`} />
-              <circle cx={ax} cy={ay} r="3" className={v.fPin} />
-              <rect x="158" y={m.y - 7} width="14" height="14" rx="3" fill={fill(m.tone)} className={v.fSwatch} />
-              <text x="180" y={m.y} dominantBaseline="central" className={v.fLabel}>
-                {m.label}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-      {spot && (
-        <figcaption>
-          <i className={v.fSpotKey} aria-hidden />
-          Scanned: {area}
-        </figcaption>
-      )}
-    </figure>
   );
 }
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { METRICS, dayOf, faceMarks, fmtDay, fmtTime, previousSameArea, scanTz, score, shortTip, signed, spansOn } from "@/lib/insights";
+import { METRICS, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, score, shortTip, signed, spansOn } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
-import { FaceMap, LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, type Light } from "./ui";
+import { LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, type Light } from "./ui";
 import m from "./sheets.module.css";
 
 // Everything about one scan: the photo under each light, every score against
@@ -115,9 +115,6 @@ export function ScanSheet({ scan }: { scan: Scan }) {
       </div>
       <i className={m.band} aria-hidden />
 
-      <div className={m.face}>
-        <FaceMap marks={faceMarks(scan.summary.observations)} area={scan.area} />
-      </div>
       <p className={m.tip}>
         <Icon name="spark" size={14} />
         {shortTip(scan.summary.tip)}

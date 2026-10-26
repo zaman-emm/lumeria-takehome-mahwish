@@ -2,7 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
-import { EXTRAS, faceMarks, score } from "@/lib/insights";
+import { EXTRAS, score } from "@/lib/insights";
 import { skinTypeOf } from "@/lib/extended";
 import { noteEcho, streakLine } from "@/lib/voice";
 import type { WeekStreak } from "@/lib/weeks";
@@ -11,11 +11,11 @@ import { useCountUp, useFirstTime, useReveal } from "./hooks";
 import { Icon } from "./Icon";
 import { MetricCarousel } from "./MetricCarousel";
 import { MonthStory } from "./MonthStory";
-import { FaceMap, Ring } from "./ui";
+import { Ring } from "./ui";
 import g from "./glance.module.css";
 
 // At a glance, under the hero: the month as one curve, the five scores as a
-// carousel of cards, what the latest scan saw on a face, the week streak, and
+// carousel of cards, what the latest scan saw, the week streak, and
 // the extra measures folded away.
 
 export function Glance({ streak }: { streak: WeekStreak }) {
@@ -25,8 +25,6 @@ export function Glance({ streak }: { streak: WeekStreak }) {
   const reduce = useReducedMotion();
   // On first load the sections rise in after the hero's card, top to bottom.
   const enter = first && !reduce;
-  const [faceRef, faceReveal] = useReveal<HTMLElement>("glance-face");
-  const marks = faceMarks(latest.summary.observations);
   const echo = noteEcho(d);
 
   return (
@@ -36,8 +34,7 @@ export function Glance({ streak }: { streak: WeekStreak }) {
         <MetricCarousel onOpen={(key) => openMetric(key)} />
       </div>
 
-      <section ref={faceRef} className={g.read} aria-label="What this scan saw" style={{ "--n": 2 } as CSSProperties}>
-        <FaceMap marks={marks} area={latest.area} reveal={faceReveal} />
+      <section className={g.read} aria-label="Your latest scan" style={{ "--n": 2 } as CSSProperties}>
         {echo && <p className={g.echo}>{echo}</p>}
         <p className={g.tip}>
           <Icon name="spark" size={14} />

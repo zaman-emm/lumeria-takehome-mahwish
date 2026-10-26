@@ -9,7 +9,6 @@ import {
   byTime,
   dayOf,
   daysBetween,
-  faceMarks,
   fmtDay,
   fmtRange,
   metricMeta,
@@ -416,30 +415,17 @@ export function buildRecap(d: Derived): Slide[] {
   const low = METRICS.map((m) => ({ m, v: score(latest, m.key) }))
     .filter((x): x is { m: (typeof METRICS)[number]; v: number } => x.v != null)
     .sort((a, b) => a.v - b.v)
-    .slice(0, 2);
-  const watch = faceMarks(latest.summary.observations).find((m) => m.tone === "watch");
+    .slice(0, 3);
   const tip = latest.summary.tip;
   out.push({
     kind: "tip",
     title: tipTitle(tip),
-    stats: [
-      ...low.map((x) => ({ label: x.m.label, value: String(x.v) })),
-      ...(watch ? [markStat(watch.label, watch.region)] : []),
-    ].slice(0, 3),
+    stats: low.map((x) => ({ label: x.m.label, value: String(x.v) })),
     chips: chipsOf(tip),
     tip,
   });
 
   return out;
-}
-
-const REGION_NAMES: Record<string, string> = { tzone: "T-zone", nose: "Nose", cheeks: "Cheeks", forehead: "Forehead", chin: "Chin" };
-
-/** "T-zone shine" → Shine: T-zone */
-function markStat(label: string, region: string): Stat {
-  const place = REGION_NAMES[region] ?? cap(region);
-  const what = label.replace(new RegExp(place, "i"), "").replace(/\b(by|more)\b/gi, "").trim();
-  return { label: cap(what || "Focus"), value: place };
 }
 
 /** The tip as next month's headline, with the one word that matters picked out. */
