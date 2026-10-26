@@ -2,12 +2,14 @@
 
 import { createContext, useContext } from "react";
 import type { Derived, LumiQuestion, ScoreKey } from "@/lib/insights";
+import type { LumiTab } from "@/lib/lumi";
 import type { Scan } from "@/lib/types";
 
 export type SheetState =
   | { kind: "scan"; scan: Scan }
   | { kind: "metric"; key: ScoreKey; area: string }
-  | { kind: "lumi" };
+  /** Lumi opens on the tab it was called from, so it can talk about it. */
+  | { kind: "lumi"; tab: LumiTab };
 
 export interface ReportApi {
   d: Derived;

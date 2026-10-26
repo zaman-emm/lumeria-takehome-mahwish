@@ -13,7 +13,7 @@ import { Glance } from "./Glance";
 import { Hero, SlimHeader } from "./Hero";
 import { withViewTransition } from "./hooks";
 import { Icon } from "./Icon";
-import { LumiDock } from "./LumiDock";
+import { LumiButton } from "./LumiButton";
 import { LumiSheet } from "./LumiSheet";
 import { MetricSheet } from "./MetricSheet";
 import { PhotosTab } from "./PhotosTab";
@@ -74,14 +74,14 @@ export function Report({ d }: { d: Derived }) {
       d,
       openScan: (scan: Scan) => open({ kind: "scan", scan }),
       openMetric: (key: ScoreKey, area?: string) => open({ kind: "metric", key, area: area ?? d.area }),
-      openLumi: () => open({ kind: "lumi" }),
+      openLumi: () => open({ kind: "lumi", tab }),
       lumi: {
         questions,
         answers,
         answer: (id: string, a: string) => setAnswers((s) => ({ ...s, [id]: a })),
       },
     }),
-    [d, open, questions, answers],
+    [d, open, questions, answers, tab],
   );
 
   const changeTab = (id: TabId) => {
@@ -176,9 +176,10 @@ export function Report({ d }: { d: Derived }) {
             </div>
           </Drawer.Indent>
 
-          <LumiDock
+          <LumiButton
             hidden={Boolean(sheet) || recap}
-            open={questions.filter((q) => !answers[q.id]).length}
+            count={questions.filter((q) => !answers[q.id]).length}
+            month={d.isMonthly}
             onOpen={api.openLumi}
           />
 
@@ -193,7 +194,7 @@ export function Report({ d }: { d: Derived }) {
             {sheet?.kind === "metric" && (
 <MetricSheet metric={sheet.key} area={sheet.area} />
             )}
-            {sheet?.kind === "lumi" && <LumiSheet />}
+            {sheet?.kind === "lumi" && <LumiSheet tab={sheet.tab} />}
           </Sheet>
 
           <AnimatePresence>

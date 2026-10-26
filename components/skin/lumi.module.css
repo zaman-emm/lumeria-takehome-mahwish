@@ -1,111 +1,410 @@
-/* Lumi's tab on the right edge of the screen. The outer layer only moves up
-   and down (drag); the tab inside slides sideways (tuck, hide, lift). */
+/* Lumi: the edge dock (a half-pill on the right edge of the phone column, its
+   peek bubble and the tuck it does while the page scrolls), then the
+   conversation in its sheet. */
 
 .dock {
   position: fixed;
   z-index: 30;
-  top: 0;
   right: max(0px, calc((100vw - var(--phone)) / 2));
-  touch-action: none;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition:
+    transform 420ms var(--ease-drawer),
+    opacity 220ms var(--ease-out);
+}
+
+.dock[data-tucked="true"] {
+  transform: translateX(34px);
+}
+
+.dock[data-hidden="true"] {
+  opacity: 0;
+  transform: translateX(72px);
+  pointer-events: none;
 }
 
 .tab {
   position: relative;
-  display: flex;
-  align-items: center;
-  width: 62px;
-  height: 60px;
-  padding-left: 14px;
-  border-radius: 30px 0 0 30px;
-  background: var(--forest);
-  box-shadow:
-    inset 1px 0 0 var(--bark),
-    inset 0 1px 0 var(--bark),
-    inset 0 -1px 0 var(--bark),
-    0 8px 24px rgba(20, 36, 26, 0.28);
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  transition:
-    transform 280ms var(--ease-out),
-    opacity 200ms var(--ease-out),
-    box-shadow 200ms var(--ease-out);
-}
-
-/* The orb gives under the finger, the way the Figma press set does. */
-.face {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  transition: transform 120ms var(--ease-out);
-}
-
-.tab:active .face {
-  transform: scale(0.92);
-}
-
-.tab[data-tucked="true"] {
-  transform: translateX(38px);
-}
-
-/* Picked up: it comes off the edge a little and sits higher. */
-.tab[data-dragging="true"] {
-  cursor: grabbing;
-  transform: translateX(-8px) scale(1.04);
+  width: 72px;
+  height: 64px;
+  padding: 0 4px 0 0;
+  border-radius: 32px 0 0 32px;
+  background:
+    radial-gradient(40px 40px at 34px 32px, rgba(215, 180, 111, 0.28), transparent 100%),
+    var(--evergreen);
   box-shadow:
-    inset 1px 0 0 var(--bark),
-    inset 0 1px 0 var(--bark),
-    inset 0 -1px 0 var(--bark),
-    0 14px 32px rgba(20, 36, 26, 0.34);
+    inset 1px 0 0 rgba(215, 180, 111, 0.45),
+    inset 0 1px 0 rgba(215, 180, 111, 0.3),
+    inset 0 -1px 0 rgba(215, 180, 111, 0.2),
+    -6px 10px 28px rgba(20, 36, 26, 0.32);
+  transition: transform 180ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.dock[data-hidden="true"] .tab {
-  opacity: 0;
-  transform: translateX(100%);
-  pointer-events: none;
+.tab:active,
+.tab[data-pressed="true"] {
+  transform: scale(0.94);
+  transform-origin: 100% 50%;
 }
 
-.count {
+.orb {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+
+/* A slow gold breath behind the orb, so the dock reads as alive. */
+.halo {
   position: absolute;
-  top: -4px;
-  left: -4px;
-  display: grid;
-  place-items: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: 11px;
-  background: var(--gold);
-  box-shadow: 0 0 0 2px var(--white);
-  color: var(--evergreen);
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  animation: countIn 260ms var(--ease-out) both;
+  left: 8px;
+  top: 4px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(215, 180, 111, 0.45), transparent 70%);
+  animation: breathe 3.6s var(--ease-in-out) infinite;
 }
 
-@keyframes countIn {
+.tab[data-pressed="true"] .halo {
+  animation: none;
+  transform: scale(1.5);
+  opacity: 1;
+  transition: transform 180ms var(--ease-out);
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--gold);
+  color: var(--evergreen);
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--evergreen);
+  animation: badgeIn 260ms var(--ease-out) both;
+}
+
+@keyframes badgeIn {
   from {
     opacity: 0;
     transform: scale(0.8);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .tab[data-tucked="true"],
-  .tab[data-dragging="true"],
-  .dock[data-hidden="true"] .tab {
-    transform: none;
-  }
-  .count {
-    animation-name: countFade;
+/* ------------------------------------------------ peek */
+
+.peek {
+  position: relative;
+  max-width: 220px;
+  transform-origin: 100% 50%;
+}
+
+.peekBody {
+  display: block;
+  padding: 12px 30px 12px 14px;
+  border-radius: 18px 18px 6px 18px;
+  background: var(--paper);
+  color: var(--bark);
+  font-size: 14px;
+  line-height: 19px;
+  font-weight: 500;
+  text-align: left;
+  box-shadow:
+    inset 0 0 0 1px var(--sand),
+    0 10px 28px rgba(20, 36, 26, 0.18);
+}
+
+.peekKicker {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--bronze-deep);
+}
+
+.peekClose {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ conversation */
+
+/* Tall from the start, so the sheet doesn't grow under your thumb as the
+   conversation does. */
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(85dvh - 64px);
+}
+
+.chatHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 48px;
+}
+
+.chatHead h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 300;
+}
+
+.chatOrb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(215, 180, 111, 0.3), transparent 70%),
+    var(--evergreen);
+  box-shadow: inset 0 0 0 1px rgba(215, 180, 111, 0.45);
+}
+
+/* While Lumi reads or thinks, its glow swells a little. */
+.chatOrb::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(215, 180, 111, 0.35), transparent 70%);
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 400ms var(--ease-out),
+    transform 400ms var(--ease-out);
+  pointer-events: none;
+}
+
+.chatOrb[data-busy="true"]::after {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.line {
+  max-width: 88%;
+}
+
+.line p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 24px;
+}
+
+.line[data-from="lumi"] p {
+  font-weight: 400;
+  color: var(--bark);
+}
+
+.line[data-from="you"] {
+  align-self: flex-end;
+  padding: 10px 14px;
+  border-radius: 18px 18px 6px 18px;
+  background: var(--forest);
+  color: var(--bone);
+}
+
+.line[data-from="you"] p {
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.ai {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+/* Words arrive a few at a time, softly, like a reply being written. */
+.written span[aria-hidden] {
+  animation: word 360ms var(--ease-out) both;
+  animation-delay: calc(var(--w) * 22ms);
+}
+
+@keyframes word {
+  from {
+    opacity: 0;
+    filter: blur(3px);
   }
 }
 
-@keyframes countFade {
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--bark-2);
+}
+
+/* A light sweep across the words while Lumi works. */
+.shimmer {
+  background: linear-gradient(
+      100deg,
+      var(--bark-2) 0%,
+      var(--bark-2) 40%,
+      var(--bronze-deep) 50%,
+      var(--bark-2) 60%,
+      var(--bark-2) 100%
+    )
+    0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -150% 0;
+  }
+}
+
+.chips {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--sand);
+  color: var(--bark);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  animation: chipIn 300ms var(--ease-out) both;
+  animation-delay: calc(120ms + var(--i) * 60ms);
+  transition: transform 160ms var(--ease-out);
+}
+
+.chips button svg {
+  color: var(--bronze-deep);
+}
+
+.chips button:active {
+  transform: scale(0.97);
+}
+
+@keyframes chipIn {
   from {
     opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.asks {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--sand);
+}
+
+.asks h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.asks h3 span {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--gold);
+  color: var(--evergreen);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chat > :last-child {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .written span[aria-hidden],
+  .chips button,
+  .badge {
+    animation-name: fadeOnly;
+  }
+  .shimmer {
+    animation: none;
+  }
+}
+
+@keyframes fadeOnly {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock,
+  .dock[data-tucked="true"],
+  .dock[data-hidden="true"] {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+  .halo {
+    animation: none;
   }
 }
