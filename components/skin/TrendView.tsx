@@ -23,6 +23,7 @@ import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { useReveal, useWidth } from "./hooks";
 import { Icon } from "./Icon";
+import { NoteCard } from "./notes";
 import { Photo, Ring } from "./ui";
 import { tick } from "./DayCurve";
 import t from "./trends.module.css";
@@ -349,26 +350,31 @@ export function ScanCard({ scan, metric = "overall" }: { scan: Scan; metric?: Sc
   const v = score(scan, metric);
   const pv = prev ? score(prev, metric) : null;
   const delta = v != null && pv != null ? v - pv : null;
-  const note = scan.annotation?.note;
+  // The card opens the scan through one button stretched over it; the note
+  // sits above that button so its pencil works on its own.
   return (
-    <button className={t.card} onClick={() => openScan(scan)} aria-label={`Open the scan from ${fmtDay(scan.takenAt, tz)}`}>
-      <Photo scan={scan} alt="" className={t.cardPhoto} />
-      <span className={t.cardText}>
-        <span className={t.cardWhen}>
-          {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}
-        </span>
-        <span className={t.cardNote}>{note ? `“${note}”` : scan.summary.headline}</span>
-      </span>
-      <span className={t.cardScore}>
-        <b>{v ?? "–"}</b>
-        {delta != null && delta !== 0 && (
-          <span className={t.cardDelta}>
-            <Icon name={delta > 0 ? "up" : "down"} size={9} stroke={2} />
-            {Math.abs(delta)}
+    <div className={t.card}>
+      <button className={t.cardHit} onClick={() => openScan(scan)} aria-label={`Open the scan from ${fmtDay(scan.takenAt, tz)}`} />
+      <div className={t.cardTop} aria-hidden>
+        <Photo scan={scan} alt="" className={t.cardPhoto} />
+        <span className={t.cardText}>
+          <span className={t.cardWhen}>
+            {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}
           </span>
-        )}
-      </span>
-      <Icon name="chevronR" size={12} stroke={1.8} className={t.cardChevron} />
-    </button>
+          <span className={t.cardSaw}>{scan.summary.headline}</span>
+        </span>
+        <span className={t.cardScore}>
+          <b>{v ?? "–"}</b>
+          {delta != null && delta !== 0 && (
+            <span className={t.cardDelta}>
+              <Icon name={delta > 0 ? "up" : "down"} size={9} stroke={2} />
+              {Math.abs(delta)}
+            </span>
+          )}
+        </span>
+        <Icon name="chevronR" size={12} stroke={1.8} className={t.cardChevron} />
+      </div>
+      {scan.annotation !== undefined && <NoteCard scan={scan} compact lines={1} addable className={t.cardNote} />}
+    </div>
   );
 }

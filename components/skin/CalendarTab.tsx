@@ -6,6 +6,7 @@ import { addDays, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, signed, type
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
+import { NoteCard } from "./notes";
 import { Photo } from "./ui";
 import c from "./calendar.module.css";
 
@@ -166,7 +167,7 @@ export function CalendarTab() {
           {[...byDay.keys()].map((day) => {
             const on = day === picked;
             const ss = byDay.get(day)!;
-            const dayNote = ss.find((s) => s.annotation?.note)?.annotation?.note;
+            const noted = ss.filter((s) => s.annotation?.note);
             return (
               <div key={day} className={c.dayPane} data-on={on} aria-hidden={!on} inert={!on}>
                 <h2>
@@ -175,7 +176,9 @@ export function CalendarTab() {
                 {ss.map((s) => (
                   <DayRow key={s.id} d={d} scan={s} ghost={!on} />
                 ))}
-                {dayNote && <blockquote className={c.note}>“{dayNote}”</blockquote>}
+                {noted.map((s) => (
+                  <NoteCard key={s.id} scan={s} className={c.note} />
+                ))}
               </div>
             );
           })}

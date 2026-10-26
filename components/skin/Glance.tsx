@@ -9,6 +9,7 @@ import type { WeekStreak } from "@/lib/weeks";
 import { useReportApi } from "./context";
 import { useCountUp, useFirstTime, useReveal } from "./hooks";
 import { Icon } from "./Icon";
+import { NoteCard } from "./notes";
 import { MetricCarousel } from "./MetricCarousel";
 import { MonthStory } from "./MonthStory";
 import { FaceMap, Ring } from "./ui";
@@ -38,7 +39,12 @@ export function Glance({ streak }: { streak: WeekStreak }) {
 
       <section ref={faceRef} className={g.read} aria-label="What this scan saw" style={{ "--n": 2 } as CSSProperties}>
         <FaceMap marks={marks} area={latest.area} reveal={faceReveal} />
-        {echo && <p className={g.echo}>{echo}</p>}
+        {echo && (
+          <>
+            <NoteCard scan={latest} className={g.echoNote} />
+            <p className={g.echo}>{echo}</p>
+          </>
+        )}
         <p className={g.tip}>
           <Icon name="spark" size={14} />
           {latest.summary.tip}

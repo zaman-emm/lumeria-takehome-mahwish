@@ -5,6 +5,7 @@ import { METRICS, dayOf, faceMarks, fmtDay, fmtTime, previousSameArea, scanTz, s
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
+import { NoteCard } from "./notes";
 import { FaceMap, LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, type Light } from "./ui";
 import m from "./sheets.module.css";
 
@@ -123,7 +124,7 @@ export function ScanSheet({ scan }: { scan: Scan }) {
         {shortTip(scan.summary.tip)}
       </p>
 
-      {ann?.note && <blockquote className={m.note}>“{ann.note}”</blockquote>}
+      {ann && <NoteCard scan={scan} addable className={m.note} />}
       {(ann?.tags.length || (stress ?? 0) >= 4) && (
         <p className={m.tags}>
           {ann?.tags.join(" · ")}

@@ -253,11 +253,6 @@
 
 .note {
   margin: 22px 0 0;
-  font-size: 20px;
-  line-height: 26px;
-  font-weight: 300;
-  font-style: italic;
-  color: var(--bark-2);
 }
 
 .tags {

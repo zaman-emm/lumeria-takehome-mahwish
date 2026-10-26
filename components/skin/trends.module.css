@@ -404,15 +404,15 @@
 /* This card sits at the end of a view whose chart you scrub, and in a bottom
    sheet that is anchored to the screen's edge, so it is one fixed size: a
    different note, or a scan with no change badge, must never resize it and
-   move what is around it. The note clamps to two lines (the scan opens in full
-   on tap) and the score keeps room for its badge. */
+   move what is around it. What the scan saw clamps to two lines, the note to
+   one (the scan opens in full on tap), and the score keeps room for its badge. */
 .card {
+  position: relative;
   background: var(--canvas);
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
-  height: 88px;
   margin-top: 16px;
   padding: 12px 14px 12px 12px;
   border-radius: 20px;
@@ -420,8 +420,46 @@
   transition: transform 160ms var(--ease-out);
 }
 
-.card:active {
+/* The card's own button, stretched over it (ScanCard). */
+.cardHit {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.cardHit:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+.card:has(.cardHit:active) {
   transform: scale(0.98);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+}
+
+/* The note's slot is one size, note or not, so scrubbing never resizes the
+   card; it grows only while the note is being edited. It sits above the
+   card's button: the pencil takes its own taps, the words fall through. */
+.cardNote {
+  position: relative;
+  z-index: 1;
+  height: 54px;
+  margin-left: 0;
+  pointer-events: none;
+}
+
+.cardNote :is(button, textarea) {
+  pointer-events: auto;
+}
+
+.cardNote[data-editing="true"] {
+  height: auto;
 }
 
 /* The card's own space, when there is no scan to show in it. */
@@ -453,13 +491,13 @@
   color: var(--bark-2);
 }
 
-.cardNote {
+.cardSaw {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   overflow: hidden;
-  /* Always two lines tall, so one line of note doesn't re-centre the text. */
+  /* Always two lines tall, so one line doesn't re-centre the text. */
   min-height: 38px;
   font-size: 14px;
   line-height: 19px;

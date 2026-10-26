@@ -16,6 +16,7 @@ import { withViewTransition } from "./hooks";
 import { LumiButton } from "./LumiButton";
 import { LumiSheet } from "./LumiSheet";
 import { MetricSheet } from "./MetricSheet";
+import { NotesProvider } from "./notes";
 import { PhotosTab } from "./PhotosTab";
 import { ProductsTab } from "./ProductsTab";
 import { Recap } from "./Recap";
@@ -176,84 +177,86 @@ export function Report({ d }: { d: Derived }) {
 
   return (
     <ReportContext.Provider value={api}>
-      <Drawer.Provider>
-        <div className={r.root} data-skin ref={setRoot}>
-          <Drawer.IndentBackground className={r.indentBg} />
-          <Drawer.Indent className={r.indent} style={{ "--origin": `${origin}px` } as CSSProperties}>
-            {dest === "home" && <HomeScreen d={d} onScan={() => go("scan")} onTrends={() => go("trends")} />}
-            {dest === "scan" && <ScanScreen d={d} />}
-            {dest === "trends" && (
-              <div className={r.page} data-tab={tab} data-head={headAway ? "away" : "shown"} data-splash={splash === "done" ? undefined : splash}>
-                {tab === "glance" ? (
-                  <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} splash={splash} />
-                ) : (
-                  <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} />
-                )}
+      <NotesProvider>
+        <Drawer.Provider>
+          <div className={r.root} data-skin ref={setRoot}>
+            <Drawer.IndentBackground className={r.indentBg} />
+            <Drawer.Indent className={r.indent} style={{ "--origin": `${origin}px` } as CSSProperties}>
+              {dest === "home" && <HomeScreen d={d} onScan={() => go("scan")} onTrends={() => go("trends")} />}
+              {dest === "scan" && <ScanScreen d={d} />}
+              {dest === "trends" && (
+                <div className={r.page} data-tab={tab} data-head={headAway ? "away" : "shown"} data-splash={splash === "done" ? undefined : splash}>
+                  {tab === "glance" ? (
+                    <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} splash={splash} />
+                  ) : (
+                    <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} />
+                  )}
 
-                <Tabs tabs={TABS} active={tab} onChange={changeTab} />
+                  <Tabs tabs={TABS} active={tab} onChange={changeTab} />
 
-                <main className={r.panel} id="skin-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
-                  {tab === "glance" && <Glance streak={streak} />}
-                  {tab === "products" && <ProductsTab />}
-                  {tab === "trends" && <TrendsTab />}
-                  {tab === "calendar" && <CalendarTab />}
-                  {tab === "photos" && <PhotosTab />}
-                </main>
+                  <main className={r.panel} id="skin-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
+                    {tab === "glance" && <Glance streak={streak} />}
+                    {tab === "products" && <ProductsTab />}
+                    {tab === "trends" && <TrendsTab />}
+                    {tab === "calendar" && <CalendarTab />}
+                    {tab === "photos" && <PhotosTab />}
+                  </main>
 
-                {tab === "glance" && (
-                  <footer className={r.foot}>
-                    <p className={r.disclaimer}>
-                      Lumeria’s AI reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the
-                      right next step.
-                    </p>
-                  </footer>
-                )}
-              </div>
+                  {tab === "glance" && (
+                    <footer className={r.foot}>
+                      <p className={r.disclaimer}>
+                        Lumeria’s AI reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the
+                        right next step.
+                      </p>
+                    </footer>
+                  )}
+                </div>
+              )}
+            </Drawer.Indent>
+
+            <TabBar active={dest} onChange={go} hidden={recap || splash !== "done"} />
+
+            <LumiButton
+              hidden={Boolean(sheet) || recap || splash !== "done" || dest === "scan"}
+              count={d.factors.length}
+              onOpen={api.openLumi}
+            />
+
+            <Sheet
+              open={Boolean(sheet)}
+              onClose={() => setSheet(null)}
+              label={sheet ? sheetLabel(sheet) : ""}
+              contentKey={sheet ? sheetKey(sheet) : undefined}
+              container={root}
+              edge={sheet?.kind !== "lumi"}
+            >
+              {sheet?.kind === "scan" && <ScanSheet scan={sheet.scan} />}
+              {sheet?.kind === "metric" && (
+  <MetricSheet metric={sheet.key} area={sheet.area} />
+              )}
+              {sheet?.kind === "lumi" && <LumiSheet tab={sheet.tab} />}
+            </Sheet>
+
+            {splash !== "done" && (
+              <Splash value={d.latest.scores.overall} onGo={() => {
+                  markSplashed();
+                  setSplash("go");
+                }} onDone={() => setSplash("done")} />
             )}
-          </Drawer.Indent>
 
-          <TabBar active={dest} onChange={go} hidden={recap || splash !== "done"} />
-
-          <LumiButton
-            hidden={Boolean(sheet) || recap || splash !== "done" || dest === "scan"}
-            count={d.factors.length}
-            onOpen={api.openLumi}
-          />
-
-          <Sheet
-            open={Boolean(sheet)}
-            onClose={() => setSheet(null)}
-            label={sheet ? sheetLabel(sheet) : ""}
-            contentKey={sheet ? sheetKey(sheet) : undefined}
-            container={root}
-            edge={sheet?.kind !== "lumi"}
-          >
-            {sheet?.kind === "scan" && <ScanSheet scan={sheet.scan} />}
-            {sheet?.kind === "metric" && (
-<MetricSheet metric={sheet.key} area={sheet.area} />
-            )}
-            {sheet?.kind === "lumi" && <LumiSheet tab={sheet.tab} />}
-          </Sheet>
-
-          {splash !== "done" && (
-            <Splash value={d.latest.scores.overall} onGo={() => {
-                markSplashed();
-                setSplash("go");
-              }} onDone={() => setSplash("done")} />
-          )}
-
-          <AnimatePresence>
-            {recap && (
-              <Recap
-                key="recap"
-                from={recapFrom}
-                onClose={closeRecap}
-                label={`${d.isMonthly ? "Your month" : "Your story"}, ${d.periodLabel}, up to ${fmtDay(d.latest.takenAt, latestTz)}`}
-              />
-            )}
-          </AnimatePresence>
-        </div>
-      </Drawer.Provider>
+            <AnimatePresence>
+              {recap && (
+                <Recap
+                  key="recap"
+                  from={recapFrom}
+                  onClose={closeRecap}
+                  label={`${d.isMonthly ? "Your month" : "Your story"}, ${d.periodLabel}, up to ${fmtDay(d.latest.takenAt, latestTz)}`}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        </Drawer.Provider>
+      </NotesProvider>
     </ReportContext.Provider>
   );
 }

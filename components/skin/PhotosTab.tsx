@@ -6,6 +6,7 @@ import { dayOf, fmtDay, fmtTime, previousSameArea, scanTz, type Derived } from "
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
+import { NoteCard } from "./notes";
 import { Delta, LIGHTS, Photo, photoFor, type Light } from "./ui";
 import ph from "./photos.module.css";
 
@@ -110,23 +111,27 @@ function PhotoRow({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
   const tz = scanTz(scan) ?? d.tz;
   const prev = previousSameArea(d, scan);
   const delta = prev ? scan.scores.overall - prev.scores.overall : null;
-  const note = scan.annotation?.note;
+  // The whole row opens the scan through one button stretched over it; the
+  // note sits above that button so its pencil can be pressed on its own.
   return (
-    <button className={ph.row} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}. Open scan`}>
+    <div className={ph.row}>
+      <button className={ph.rowHit} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}. Open scan`} />
       <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.rowPhoto} />
       <span className={ph.rowText}>
-        <span className={ph.rowWhen}>
+        <span className={ph.rowWhen} aria-hidden>
           {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}
         </span>
-        <span className={ph.rowArea}>{scan.area}</span>
+        <span className={ph.rowArea} aria-hidden>
+          {scan.area}
+        </span>
         <span className={ph.rowSaw}>{scan.summary.headline}</span>
-        {note && <span className={ph.rowNote}>“{note}”</span>}
+        <NoteCard scan={scan} compact className={ph.rowNote} />
       </span>
-      <span className={ph.rowScore}>
+      <span className={ph.rowScore} aria-hidden>
         <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>
         {delta != null && delta !== 0 && <Delta n={delta} className={ph.rowDelta} />}
       </span>
-    </button>
+    </div>
   );
 }
 
