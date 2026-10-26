@@ -98,8 +98,8 @@
      one (DeviceChrome) on a laptop. */
   --chrome-top: 0px;
   --top-inset: max(env(safe-area-inset-top, 0px), var(--chrome-top));
-  /* How tall the At a glance hero's gold is on a phone (measured: 745px on a 393-wide
-     screen with a 59px top inset; 640px plus the inset since the greeting and card moved into it). The loading, error and empty screens and the phone
+  /* How tall the At a glance hero's gold is on a phone (measured: 640px plus the
+     top inset on a 393-wide screen). The loading, error and empty screens and the phone
      frame's placeholder paint the same height, so the gold's edge never moves when
      the real hero takes over. Re-measure if the hero's layout changes. */
   --hero-h: calc(var(--top-inset) + 640px);
