@@ -51,15 +51,6 @@
   --tabs-top: 72px;
 }
 
-/* At a glance sits on one long gradient behind the gold hero and the cards:
-   deep forest at the top, easing through sage into sand and bone by the
-   footer. The tab bar takes the forest so it doesn't sit as a white band. */
-.page[data-tab="glance"] {
-  background: linear-gradient(180deg, #1a2e21 0px, #2a4330 420px, #2f4a35 640px, #56684f 980px, #a6a78c 1300px, #ddd3bf 1560px, var(--bone) 1800px);
-  --tabs-bg: rgba(47, 74, 53, 0.82);
-  --tabs-active-ring: inset 0 0 0 1px rgba(215, 180, 111, 0.55);
-}
-
 .panel {
   padding: 0 16px;
   view-transition-name: skin-panel;

@@ -11,15 +11,39 @@ import { Photo } from "./ui";
 import h from "./hero.module.css";
 
 // The At a glance hero: the score as a sunrise gauge on gold. On first load
-// the rays light up along the arc, the arc draws to the score with its knob
-// riding the tip, and the number scrambles into place. Once per load only.
+// the arc draws to the score with its knob riding the tip, each ray lights as
+// the tip passes it, and the number rolls through random values that close in
+// on the score before it lands. Once per load only.
 
 const CX = 171;
 const CY = 185;
 const R = 126;
 const RAYS = 25;
-/** The digits the score flicks through before it lands, one every 100ms. */
-const SCRAMBLE = [38, 91, 46, 83, 29, 65, 74];
+/** How long the arc takes to draw, in ms; the rays and the roll follow it. */
+const DRAW = 1100;
+/** Where the arc starts drawing, in ms. */
+const LEAD = 150;
+
+/**
+ * The values the score rolls through: random at first, closing in on the
+ * score, each held a little longer than the last, like a wheel slowing down.
+ */
+function roll(value: number) {
+  const steps: { at: number; n: number }[] = [];
+  let at = 0;
+  for (let k = 0; k < 16; k++) {
+    const p = k / 16;
+    const spread = Math.round(45 * (1 - p) ** 1.6) + 2;
+    let n = value;
+    while (n === value) n = Math.max(0, Math.min(99, value + Math.round((Math.random() * 2 - 1) * spread)));
+    steps.push({ at, n });
+    at += 40 + 120 * p * p;
+  }
+  return { steps, end: at };
+}
+
+/** When the arc's tip reaches a share of its length, with the ease-out it draws on. */
+const reach = (share: number) => LEAD + DRAW * (1 - Math.cbrt(1 - Math.min(1, share)));
 
 const polar = (deg: number, r: number) => {
   const a = (deg * Math.PI) / 180;
@@ -49,22 +73,27 @@ export function Hero({
   useEffect(() => {
     if (!play || !digits.current) return;
     const el = digits.current;
-    const start = performance.now();
+    const { steps, end } = roll(value);
+    const start = performance.now() + LEAD;
     let raf = 0;
+    const land = () => {
+      el.textContent = String(value);
+      el.dataset.rolling = "false";
+    };
     const tick = (now: number) => {
-      const i = Math.floor((now - start) / 100);
-      if (i >= SCRAMBLE.length) {
-        el.textContent = String(value);
-        return;
-      }
-      el.textContent = String(SCRAMBLE[i]);
+      const t = now - start;
+      if (t >= end) return land();
+      let n = steps[0].n;
+      for (const st of steps) if (st.at <= t) n = st.n;
+      el.textContent = String(n);
       raf = requestAnimationFrame(tick);
     };
-    el.textContent = String(SCRAMBLE[0]);
+    el.textContent = String(steps[0].n);
+    el.dataset.rolling = "true";
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
-      el.textContent = String(value);
+      land();
     };
   }, [play, value]);
 
@@ -99,7 +128,7 @@ export function Hero({
                 y2={y2}
                 className={h.ray}
                 data-lit={i <= lit}
-                style={{ "--i": i } as CSSProperties}
+                style={{ "--i": i, "--at": `${reach(i / (RAYS - 1) / (value / 100))}ms` } as CSSProperties}
               />
             );
           })}
@@ -117,7 +146,7 @@ export function Hero({
         </svg>
         <div className={h.score}>
           <span className={h.value} style={{ viewTransitionName: "skin-score" }}>
-            <span ref={digits} aria-hidden>
+            <span ref={digits} className={h.digits} aria-hidden>
               {value}
             </span>
           </span>

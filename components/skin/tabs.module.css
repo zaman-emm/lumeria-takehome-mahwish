@@ -6,7 +6,7 @@
   top: var(--tabs-top, 0px);
   z-index: 5;
   padding: 15px 0 16px;
-  background: var(--tabs-bg, rgba(255, 255, 255, 0.86));
+  background: rgba(255, 255, 255, 0.86);
   -webkit-backdrop-filter: saturate(1.4) blur(12px);
   backdrop-filter: saturate(1.4) blur(12px);
   view-transition-name: skin-tabs;
@@ -80,7 +80,6 @@ button.chip:active {
 }
 
 .active .chip {
-  box-shadow: var(--tabs-active-ring, none);
   background: var(--forest);
   color: var(--bone);
   font-weight: 600;
