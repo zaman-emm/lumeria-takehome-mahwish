@@ -356,6 +356,51 @@
   fill: var(--bark);
 }
 
+/* The first time the map scrolls in: the zones fill, then each note's line
+   draws out from its zone and the label lands at the end of it. */
+.fLeader {
+  stroke-dasharray: 1;
+}
+
+.face[data-reveal="out"] .fZone,
+.face[data-reveal="out"] .fPin,
+.face[data-reveal="out"] .fSwatch,
+.face[data-reveal="out"] .fLabel {
+  opacity: 0;
+}
+
+.face[data-reveal="out"] .fLeader {
+  stroke-dashoffset: 1;
+}
+
+.face[data-reveal="out"] .fSwatch,
+.face[data-reveal="out"] .fLabel {
+  transform: translateX(-6px);
+}
+
+.face[data-reveal="in"] .fZone {
+  transition: opacity 360ms var(--ease-out);
+  transition-delay: calc(var(--k) * 80ms);
+}
+
+.face[data-reveal="in"] .fPin {
+  transition: opacity 200ms var(--ease-out);
+  transition-delay: calc(240ms + var(--k) * 140ms);
+}
+
+.face[data-reveal="in"] .fLeader {
+  transition: stroke-dashoffset 420ms var(--ease-out);
+  transition-delay: calc(260ms + var(--k) * 140ms);
+}
+
+.face[data-reveal="in"] .fSwatch,
+.face[data-reveal="in"] .fLabel {
+  transition:
+    opacity 300ms var(--ease-out),
+    transform 300ms var(--ease-out);
+  transition-delay: calc(560ms + var(--k) * 140ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ringValue[data-draw="true"] {
     animation: ringFade 400ms ease both;

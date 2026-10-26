@@ -48,6 +48,18 @@
   margin-top: 6px;
 }
 
+/* A new month slides in from the side of the arrow that was tapped. */
+.grid:not([data-dir="0"]) {
+  animation: monthIn 240ms var(--ease-out) both;
+}
+
+@keyframes monthIn {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--dir) * 16px));
+  }
+}
+
 .weekday {
   height: 24px;
   font-size: 12px;
@@ -316,7 +328,8 @@ button.stat:active {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dayCard {
+  .dayCard,
+  .grid:not([data-dir="0"]) {
     animation-name: dayFade;
   }
 }

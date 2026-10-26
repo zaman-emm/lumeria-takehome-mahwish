@@ -51,8 +51,15 @@ export function CalendarTab() {
   const best = d.trend?.high ?? [...d.scans].sort((a, b) => b.scores.overall - a.scores.overall)[0];
   const low = d.trend?.low ?? [...d.scans].sort((a, b) => a.scores.overall - b.scores.overall)[0];
   const [picked, setPicked] = useState(dayOf(d, d.latest));
-  const [month, setMonth] = useState(monthKey(picked));
+  const [month, setMonthRaw] = useState(monthKey(picked));
+  // Which way the last month change went, so the grid slides in from that side.
+  const [dir, setDir] = useState(0);
   const mi = months.indexOf(month);
+  const setMonth = (next: string) => {
+    if (next === month) return;
+    setDir(next > month ? 1 : -1);
+    setMonthRaw(next);
+  };
 
   const pick = (day: string) => {
     setPicked(day);
@@ -87,7 +94,7 @@ export function CalendarTab() {
             <Icon name="chevronR" size={14} stroke={1.6} />
           </button>
         </div>
-        <div className={c.grid}>
+        <div key={month} className={c.grid} data-dir={dir} style={{ "--dir": dir } as CSSProperties}>
           {WEEKDAYS.map((w, i) => (
             <span key={i} className={c.weekday} aria-hidden>
               {w}

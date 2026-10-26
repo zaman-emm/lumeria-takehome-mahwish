@@ -9,6 +9,41 @@ import { useInView, useReducedMotion } from "motion/react";
 
 const played = new Set<string>();
 
+const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
+
+/**
+ * Counts a number up from zero into the element's text, alongside whatever
+ * draws it (a ring, a reveal). Writes the DOM directly so React doesn't
+ * re-render sixty times a second; the real value is always what React rendered.
+ */
+export function useCountUp<T extends HTMLElement>(
+  value: number | null,
+  play: boolean,
+  { delay = 0, duration = 1000, ease = "out" }: { delay?: number; duration?: number; ease?: "out" | "inOut" } = {},
+) {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!play || !el || value == null) return;
+    const curve = ease === "out" ? easeOutCubic : easeInOutCubic;
+    const start = performance.now() + delay;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, Math.max(0, (now - start) / duration));
+      el.textContent = String(Math.round(curve(t) * value));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    el.textContent = "0";
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      el.textContent = String(value);
+    };
+  }, [play, value, delay, duration, ease]);
+  return ref;
+}
+
 /** True the first time `key` mounts in this page load. */
 export function useFirstTime(key: string) {
   const [first] = useState(() => !played.has(key));

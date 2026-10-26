@@ -17,6 +17,11 @@
   gap: 12px;
   width: 100%;
   text-align: left;
+  transition: transform 160ms var(--ease-out);
+}
+
+.head:active {
+  transform: scale(0.98);
 }
 
 .icon {
@@ -228,6 +233,17 @@
 
 .trialBar i[data-on="true"] {
   background: var(--forest);
+  transform-origin: left;
+}
+
+/* The days used so far fill in one by one, after the bars grow. */
+.trialBar[data-reveal="out"] i[data-on="true"] {
+  transform: scaleX(0);
+}
+
+.trialBar[data-reveal="in"] i[data-on="true"] {
+  transition: transform 260ms var(--ease-out);
+  transition-delay: calc(300ms + var(--i) * 45ms);
 }
 
 .stopped {

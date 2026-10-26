@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
+import { useReducedMotion } from "motion/react";
 import { EXTRAS, METRICS, faceMarks, score, shortTip, type ScoreKey } from "@/lib/insights";
 import { skinTypeOf } from "@/lib/extended";
 import type { WeekStreak } from "@/lib/weeks";
 import { useReportApi } from "./context";
-import { useFirstTime, useReveal } from "./hooks";
+import { useCountUp, useFirstTime, useReveal } from "./hooks";
 import { Icon } from "./Icon";
 import { Delta, FaceMap, Ring } from "./ui";
 import g from "./glance.module.css";
@@ -13,16 +14,23 @@ import g from "./glance.module.css";
 // At a glance, under the hero: the five scores as rings, what the latest scan
 // saw on a face, the week streak, and the extra measures folded away.
 
+/** When the sections start rising in on first load, in ms: as the hero's card lands. */
+const ENTER = 1000;
+
 export function Glance({ streak }: { streak: WeekStreak }) {
   const { d, openMetric, openScan } = useReportApi();
   const latest = d.latest;
   const draw = useFirstTime("glance-rings");
+  const reduce = useReducedMotion();
+  // On first load the sections rise in after the hero's card, top to bottom.
+  const enter = draw && !reduce;
+  const [faceRef, faceReveal] = useReveal<HTMLElement>("glance-face");
   const change = (key: ScoreKey) => d.changes.find((c) => c.key === key);
   const marks = faceMarks(latest.summary.observations);
 
   return (
-    <div className={g.stack}>
-      <section className={g.rings} aria-label="Your scores">
+    <div className={g.stack} data-enter={enter}>
+      <section className={g.rings} aria-label="Your scores" style={{ "--n": 0 } as CSSProperties}>
         {METRICS.map((m, i) => {
           const c = change(m.key);
           const v = score(latest, m.key);
@@ -33,7 +41,7 @@ export function Glance({ streak }: { streak: WeekStreak }) {
               onClick={() => openMetric(m.key)}
               aria-label={`${m.label} ${v ?? "not measured"}${c ? `, ${c.delta >= 0 ? "up" : "down"} ${Math.abs(c.delta)}` : ""}. Open trend`}
             >
-              <Ring value={v} draw={draw} delay={i * 60} />
+              <Ring value={v} draw={draw} count={enter} delay={(enter ? ENTER : 0) + i * 60} />
               <span className={g.metricLabel}>{m.label}</span>
               {c && (
                 <span className={g.metricDelta}>
@@ -46,8 +54,8 @@ export function Glance({ streak }: { streak: WeekStreak }) {
         })}
       </section>
 
-      <section className={g.read} aria-label="What this scan saw">
-        <FaceMap marks={marks} area={latest.area} />
+      <section ref={faceRef} className={g.read} aria-label="What this scan saw" style={{ "--n": 1 } as CSSProperties}>
+        <FaceMap marks={marks} area={latest.area} reveal={faceReveal} />
         <p className={g.tip}>
           <Icon name="spark" size={14} />
           {shortTip(latest.summary.tip)}
@@ -68,10 +76,11 @@ export function Glance({ streak }: { streak: WeekStreak }) {
 function Streak({ streak }: { streak: WeekStreak }) {
   const [ref, reveal] = useReveal<HTMLElement>("glance-streak");
   const run = streak.current || streak.best;
+  const count = useCountUp<HTMLElement>(run, reveal === "in", { duration: 700 });
   return (
-    <section ref={ref} className={g.streak} data-reveal={reveal} aria-label={`${run} weeks in a row with a scan`}>
+    <section ref={ref} className={g.streak} data-reveal={reveal} aria-label={`${run} weeks in a row with a scan`} style={{ "--n": 2 } as CSSProperties}>
       <p className={g.streakHead} aria-hidden>
-        <b>{run}</b>
+        <b ref={count}>{run}</b>
         <span>{streak.current ? "weeks in a row" : "weeks, your best run"}</span>
       </p>
       <div className={g.weeks} aria-hidden>
@@ -100,7 +109,7 @@ function MoreMetrics() {
   const skinType = skinTypeOf(d);
   const underEye = d.areas.some((a) => /eye/i.test(a.area));
   return (
-    <section className={g.more} data-open={open}>
+    <section className={g.more} data-open={open} style={{ "--n": 3 } as CSSProperties}>
       <button className={g.moreHead} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="more-metrics">
         <span>
           More metrics <span className={g.count}>· {EXTRAS.length}</span>

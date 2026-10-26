@@ -23,6 +23,8 @@ const clampY = (y: number) => Math.min(Math.max(y, TOP), window.innerHeight - BO
 export function LumiDock({ hidden, open, onOpen }: { hidden: boolean; open: number; onOpen: () => void }) {
   const dock = useRef<HTMLDivElement>(null);
   const y = useRef(0);
+  /** Where it sits as a share of the screen height; what a resize keeps. */
+  const frac = useRef(1);
   const press = useRef<{ id: number; dy: number; moved: boolean } | null>(null);
   const swallowClick = useRef(false);
   const [dragging, setDragging] = useState(false);
@@ -35,15 +37,18 @@ export function LumiDock({ hidden, open, onOpen }: { hidden: boolean; open: numb
     if (dock.current) dock.current.style.transform = `translate3d(0, ${y.current}px, 0)`;
   };
   useLayoutEffect(() => {
-    let frac = 0.78;
+    // It starts at the bottom of the edge, where a floating button lives,
+    // clear of the hero and the tabs.
     try {
       const saved = Number(localStorage.getItem(KEY));
-      if (saved > 0 && saved < 1) frac = saved;
+      if (saved > 0 && saved < 1) frac.current = saved;
     } catch {
       /* storage blocked */
     }
-    place(frac * window.innerHeight);
-    const onResize = () => place(y.current);
+    place(frac.current * window.innerHeight);
+    // Re-place from the share, not the last position, so a brief resize (the
+    // address bar, the keyboard) can't leave it pinned to an edge.
+    const onResize = () => place(frac.current * window.innerHeight);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -97,8 +102,9 @@ export function LumiDock({ hidden, open, onOpen }: { hidden: boolean; open: numb
           if (!p.moved) return;
           swallowClick.current = true;
           setDragging(false);
+          frac.current = y.current / window.innerHeight;
           try {
-            localStorage.setItem(KEY, String(y.current / window.innerHeight));
+            localStorage.setItem(KEY, String(frac.current));
           } catch {
             /* storage blocked */
           }

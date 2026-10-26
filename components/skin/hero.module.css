@@ -378,6 +378,20 @@
   }
 }
 
+/* A backstop in case the reduced-motion setting reaches JS late. */
+@media (prefers-reduced-motion: reduce) {
+  .hero[data-play="true"] .ray,
+  .hero[data-play="true"] .arc,
+  .hero[data-play="true"] .knob,
+  .hero[data-play="true"] .segs i::after {
+    animation: none;
+  }
+  .digits[data-rolling="true"] {
+    filter: none;
+    transform: none;
+  }
+}
+
 /* Reduced motion: the gauge is simply there; the card fades in softly. */
 .hero[data-reduce="true"] .card,
 .hero[data-reduce="true"] .month,

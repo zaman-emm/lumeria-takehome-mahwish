@@ -5,6 +5,20 @@
   padding-top: 6px;
 }
 
+/* First load only: the sections rise in one after another as the hero's card
+   lands. They stay tappable throughout. */
+.stack[data-enter="true"] > * {
+  animation: sectionIn 420ms var(--ease-out) both;
+  animation-delay: calc(1000ms + var(--n) * 70ms);
+}
+
+@keyframes sectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
 /* ------------------------------------------------ rings */
 
 .rings {

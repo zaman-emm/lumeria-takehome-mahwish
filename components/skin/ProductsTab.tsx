@@ -93,7 +93,7 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
                   {tr.day} of {tr.of}
                 </b>
               </span>
-              <span className={p.trialBar} role="progressbar" aria-valuemin={0} aria-valuemax={tr.of} aria-valuenow={tr.day} aria-label="Trial progress">
+              <span className={p.trialBar} data-reveal={reveal} role="progressbar" aria-valuemin={0} aria-valuemax={tr.of} aria-valuenow={tr.day} aria-label="Trial progress">
                 {Array.from({ length: tr.of }, (_, i) => (
                   <i key={i} data-on={i < tr.day} style={{ "--i": i } as CSSProperties} />
                 ))}

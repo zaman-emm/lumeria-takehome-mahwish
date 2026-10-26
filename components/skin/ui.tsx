@@ -4,7 +4,7 @@ import { useId, type CSSProperties, type ReactNode } from "react";
 import { signed, type FaceMark, type FaceRegion } from "@/lib/insights";
 import { schedule } from "@/lib/routine";
 import type { Product, Scan } from "@/lib/types";
-import type { RevealState } from "./hooks";
+import { useCountUp, type RevealState } from "./hooks";
 import { Icon } from "./Icon";
 import u from "./ui.module.css";
 
@@ -71,11 +71,15 @@ export function Photo({
 
 // ---------------------------------------------------------------- rings
 
-/** A score as a ring: the fuller, the healthier. Draws in once when `draw` is set. */
+/**
+ * A score as a ring: the fuller, the healthier. Draws in once when `draw` is
+ * set; with `count`, the number counts up with it.
+ */
 export function Ring({
   value,
   size = 54,
   draw,
+  count,
   delay = 0,
   dashed,
   className,
@@ -83,11 +87,13 @@ export function Ring({
   value: number | null;
   size?: number;
   draw?: boolean;
+  count?: boolean;
   delay?: number;
   dashed?: boolean;
   className?: string;
 }) {
   const empty = value == null || dashed;
+  const digits = useCountUp<HTMLElement>(value, Boolean(draw && count && !empty), { delay, duration: 1000, ease: "inOut" });
   return (
     <span className={`${u.ring} ${className ?? ""}`} style={{ width: size, height: size }} data-empty={empty}>
       <svg viewBox="0 0 54 54" width={size} height={size} aria-hidden>
@@ -106,7 +112,7 @@ export function Ring({
           />
         )}
       </svg>
-      <b>{empty ? "–" : value}</b>
+      <b ref={digits}>{empty ? "–" : value}</b>
     </span>
   );
 }
@@ -248,7 +254,7 @@ const AREA_SPOTS: [RegExp, number, number][] = [
  * about, filled with a pattern (dots for calm, hatching for worth a look), so
  * it never leans on colour alone. A dashed ring marks the spot that was scanned.
  */
-export function FaceMap({ marks, area }: { marks: FaceMark[]; area: string }) {
+export function FaceMap({ marks, area, reveal = "done" }: { marks: FaceMark[]; area: string; reveal?: RevealState }) {
   const id = useId().replace(/:/g, "");
   const spot = AREA_SPOTS.find(([re]) => re.test(area));
   const placed = [...marks]
@@ -260,7 +266,7 @@ export function FaceMap({ marks, area }: { marks: FaceMark[]; area: string }) {
     }, []);
   const fill = (tone: FaceMark["tone"]) => `url(#${id}-${tone})`;
   return (
-    <figure className={u.face}>
+    <figure className={u.face} data-reveal={reveal}>
       <svg viewBox="0 8 320 148" role="img" aria-label={`${marks.map((m) => m.label).join(", ") || "Nothing to flag"}. Scanned: ${area}.`}>
         <defs>
           <pattern id={`${id}-good`} width="5" height="5" patternUnits="userSpaceOnUse">
@@ -273,16 +279,16 @@ export function FaceMap({ marks, area }: { marks: FaceMark[]; area: string }) {
           </pattern>
         </defs>
         <path className={u.fHead} d="M70 12c34 0 50 30 50 66 0 42-24 72-50 72S20 120 20 78c0-36 16-66 50-66z" />
-        {marks.map((m) => (
-          <path key={m.region} d={REGION_SHAPES[m.region]} fill={fill(m.tone)} className={u.fZone} />
+        {marks.map((m, k) => (
+          <path key={m.region} d={REGION_SHAPES[m.region]} fill={fill(m.tone)} className={u.fZone} style={{ "--k": k } as CSSProperties} />
         ))}
         <path className={u.fLine} d="M45 72q8-5 16 0M79 72q8-5 16 0M70 78v20q-3 3-7 2M59 120q11 7 22 0" />
         {spot && <circle cx={spot[1]} cy={spot[2]} r="17" className={u.fSpot} />}
-        {placed.map((m) => {
+        {placed.map((m, k) => {
           const [ax, ay] = ANCHORS[m.region];
           return (
-            <g key={m.region}>
-              <path className={u.fLeader} d={`M${ax} ${ay}L140 ${m.y}H154`} />
+            <g key={m.region} className={u.fMark} style={{ "--k": k } as CSSProperties}>
+              <path className={u.fLeader} d={`M${ax} ${ay}L140 ${m.y}H154`} pathLength={1} />
               <circle cx={ax} cy={ay} r="2.5" className={u.fPin} />
               <rect x="160" y={m.y - 6.5} width="13" height="13" rx="2" fill={fill(m.tone)} className={u.fSwatch} />
               <text x="181" y={m.y} dominantBaseline="central" className={u.fLabel}>
