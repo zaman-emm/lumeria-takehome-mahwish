@@ -140,9 +140,8 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
   const from = maxDay(d.start, addDays(product.startDate, -LEAD_DAYS));
   const to = product.endDate ?? d.end;
   const pts = seriesFor(d, area, key, from, to);
-  // How many scans each spot has in the stretch, for the picker.
-  const counts = new Map(d.areas.map((a) => [a.area, d.scans.filter((s) => s.area === a.area && dayOf(d, s) >= from && dayOf(d, s) <= to).length]));
-  const count = counts.get(area) ?? 0;
+  // How many scans of the spot fall in the stretch.
+  const count = d.scans.filter((s) => s.area === area && dayOf(d, s) >= from && dayOf(d, s) <= to).length;
   const before = pts.filter((x) => x.day < product.startDate);
   const during = pts.filter((x) => x.day >= product.startDate);
   const was = before[before.length - 1] ?? during[0];
@@ -206,7 +205,7 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
                 <select value={area} onChange={(e) => setArea(e.target.value)}>
                   {d.areas.map((a) => (
                     <option key={a.area} value={a.area}>
-                      {a.area} · {counts.get(a.area)} {counts.get(a.area) === 1 ? "scan" : "scans"}
+                      {a.area}
                     </option>
                   ))}
                 </select>
@@ -215,6 +214,10 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
             ) : (
               <span className={p.spotStatic}>{area}</span>
             )}
+            {/* How many scans of this spot fall in the stretch, as a side note. */}
+            <span className={p.count}>
+              {count} {count === 1 ? "scan" : "scans"}
+            </span>
             <span className={p.range}>
               {fmtDay(from)} – {fmtDay(to)}
             </span>
