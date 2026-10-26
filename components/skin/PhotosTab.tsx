@@ -2,15 +2,16 @@
 
 import { useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { dayOf, fmtDay, fmtTime, scanTz, type Derived } from "@/lib/insights";
+import { dayOf, fmtDay, fmtTime, previousSameArea, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
-import { LIGHTS, Photo, photoFor, type Light } from "./ui";
+import { Delta, LIGHTS, Photo, photoFor, type Light } from "./ui";
 import ph from "./photos.module.css";
 
 // Photos: first against latest under a drag-to-compare slider, then every
-// scan as a polaroid wall (or a list), filtered by spot.
+// scan as a polaroid wall, or as details (what each scan saw, your note, and
+// how it moved since the last scan of that spot), filtered by spot.
 
 const ALL = "All";
 
@@ -57,7 +58,7 @@ export function PhotosTab() {
           <button role="radio" aria-checked={view === "grid"} onClick={() => setView("grid")} aria-label="Grid">
             <Icon name="grid" size={16} />
           </button>
-          <button role="radio" aria-checked={view === "rows"} onClick={() => setView("rows")} aria-label="List">
+          <button role="radio" aria-checked={view === "rows"} onClick={() => setView("rows")} aria-label="Details">
             <Icon name="rows" size={16} />
           </button>
         </div>
@@ -106,17 +107,24 @@ function Polaroid({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
 function PhotoRow({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) {
   const { openScan } = useReportApi();
   const tz = scanTz(scan) ?? d.tz;
+  const prev = previousSameArea(d, scan);
+  const delta = prev ? scan.scores.overall - prev.scores.overall : null;
+  const note = scan.annotation?.note;
   return (
-    <button className={ph.row} onClick={() => openScan(scan)}>
+    <button className={ph.row} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}. Open scan`}>
       <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.rowPhoto} />
       <span className={ph.rowText}>
-        <span>
+        <span className={ph.rowWhen}>
           {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}
         </span>
-        <span>{scan.area}</span>
-        {scan.annotation?.note && <span className={ph.rowNote}>“{scan.annotation.note}”</span>}
+        <span className={ph.rowArea}>{scan.area}</span>
+        <span className={ph.rowSaw}>{scan.summary.headline}</span>
+        {note && <span className={ph.rowNote}>“{note}”</span>}
       </span>
-      <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>
+      <span className={ph.rowScore}>
+        <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>
+        {delta != null && delta !== 0 && <Delta n={delta} className={ph.rowDelta} />}
+      </span>
     </button>
   );
 }
