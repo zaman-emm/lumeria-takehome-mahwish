@@ -138,6 +138,10 @@
 
 .bodyInner {
   min-height: 0;
+  /* Room for the focus ring (2px, 3px out) on the controls at its edges,
+     which the overflow clip for folding would otherwise cut off. */
+  margin: 0 -6px;
+  padding: 0 6px;
   overflow: hidden;
 }
 
