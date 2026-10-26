@@ -140,12 +140,22 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
   const from = maxDay(d.start, addDays(product.startDate, -LEAD_DAYS));
   const to = product.endDate ?? d.end;
   const pts = seriesFor(d, area, key, from, to);
+  // How many scans each spot has in the stretch, for the picker.
+  const counts = new Map(d.areas.map((a) => [a.area, d.scans.filter((s) => s.area === a.area && dayOf(d, s) >= from && dayOf(d, s) <= to).length]));
+  const count = counts.get(area) ?? 0;
   const before = pts.filter((x) => x.day < product.startDate);
   const during = pts.filter((x) => x.day >= product.startDate);
   const was = before[before.length - 1] ?? during[0];
   const now = during[during.length - 1];
   const delta = was && now && was !== now ? now.value - was.value : null;
   const tone = delta == null || Math.abs(delta) < 3 ? "flat" : delta > 0 ? "up" : "down";
+  // The bottle's tint belongs to the product, not the spot: read it from her
+  // main spot, so switching spots never recolours the header.
+  const mainPts = seriesFor(d, d.area, key, from, to);
+  const mainWas = mainPts.filter((x) => x.day < product.startDate).at(-1) ?? mainPts.find((x) => x.day >= product.startDate);
+  const mainNow = mainPts.filter((x) => x.day >= product.startDate).at(-1);
+  const mainDelta = mainWas && mainNow && mainWas !== mainNow ? mainNow.value - mainWas.value : 0;
+  const iconTone = Math.abs(mainDelta) < 3 ? "flat" : mainDelta > 0 ? "up" : "down";
 
   const trips = d.spans.filter((s) => s.kind === "travel" && s.start <= to && s.end >= product.startDate);
   const reason = product.stoppedReason?.split(/ and |,/)[0].trim();
@@ -153,7 +163,7 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
   return (
     <article className={p.card} data-tone={tone} aria-labelledby={`${bodyId}-name`}>
       <header className={p.head}>
-        <span className={p.icon} aria-hidden>
+        <span className={p.icon} data-tone={iconTone} aria-hidden>
           <Icon name="bottle" size={18} />
         </span>
         <div className={p.title}>
@@ -196,7 +206,7 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
                 <select value={area} onChange={(e) => setArea(e.target.value)}>
                   {d.areas.map((a) => (
                     <option key={a.area} value={a.area}>
-                      {a.area}
+                      {a.area} · {counts.get(a.area)} {counts.get(a.area) === 1 ? "scan" : "scans"}
                     </option>
                   ))}
                 </select>
@@ -211,6 +221,8 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
           </div>
 
           <p className={p.metric}>{metricMeta(key).label}</p>
+          {/* The same rows for every spot; a spot with too few scans fills them
+              with blanks instead of dropping them, so the card keeps its shape. */}
           {was && now && delta != null ? (
             <p className={p.fromTo} aria-label={`${metricMeta(key).label} ${was.value} to ${now.value}`}>
               <span>{was.value}</span>
@@ -221,17 +233,36 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
               <b className={p.delta}>{delta > 0 ? `+${delta}` : delta < 0 ? `−${-delta}` : "±0"}</b>
             </p>
           ) : (
-            <p className={p.thin}>Not enough scans of your {area.toLowerCase()} in this stretch yet.</p>
-          )}
-
-          {during.length > 0 && pts.length >= 2 && <Chart pts={pts} from={from} to={to} start={product.startDate} trips={trips} />}
-
-          {delta != null && (
-            <p className={p.verdict}>
-              <Icon name={tone === "down" ? "down" : tone === "up" ? "up" : "chevronR"} size={14} stroke={1.8} />
-              {tone === "up" ? "Improved during use" : tone === "down" ? "Declined during use" : "Held steady during use"}
+            <p className={p.fromTo} data-empty aria-label="No change to show yet">
+              <span>–</span>
+              <span className={p.arrow} aria-hidden>
+                →
+              </span>
+              <span>–</span>
             </p>
           )}
+
+          <Chart
+            pts={pts}
+            from={from}
+            to={to}
+            start={product.startDate}
+            trips={trips}
+            empty={
+              delta == null
+                ? count === 0
+                  ? `No ${area.toLowerCase()} scans in this stretch`
+                  : during.length === 0
+                    ? `No ${area.toLowerCase()} scans since ${fmtDay(product.startDate)}`
+                    : `Only ${count} ${area.toLowerCase()} ${count === 1 ? "scan" : "scans"} in this stretch`
+                : undefined
+            }
+          />
+
+          <p className={p.verdict}>
+            <Icon name={tone === "down" ? "down" : tone === "up" ? "up" : "chevronR"} size={14} stroke={1.8} />
+            {delta == null ? "Not enough scans to tell yet" : tone === "up" ? "Improved during use" : tone === "down" ? "Declined during use" : "Held steady during use"}
+          </p>
 
           {swaps.length > 0 && (
             <div className={p.swaps}>
@@ -286,17 +317,21 @@ function Chart({
   to,
   start,
   trips,
+  empty,
 }: {
   pts: { day: string; value: number }[];
   from: string;
   to: string;
   start: string;
   trips: Derived["spans"];
+  /** Said over the chart when the spot has too few scans to read. */
+  empty?: string;
 }) {
   const [box, w] = useWidth<HTMLDivElement>();
   const n = Math.max(1, daysBetween(from, to));
   const x = (day: string) => LEFT + (Math.max(0, Math.min(n, daysBetween(from, day))) / n) * (w - LEFT - RIGHT);
-  const values = pts.map((q) => q.value);
+  // With no scans, a plain 40–80 frame holds the space.
+  const values = pts.length ? pts.map((q) => q.value) : [44, 76];
   const lo = Math.floor((Math.min(...values) - 4) / 10) * 10;
   const hi = Math.ceil((Math.max(...values) + 4) / 10) * 10;
   const grid = [hi, (hi + lo) / 2, lo];
@@ -304,8 +339,20 @@ function Chart({
   const xy = pts.map((q) => [x(q.day), y(q.value)] as const);
   const firstDuring = pts.findIndex((q) => q.day >= start);
   const path = (list: (readonly [number, number])[]) => list.map(([px, py], i) => `${i ? "L" : "M"}${px.toFixed(1)} ${py.toFixed(1)}`).join("");
-  const dashed = firstDuring > 0 ? path(xy.slice(0, firstDuring + 1)) : "";
-  const solid = path(firstDuring >= 0 ? xy.slice(firstDuring) : []);
+  // The dashed line stops on the start date: where it crosses the start rule
+  // is read off the line between the last scan before and the first after.
+  let dashed = "";
+  let solid = "";
+  if (firstDuring === -1) dashed = path(xy);
+  else if (firstDuring === 0) solid = path(xy);
+  else {
+    const [ax, ay] = xy[firstDuring - 1];
+    const [bx, by] = xy[firstDuring];
+    const sx = x(start);
+    const cross = [sx, ay + ((by - ay) * (sx - ax)) / (bx - ax || 1)] as const;
+    dashed = path([...xy.slice(0, firstDuring), cross]);
+    solid = path([cross, ...xy.slice(firstDuring)]);
+  }
   const showStart = start > from;
 
   // Labels where they fit: never closer than 20px to the last one shown.
@@ -317,7 +364,7 @@ function Chart({
   });
 
   return (
-    <div className={p.chart} ref={box}>
+    <div className={p.chart} ref={box} data-empty={empty ? true : undefined}>
       {w > 0 && (
         <svg width={w} height={H} aria-hidden>
           {trips.map((t) => (
@@ -364,6 +411,11 @@ function Chart({
             <Icon name="plane" size={11} />
           </span>
         ))}
+      {empty && (
+        <p className={p.chartEmpty} style={{ height: H }}>
+          <span>{empty}</span>
+        </p>
+      )}
       <div className={p.axis} aria-hidden>
         <span>{fmtDay(from)}</span>
         <span>{fmtDay(to)}</span>

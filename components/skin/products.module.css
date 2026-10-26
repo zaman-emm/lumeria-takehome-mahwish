@@ -44,7 +44,7 @@
   color: var(--forest);
 }
 
-.card[data-tone="down"] .icon {
+.icon[data-tone="down"] {
   background: var(--clay-soft);
   color: var(--clay-ink);
 }
@@ -207,6 +207,11 @@
   color: var(--bark);
 }
 
+/* No change to show for this spot: the same row, in blanks. */
+.fromTo[data-empty] {
+  color: var(--bark-3);
+}
+
 .arrow {
   font-size: 30px;
   color: var(--bark-2);
@@ -235,12 +240,6 @@
   color: var(--bark-2);
 }
 
-.thin {
-  margin: 6px 0 12px;
-  font-size: 14px;
-  color: var(--bark-2);
-}
-
 /* ------------------------------------------------ chart */
 
 .chart {
@@ -251,6 +250,11 @@
 .chart svg {
   display: block;
   overflow: visible;
+}
+
+/* Faded behind the message when there's too little to read. */
+.chart[data-empty] svg {
+  opacity: 0.35;
 }
 
 .grid {
@@ -296,6 +300,27 @@
   font-size: 10px;
   fill: var(--bark-2);
   font-variant-numeric: tabular-nums;
+}
+
+/* Over the chart's frame when the spot has too few scans to draw a line. */
+.chartEmpty {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0 24px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--bark-2);
+  pointer-events: none;
+}
+
+.chartEmpty span {
+  padding: 5px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--sand-deep);
 }
 
 .startTag,
