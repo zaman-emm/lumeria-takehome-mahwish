@@ -336,7 +336,7 @@
 }
 
 .row {
-  composes: glass from "./glass.module.css";
+  composes: card from "./surface.module.css";
   display: flex;
   align-items: center;
   gap: 12px;

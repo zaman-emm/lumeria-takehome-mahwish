@@ -335,7 +335,7 @@
 /* ------------------------------------------------ scan card */
 
 .card {
-  composes: glass from "./glass.module.css";
+  background: var(--canvas);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -419,7 +419,7 @@
 }
 
 .panelCard {
-  composes: glass from "./glass.module.css";
+  composes: card from "./surface.module.css";
   padding: 16px;
   border-radius: 20px;
 }
@@ -452,7 +452,7 @@
 }
 
 .factor {
-  composes: glass from "./glass.module.css";
+  composes: card from "./surface.module.css";
   display: grid;
   grid-template-columns: 40px 1fr;
   column-gap: 14px;

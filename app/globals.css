@@ -23,6 +23,9 @@
   --green: #4d7a58;
   --clay-ink: #7d3524;
   --white: #ffffff;
+  /* The page behind the cards, and the cards on it. */
+  --canvas: #f5f3ef;
+  --card: var(--white);
   --sunrise: linear-gradient(180deg, #e6cf9f 0%, #d7b46f 45%, #c0913f 100%);
   --sunrise-x: linear-gradient(90deg, #e6cf9f 0%, #d7b46f 55%, #c0913f 100%);
 
@@ -33,7 +36,7 @@
 
   /* Liquid glass. A thin fill lets the light field through, the blur and
      saturation bend it, a sheen and bright rim give the edge, and a soft lift
-     sets it down. Shared through components/skin/glass.module.css. */
+     sets it down. Used by what floats over content; cards stay flat (surface.module.css). */
   --lg-fill: rgba(255, 253, 249, 0.42);
   --lg-fill-strong: rgba(255, 253, 249, 0.72);
   --lg-sheen: linear-gradient(
@@ -61,12 +64,6 @@
   --lg-rim-dark:
     inset 0 1px 0.5px rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.08),
     inset 0 -1px 1px rgba(0, 0, 0, 0.12);
-  /* Warm light behind the report, so the glass has something to catch. */
-  --lg-field:
-    radial-gradient(75% 40% at 92% 6%, rgba(215, 180, 111, 0.5), transparent 72%),
-    radial-gradient(65% 36% at 0% 48%, rgba(77, 122, 88, 0.2), transparent 72%),
-    radial-gradient(85% 42% at 80% 98%, rgba(215, 180, 111, 0.46), transparent 72%),
-    linear-gradient(180deg, #fffdf8 0%, #faf5ea 100%);
 
   --radius-s: 12px;
   --radius-m: 20px;
