@@ -69,8 +69,6 @@ export function ScanSheet({ scan }: { scan: Scan }) {
           <Photo scan={scan} className={m.photoImg} />
         )}
       </div>
-      <p className={m.eyebrow}>{scan.area}</p>
-
       {scan.photos && (
         <div className={m.lights} role="radiogroup" aria-label="Light" style={{ "--i": li } as CSSProperties}>
           <i className={m.lightKnob} aria-hidden />
@@ -82,6 +80,8 @@ export function ScanSheet({ scan }: { scan: Scan }) {
         </div>
       )}
 
+      <i className={m.band} aria-hidden />
+      <p className={m.eyebrow}>{scan.area}</p>
       <div className={m.overall}>
         <b>{scan.scores.overall}</b>
         <span>
@@ -113,6 +113,7 @@ export function ScanSheet({ scan }: { scan: Scan }) {
           <TickAxis />
         </div>
       </div>
+      <i className={m.band} aria-hidden />
 
       <div className={m.face}>
         <FaceMap marks={faceMarks(scan.summary.observations)} area={scan.area} />

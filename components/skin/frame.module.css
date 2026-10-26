@@ -117,9 +117,8 @@
   right: -30px;
   left: -30px;
   height: calc(var(--hero-h) + 30px);
-  border-radius: 0 0 58px 58px;
   background:
     radial-gradient(130px 80px at 50% 30px, rgba(243, 230, 200, 0.6), transparent 100%),
-    var(--sunrise);
+    var(--sunrise-fade);
   filter: blur(20px);
 }

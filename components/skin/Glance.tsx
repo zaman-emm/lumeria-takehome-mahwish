@@ -2,61 +2,39 @@
 
 import { useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
-import { EXTRAS, METRICS, faceMarks, score, type ScoreKey } from "@/lib/insights";
+import { EXTRAS, faceMarks, score } from "@/lib/insights";
 import { skinTypeOf } from "@/lib/extended";
 import { noteEcho, streakLine } from "@/lib/voice";
 import type { WeekStreak } from "@/lib/weeks";
 import { useReportApi } from "./context";
 import { useCountUp, useFirstTime, useReveal } from "./hooks";
 import { Icon } from "./Icon";
+import { MetricCarousel } from "./MetricCarousel";
 import { MonthStory } from "./MonthStory";
-import { Delta, FaceMap, Ring } from "./ui";
+import { FaceMap, Ring } from "./ui";
 import g from "./glance.module.css";
 
-// At a glance, under the hero: the month as one curve, the five scores as
-// rings, what the latest scan saw on a face, the week streak, and the extra
-// measures folded away.
-
-/** When the sections start rising in on first load, in ms: as the hero's card lands. */
-const ENTER = 1000;
+// At a glance, under the hero: the month as one curve, the five scores as a
+// carousel of cards, what the latest scan saw on a face, the week streak, and
+// the extra measures folded away.
 
 export function Glance({ streak }: { streak: WeekStreak }) {
   const { d, openMetric, openScan } = useReportApi();
   const latest = d.latest;
-  const draw = useFirstTime("glance-rings");
+  const first = useFirstTime("glance-enter");
   const reduce = useReducedMotion();
   // On first load the sections rise in after the hero's card, top to bottom.
-  const enter = draw && !reduce;
+  const enter = first && !reduce;
   const [faceRef, faceReveal] = useReveal<HTMLElement>("glance-face");
-  const change = (key: ScoreKey) => d.changes.find((c) => c.key === key);
   const marks = faceMarks(latest.summary.observations);
   const echo = noteEcho(d);
 
   return (
     <div className={g.stack} data-enter={enter}>
       <MonthStory d={d} n={0} />
-      <section className={g.rings} aria-label="Your scores" style={{ "--n": 1 } as CSSProperties}>
-        {METRICS.map((m, i) => {
-          const c = change(m.key);
-          const v = score(latest, m.key);
-          return (
-            <button
-              key={m.key}
-              className={g.metric}
-              onClick={() => openMetric(m.key)}
-              aria-label={`${m.label} ${v ?? "not measured"}${c ? `, ${c.delta >= 0 ? "up" : "down"} ${Math.abs(c.delta)}` : ""}. Open trend`}
-            >
-              <Ring value={v} draw={draw} count={enter} delay={(enter ? ENTER : 0) + i * 60} />
-              <span className={g.metricLabel}>{m.label}</span>
-              {c && (
-                <span className={g.metricDelta}>
-                  <Delta n={c.delta} />
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </section>
+      <div style={{ "--n": 1 } as CSSProperties}>
+        <MetricCarousel onOpen={(key) => openMetric(key)} />
+      </div>
 
       <section ref={faceRef} className={g.read} aria-label="What this scan saw" style={{ "--n": 2 } as CSSProperties}>
         <FaceMap marks={marks} area={latest.area} reveal={faceReveal} />

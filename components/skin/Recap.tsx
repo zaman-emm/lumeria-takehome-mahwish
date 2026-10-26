@@ -250,25 +250,6 @@ export function Recap({
   );
 }
 
-/** The story's first two pages in miniature, leaning apart in a V: the play button's preview. */
-export function RecapPeek({ d }: { d: Derived }) {
-  const pages = useMemo(() => buildRecap(d).slice(0, 2), [d]);
-  return (
-    <span className={s.peek} data-peek aria-hidden>
-      {pages.map((sl, n) => (
-        <span key={n} className={s.peekCard} data-peek-card style={{ "--n": n } as CSSProperties}>
-          <span className={`${s.stage} ${s.peekPage}`} data-ink={THEMES[sl.kind].ink}>
-            <span className={s.bg} data-on style={{ backgroundColor: THEMES[sl.kind].bg, backgroundImage: THEMES[sl.kind].glows }} />
-            <section className={s.slide} data-kind={sl.kind}>
-              <SlideBody slide={sl} />
-            </section>
-          </span>
-        </span>
-      ))}
-    </span>
-  );
-}
-
 function SlideBody({ slide }: { slide: Slide }) {
   switch (slide.kind) {
     case "highs":

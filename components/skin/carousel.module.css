@@ -1,0 +1,144 @@
+/* The scores carousel on At a glance (MetricCarousel.tsx). */
+
+.carousel {
+  /* One soft wash per score, all from the report's own palette. */
+  --tint-hydration: #dfe6dc;
+  --tint-tone: #efe1c4;
+  --tint-calm: #f1ddd3;
+  --tint-clarity: #e8dfce;
+  --tint-oil: #e6cf9f;
+  /* Bleeds past the panel's 16px gutter so the side cards reach the edges. */
+  margin: 0 -16px;
+}
+
+.track {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0 22px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  --card-w: 62%;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Room either side so the first and last cards can sit in the middle. */
+.track::before,
+.track::after {
+  content: "";
+  flex: none;
+  width: calc((100% - var(--card-w)) / 2 - 12px);
+}
+
+/* The inverted arc: level in the middle; outward the cards tip away from the
+   centre and drop, smaller and quieter. --p is set per frame from the scroll. */
+.card {
+  --p: 0;
+  --ap: 0;
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: var(--card-w);
+  min-height: 188px;
+  padding: 16px 16px 14px;
+  border-radius: 24px;
+  scroll-snap-align: center;
+  text-align: left;
+  color: var(--bark);
+  background:
+    radial-gradient(120% 90% at 20% 0%, var(--tint), transparent 70%),
+    linear-gradient(180deg, var(--tint), var(--card) 85%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 12px 28px -18px rgba(46, 38, 32, 0.4);
+  transform-origin: 50% 120%;
+  transform: translateY(calc(var(--ap) * 16px)) rotate(calc(var(--p) * 7deg)) scale(calc(1 - var(--ap) * 0.07));
+  opacity: calc(1 - var(--ap) * 0.25);
+  will-change: transform;
+}
+
+.card:active {
+  scale: 0.97;
+  transition: scale 160ms var(--ease-out);
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--bark);
+}
+
+.value {
+  margin-top: 10px;
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: -1.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--bark-2);
+  white-space: nowrap;
+}
+
+.delta {
+  font-weight: 600;
+  color: var(--forest);
+}
+
+.ticks {
+  align-self: stretch;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin-top: -6px;
+}
+
+.dots button {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 24px;
+}
+
+.dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--sand-deep);
+  transition:
+    width 240ms var(--ease-out),
+    background 240ms var(--ease-out);
+}
+
+.dots button[aria-selected="true"] i {
+  width: 18px;
+  background: var(--bark-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transform: none;
+  }
+
+  .dots i {
+    transition: none;
+  }
+}

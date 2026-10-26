@@ -10,6 +10,7 @@ import {
   daysBetween,
   dayOf,
   fmtDay,
+  fmtRange,
   fmtTime,
   metricMeta,
   previousSameArea,
@@ -80,9 +81,9 @@ export function TrendView({
         <div className={t.areas} role="tablist" aria-label="Spot">
           {d.areas.map((a) => (
             <button key={a.area} role="tab" aria-selected={a.area === area} className={t.area} onClick={() => onArea(a.area)}>
-              {a.area}
-              <span>{a.count}</span>
               {a.area === area && <motion.i layoutId={`${revealKey}-area`} className={t.areaLine} transition={{ type: "spring", duration: 0.35, bounce: 0 }} />}
+              <b>{a.area}</b>
+              <span>{a.count}</span>
             </button>
           ))}
         </div>
@@ -164,6 +165,7 @@ function Chart({
   const wash = d3area().curve(curveMonotoneX).y0(H - PAD_B).y1((p) => p[1])(pts as [number, number][]) ?? "";
   const washId = `${useId().replace(/:/g, "")}-wash`;
   const trips = d.spans.filter((s) => s.kind === "travel");
+  const hatchId = `${washId}-period`;
   const sel = picked ? scans.indexOf(picked) : -1;
   // Only the first finger reads the chart; the pill shows while it's down.
   const finger = useRef<number | null>(null);
@@ -240,9 +242,25 @@ function Chart({
                 <stop offset="0" className={t.washTop} />
                 <stop offset="1" className={t.washEnd} />
               </linearGradient>
+              <pattern id={hatchId} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <rect width="6" height="6" className={t.periodBg} />
+                <line x1="1" y1="0" x2="1" y2="6" className={t.periodInk} />
+              </pattern>
             </defs>
             {trips.map((tr) => (
               <rect key={tr.id} x={x(tr.start) - 5} y={PAD_T - 4} width={x(tr.end) - x(tr.start) + 10} height={H - PAD_T - PAD_B + 8} rx={3} className={t.trip} />
+            ))}
+            {d.moments.map((m) => (
+              <rect
+                key={m.id}
+                x={x(m.day) - 3}
+                y={PAD_T - 4}
+                width={x(m.end) - x(m.day) + 6}
+                height={H - PAD_T - PAD_B + 8}
+                rx={3}
+                fill={`url(#${hatchId})`}
+                className={t.period}
+              />
             ))}
             {[hi, mid, lo].map((g) => (
               <g key={g}>
@@ -303,14 +321,21 @@ function Spans({ d }: { d: Derived }) {
           </span>
         </li>
       ))}
-      {d.moments.map((m) => (
-        <li key={m.id}>
-          <span className={t.moment} style={{ left: pct(m.day) }}>
-            <i aria-hidden />
-            {m.label}
-          </span>
-        </li>
-      ))}
+      {d.moments.map((m) => {
+        const late = daysBetween(d.start, m.day) / days > 0.6;
+        return (
+          <li key={m.id}>
+            <span className={t.span} data-tone="period" style={{ left: pct(m.day), width: `max(calc(${pct(m.end)} - ${pct(m.day)}), 8px)` } as CSSProperties} />
+            {/* The dates sit beside the bar, on whichever side has room. */}
+            <span
+              className={t.spanOutside}
+              style={(late ? { right: `calc(100% - ${pct(m.day)} + 8px)` } : { left: `calc(${pct(m.end)} + 8px)` }) as CSSProperties}
+            >
+              {m.label} · {fmtRange(m.day, m.end)}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }

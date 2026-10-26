@@ -106,8 +106,8 @@
   filter: blur(4px);
 }
 
-.photo + .eyebrow {
-  margin-top: 12px;
+.band + .eyebrow {
+  margin-top: 20px;
 }
 
 .lights {
@@ -146,11 +146,16 @@
   color: var(--bark);
 }
 
+/* The scores, Uber-style: a full-bleed band closes off the photo above, a
+   hairline sits under the overall and under each score, and another band ends
+   the section, so every row reads as its own line. */
 .overall {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: 18px;
+  margin-top: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--sand);
 }
 
 .overall b {
@@ -177,25 +182,33 @@
 .tickTable {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 18px;
 }
 
 .tickRow {
   display: grid;
-  grid-template-columns: 84px auto 1fr 30px;
+  grid-template-columns: 86px 1fr 28px 34px;
   align-items: center;
-  column-gap: 10px;
+  column-gap: 12px;
+  min-height: 48px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--sand);
+}
+
+/* The axis row: no line, just the band marks under the ticks. */
+.tickRow[aria-hidden] {
+  min-height: 0;
+  padding: 6px 0 0;
+  border-bottom: 0;
 }
 
 .tickLabel {
-  font-size: 13px;
-  color: var(--bark-2);
+  font-size: 14px;
+  color: var(--bark);
 }
 
 .tickValue {
   justify-self: end;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
@@ -207,8 +220,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-.tickRow:last-child > :last-child {
-  width: 116px;
+/* A full-bleed band between sections. */
+.band {
+  height: 8px;
+  margin: 20px -20px 0;
+  background: var(--sand);
+  opacity: 0.6;
 }
 
 .face {

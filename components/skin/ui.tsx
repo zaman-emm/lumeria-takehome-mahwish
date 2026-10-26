@@ -155,9 +155,10 @@ export function FromTo({ from, to }: { from: number; to: number }) {
 // ---------------------------------------------------------------- ticks
 
 /**
- * A score as twenty ticks, one per five points. Gaps sit where the bands
- * change (60 and 75), so where a score falls reads without a word. The tall
- * tick is now; the dot marks the previous scan of the same spot.
+ * A score as twenty ticks, one per five points, filled up to the score and
+ * faint past it, so where a score falls reads at a glance. The tall tick is
+ * now; the dot marks the previous scan of the same spot. Each tick sits in an
+ * equal cell, so TickAxis lines up with it at any width.
  */
 export function Ticks({ value, prev, reveal = "done", order = 0 }: { value: number | null; prev?: number | null; reveal?: RevealState; order?: number }) {
   const now = value == null ? -1 : Math.min(19, Math.floor(value / 5));
@@ -169,7 +170,7 @@ export function Ticks({ value, prev, reveal = "done", order = 0 }: { value: numb
           key={i}
           data-now={i === now}
           data-was={i === was && was !== now}
-          data-gap={i === 11 || i === 14}
+          data-fill={i <= now}
           data-off={value == null}
           style={{ "--d": `${order * 40 + i * 14}ms` } as CSSProperties}
         />
@@ -178,6 +179,7 @@ export function Ticks({ value, prev, reveal = "done", order = 0 }: { value: numb
   );
 }
 
+/** Where the bands change under Ticks: 0, 60, 75 and 100. */
 export function TickAxis() {
   return (
     <span className={u.tickAxis} aria-hidden>
@@ -212,11 +214,12 @@ export function ScheduleChip({ product }: { product: Product }) {
   );
 }
 
+/** A change as an arrow and a number. The arrow already says which way, so no sign. */
 export function Delta({ n, className }: { n: number; className?: string }) {
   return (
     <span className={`${u.delta} ${className ?? ""}`}>
       {n !== 0 && <Icon name={n > 0 ? "up" : "down"} size={11} />}
-      {signed(n)}
+      {n === 0 ? signed(n) : Math.abs(n)}
     </span>
   );
 }

@@ -50,29 +50,7 @@
   color: var(--bark-3);
 }
 
-/* ------------------------------------------------ rings */
-
-.rings {
-  composes: card from "./surface.module.css";
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  padding: 22px 6px 18px;
-  border-radius: 20px;
-}
-
-.metric {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 0;
-  border-radius: 14px;
-  transition: transform 160ms var(--ease-out);
-}
-
-.metric:active {
-  transform: scale(0.96);
-}
+/* ------------------------------------------------ labels */
 
 .metricLabel {
   margin-top: 2px;
@@ -80,16 +58,6 @@
   font-weight: 500;
   color: var(--bark);
   white-space: nowrap;
-}
-
-.metricDelta {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--bark-2);
 }
 
 /* ------------------------------------------------ the read */

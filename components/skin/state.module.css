@@ -27,10 +27,9 @@
   position: absolute;
   inset: 0 0 auto;
   height: var(--hero-h);
-  border-radius: 0 0 28px 28px;
   background:
     radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
-    var(--sunrise);
+    var(--sunrise-fade);
 }
 
 /* The splash's glass, already on while the report loads, so the gold and the

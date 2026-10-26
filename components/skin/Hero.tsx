@@ -10,7 +10,6 @@ import { Flame, Icon } from "./Icon";
 import { headline, sinceStart } from "@/lib/voice";
 import { Logo } from "./Logo";
 import { Photo } from "./ui";
-import { RecapPeek } from "./Recap";
 import h from "./hero.module.css";
 
 // The At a glance hero: the score as a sunrise gauge on gold. On a first load
@@ -56,13 +55,20 @@ export function Hero({
     <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-skin-hero>
       <BackButton />
       <Logo className={h.logo} />
-      <p className={h.hi}>Hi {d.firstName},</p>
       <h1 className={h.title}>{headline(d)}</h1>
 
       <div className={h.gaugeBox} data-skin-gauge>
         <Gauge value={value} play={play} named />
       </div>
 
+      {onPlay && (
+        <button className={h.month} onClick={(e) => onPlay(e.currentTarget)}>
+          {d.isMonthly ? "Check your month’s highlights" : "Check your highlights"}
+          <Icon name="chevronR" size={12} stroke={2} />
+        </button>
+      )}
+
+      <p className={h.hi}>Hi {d.firstName},</p>
       <div className={h.card}>
         <div className={h.cardText}>
           {d.trend?.delta ? (
@@ -103,16 +109,6 @@ export function Hero({
           </button>
         )}
       </div>
-
-      {onPlay && (
-        <button className={h.month} data-size="card" onClick={(e) => onPlay(e.currentTarget)}>
-          <span className={h.monthPlay}>
-            <Icon name="play" size={14} />
-          </span>
-          {d.isMonthly ? "Relive your month" : "Relive your story"}
-          <RecapPeek d={d} />
-        </button>
-      )}
     </header>
   );
 }
@@ -148,8 +144,8 @@ export function SlimHeader({
         {streak}
       </span>
       {onPlay && (
-        <button className={h.play} onClick={(e) => onPlay(e.currentTarget)} aria-label={d.isMonthly ? "Relive your month" : "Relive your story"}>
-          <Icon name="play" size={14} />
+        <button className={h.play} onClick={(e) => onPlay(e.currentTarget)} aria-label={d.isMonthly ? "Check your month’s highlights" : "Check your highlights"}>
+          <Icon name="spark" size={16} />
         </button>
       )}
     </header>

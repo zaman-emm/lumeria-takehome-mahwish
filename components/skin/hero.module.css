@@ -5,11 +5,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: calc(16px + var(--top-inset)) 24px 24px;
+  padding: calc(16px + var(--top-inset)) 24px 20px;
+  /* Gold at the top, easing into the page's canvas at the bottom: no hard edge
+     between the hero and what follows it. */
   background:
     radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
-    var(--sunrise);
-  border-radius: 0 0 28px 28px;
+    var(--sunrise-fade);
   color: var(--evergreen);
   view-transition-name: skin-head;
   overflow: hidden;
@@ -21,9 +22,12 @@
   color: var(--evergreen);
 }
 
+/* The greeting opens the part of the page that's about her, under the gold. */
 .hi {
-  margin: 10px 0 0;
-  font-size: 20px;
+  align-self: stretch;
+  max-width: 342px;
+  margin: 28px auto 0;
+  font-size: 22px;
   line-height: 28px;
   letter-spacing: -0.2px;
   color: var(--bark);
@@ -123,7 +127,8 @@
   line-height: 0.9;
   font-weight: 500;
   letter-spacing: -3px;
-  color: var(--evergreen);
+  color: var(--white);
+  text-shadow: 0 2px 18px rgba(128, 96, 31, 0.45), 0 1px 2px rgba(128, 96, 31, 0.3);
   font-variant-numeric: tabular-nums;
   /* A touch of left room so the negative tracking stays centred. */
   padding-left: 3px;
@@ -143,10 +148,11 @@
   max-width: 342px;
   min-height: 104px;
   margin-top: 12px;
-  padding: 16px 16px 16px 16px;
+  padding: 16px;
   border-radius: 20px;
-  background: var(--lg-sheen), rgba(251, 246, 236, 0.32);
-  box-shadow: var(--lg-rim);
+  /* It sits where the gold has faded out, so it's a light card, not glass. */
+  background: var(--lg-sheen), rgba(255, 253, 249, 0.72);
+  box-shadow: var(--lg-rim), var(--lg-lift);
   -webkit-backdrop-filter: var(--lg-blur);
   backdrop-filter: var(--lg-blur);
 }
@@ -236,85 +242,31 @@
   position: relative;
 }
 
-/* ------------------------------------------------ play your month */
+/* ------------------------------------------------ month highlights */
 
+/* A plain call to action on the gold: glass pill, words and a chevron. */
 .month {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 342px;
-  height: 56px;
-  margin-top: 12px;
-  padding: 0 18px 0 8px;
-  border-radius: 28px;
-  background: var(--forest);
-  color: var(--bone);
-  font-size: 15px;
-  font-weight: 500;
-  transition: transform 160ms var(--ease-out);
-}
-
-/* Card-sized try: as big as the card above, with larger pages. */
-.month[data-size="card"] {
-  position: relative;
-  height: auto;
-  min-height: 104px;
-  overflow: hidden;
-  padding: 0 20px 0 16px;
-  border-radius: 20px;
-  font-size: 16px;
-  white-space: nowrap;
-  /* The same glass as the card above it. */
-  background: var(--lg-sheen), rgba(251, 246, 236, 0.32);
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  margin-top: 8px;
+  padding: 0 22px 0 24px;
+  border-radius: 24px;
+  background: var(--lg-sheen), rgba(251, 246, 236, 0.38);
   box-shadow: var(--lg-rim);
   -webkit-backdrop-filter: var(--lg-blur);
   backdrop-filter: var(--lg-blur);
   color: var(--evergreen);
-}
-
-.month[data-size="card"] .monthPlay {
-  width: 44px;
-  height: 44px;
-}
-
-/* Only the top half of each page shows, rising out of the bottom edge. */
-.month[data-size="card"] :global(*) {
-  --ps: 0.13;
-}
-
-.month[data-size="card"] [data-peek] {
-  align-self: stretch;
-  width: 100px;
-  height: auto;
-  margin-right: -6px;
-}
-
-.month[data-size="card"] [data-peek-card] {
-  top: 36px;
-  bottom: auto;
-  left: calc(10px + var(--n) * 38px);
-  transform: rotate(calc((var(--n) * 2 - 1) * 9deg));
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 160ms var(--ease-out);
 }
 
 .month:active {
   transform: scale(0.96);
-}
-
-.monthPlay {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--lg-btn);
-  box-shadow: var(--lg-btn-rim);
-  color: var(--evergreen);
-}
-
-.monthPlay svg {
-  transform: translateX(1px);
 }
 
 /* ------------------------------------------------ first-load sequence */
@@ -341,8 +293,8 @@
   animation: fade 300ms var(--ease-out) var(--lead, 150ms) both;
 }
 
-.hero[data-play="true"] .card {
-  animation: rise 500ms var(--ease-out) 900ms both;
+.hero[data-play="true"] :is(.hi, .card) {
+  animation: rise 500ms var(--ease-out) 1000ms both;
 }
 
 /* The newest photo slides out from behind the first, as the card lands. */
@@ -351,18 +303,7 @@
 }
 
 .hero[data-play="true"] .month {
-  animation: rise 500ms var(--ease-out) 1000ms both;
-}
-
-/* Once the button lands, the two story pages open into their V. */
-.hero[data-play="true"] .month [data-peek-card] {
-  animation: peekOpen 520ms var(--ease-out) 1300ms both;
-}
-
-@keyframes peekOpen {
-  from {
-    transform: rotate(0deg);
-  }
+  animation: rise 500ms var(--ease-out) 900ms both;
 }
 
 @keyframes rayIn {
@@ -414,13 +355,13 @@
 /* A backstop in case the reduced-motion setting reaches JS late. */
 @media (prefers-reduced-motion: reduce) {
   .gauge[data-play="true"] .ray,
-  .gauge[data-play="true"] .arc,
-  .hero[data-play="true"] .month [data-peek-card] {
+  .gauge[data-play="true"] .arc {
     animation: none;
   }
 }
 
 /* Reduced motion: the gauge is simply there; the card fades in softly. */
+.hero[data-reduce="true"] .hi,
 .hero[data-reduce="true"] .card,
 .hero[data-reduce="true"] .month,
 .hero[data-reduce="true"] .gaugeBox {
@@ -447,19 +388,19 @@
   --at: 120ms;
 }
 
-.hero[data-splash="go"] .hi {
+.hero[data-splash="go"] .title {
   --at: 180ms;
 }
 
-.hero[data-splash="go"] .title {
-  --at: 240ms;
+.hero[data-splash="go"] .month {
+  --at: 280ms;
 }
 
-.hero[data-splash="go"] .card {
+.hero[data-splash="go"] .hi {
   --at: 340ms;
 }
 
-.hero[data-splash="go"] .month {
+.hero[data-splash="go"] .card {
   --at: 400ms;
 }
 
@@ -467,12 +408,8 @@
   animation: reveal 620ms var(--ease-out) 760ms both;
 }
 
-.hero[data-splash="go"] .month [data-peek-card] {
-  animation: peekOpen 520ms var(--ease-out) 800ms both;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .hero[data-splash] :is(.logo, .hi, .title, .card, .month, .pairItem, .month [data-peek-card]) {
+  .hero[data-splash] :is(.logo, .hi, .title, .card, .month, .pairItem) {
     animation: none;
   }
 }

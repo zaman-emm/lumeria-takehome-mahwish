@@ -178,31 +178,33 @@
 /* ------------------------------------------------ ticks */
 
 .ticks {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
   align-items: center;
   height: 22px;
-  gap: 2.4px;
 }
 
 .ticks i {
   position: relative;
+  justify-self: center;
   width: 3px;
   height: 10px;
   border-radius: 1px;
+  background: rgba(47, 74, 53, 0.16);
+}
+
+.ticks i[data-fill="true"] {
   background: var(--forest);
-  flex: none;
 }
 
 .ticks i[data-off="true"] {
-  background: rgba(46, 38, 32, 0.15);
-}
-
-.ticks i[data-gap="true"] {
-  margin-right: 5px;
+  background: rgba(46, 38, 32, 0.12);
 }
 
 .ticks i[data-now="true"] {
-  height: 18px;
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
 }
 
 .ticks i[data-was="true"]::after {
@@ -243,6 +245,10 @@
 
 .tickAxis span:first-child {
   transform: none;
+}
+
+.tickAxis span:last-child {
+  transform: translateX(-100%);
 }
 
 /* ------------------------------------------------ chips */

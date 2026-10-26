@@ -29,6 +29,17 @@
   --card: var(--bone);
   --sunrise: linear-gradient(180deg, #e6cf9f 0%, #d7b46f 45%, #c0913f 100%);
   --sunrise-x: linear-gradient(90deg, #e6cf9f 0%, #d7b46f 55%, #c0913f 100%);
+  /* The At a glance ground: the sunrise, then easing back into the page's own
+     canvas, so the gold has no hard edge. */
+  --sunrise-fade: linear-gradient(
+    180deg,
+    #e6cf9f 0%,
+    #d7b46f 30%,
+    #c99d4f 52%,
+    #dcc08a 70%,
+    #efe3c9 85%,
+    var(--canvas) 100%
+  );
 
   --glass: rgba(255, 252, 246, 0.62);
   --glass-edge: rgba(255, 255, 255, 0.7);

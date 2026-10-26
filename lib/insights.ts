@@ -80,6 +80,8 @@ export const score = (scan: Scan, key: ScoreKey): number | null =>
 // ---------------------------------------------------------------- dates
 
 const DAY_MS = 86_400_000;
+/** How long a period is drawn for, from its first day. */
+const PERIOD_DAYS = 5;
 
 export const scanTz = (scan: Scan) => scan.location?.tz;
 
@@ -139,6 +141,8 @@ export interface Moment {
   id: string;
   kind: "period";
   day: string;
+  /** Inclusive. The data only marks the first day, so this assumes a five-day period. */
+  end: string;
   label: string;
 }
 
@@ -308,7 +312,11 @@ export function derive(report: SkinReport): Derived | null {
 
   const moments: Moment[] = scans
     .filter((s) => s.health?.cycleDay === 1)
-    .map((s) => ({ id: `period_${s.id}`, kind: "period", day: day(s), label: "Period started" }));
+    .map((s) => {
+      const from = day(s);
+      const stop = addDays(from, PERIOD_DAYS - 1);
+      return { id: `period_${s.id}`, kind: "period", day: from, end: stop < end ? stop : end, label: "Period" };
+    });
 
   const notes: Note[] = scans
     .filter((s) => s.annotation && (s.annotation.note || s.annotation.tags.length))
