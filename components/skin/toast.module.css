@@ -1,0 +1,99 @@
+/* The suggestion card (TipToast.tsx): forest glass, anchored to the bottom.
+   In the app it sits 12px above the floating tab bar; in a sheet it sticks to
+   the sheet's bottom edge while the sheet scrolls. */
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px 12px 14px;
+  border-radius: 20px;
+  background: var(--lg-sheen-dark), var(--lg-forest);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim-dark), 0 14px 34px -12px rgba(20, 36, 26, 0.45);
+  color: var(--bone);
+  touch-action: none;
+  cursor: grab;
+}
+
+.toast[data-placement="app"] {
+  position: fixed;
+  z-index: 31;
+  left: 50%;
+  bottom: calc(max(16px, var(--bottom-inset)) + 62px + 12px);
+  width: calc(min(100vw, var(--phone)) - 32px);
+  /* Centred without a transform, which motion owns for the slide. */
+  margin-left: calc(min(100vw, var(--phone)) / -2 + 16px);
+}
+
+/* The sheet runs --bleed past the screen's bottom edge (sheet.module.css), so
+   that's added back. It rises on its own spring, not the sheet's cascade. */
+.toast[data-placement="sheet"] {
+  position: sticky;
+  z-index: 3;
+  bottom: calc(var(--bleed, 0px) + var(--bottom-inset) + 12px);
+  margin-top: 20px;
+  animation: none !important;
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(215, 180, 111, 0.18);
+  color: var(--gold);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.text {
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.from {
+  font-size: 11.5px;
+  line-height: 15px;
+  color: rgba(244, 239, 230, 0.68);
+}
+
+/* A small mark with a full 44px target. */
+.close {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: flex-start;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(244, 239, 230, 0.85);
+  transition: transform 140ms var(--ease-out);
+}
+
+.close::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+.close:active {
+  transform: scale(0.92);
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

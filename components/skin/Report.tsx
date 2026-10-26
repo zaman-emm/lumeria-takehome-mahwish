@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Drawer } from "@base-ui/react/drawer";
 import { AnimatePresence } from "motion/react";
-import { fmtDay, metricMeta, scanTz, type Derived, type ScoreKey } from "@/lib/insights";
+import { fmtDay, metricMeta, scanTz, shortTip, type Derived, type ScoreKey } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { buildRecap } from "@/lib/recap";
 import { weekStreak } from "@/lib/weeks";
@@ -25,6 +25,7 @@ import { ScanSheet } from "./ScanSheet";
 import { Sheet } from "./Sheet";
 import { Splash } from "./Splash";
 import { TabBar, type Dest } from "./TabBar";
+import { TipToast } from "./TipToast";
 import { markSplashed, willSplash } from "./splashState";
 import { Tabs } from "./Tabs";
 import { TrendsTab } from "./TrendsTab";
@@ -175,6 +176,18 @@ export function Report({ d }: { d: Derived }) {
 
   const latestTz = scanTz(d.latest) ?? d.tz;
 
+  // The latest scan's suggestion rises from the bottom once the page has
+  // settled, and stays until it's dismissed. Lumi steps aside while it's up,
+  // and it steps aside for sheets, the story and the viewfinder.
+  const [tipReady, setTipReady] = useState(false);
+  const [tipGone, setTipGone] = useState(false);
+  useEffect(() => {
+    if (splash !== "done") return;
+    const id = window.setTimeout(() => setTipReady(true), 1400);
+    return () => window.clearTimeout(id);
+  }, [splash]);
+  const tipShown = tipReady && !tipGone && !sheet && !recap && dest !== "scan";
+
   return (
     <ReportContext.Provider value={api}>
       <NotesProvider>
@@ -217,10 +230,22 @@ export function Report({ d }: { d: Derived }) {
             <TabBar active={dest} onChange={go} hidden={recap || splash !== "done"} />
 
             <LumiButton
-              hidden={Boolean(sheet) || recap || splash !== "done" || dest === "scan"}
+              hidden={Boolean(sheet) || recap || splash !== "done" || dest === "scan" || tipShown}
               count={d.factors.length}
               onOpen={api.openLumi}
             />
+
+            <AnimatePresence>
+              {tipShown && (
+                <TipToast
+                  key="tip"
+                  placement="app"
+                  tip={shortTip(d.latest.summary.tip)}
+                  from={`Your ${fmtDay(d.latest.takenAt, latestTz)} scan`}
+                  onDismiss={() => setTipGone(true)}
+                />
+              )}
+            </AnimatePresence>
 
             <Sheet
               open={Boolean(sheet)}

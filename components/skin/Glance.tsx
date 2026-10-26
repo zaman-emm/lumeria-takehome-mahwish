@@ -45,10 +45,6 @@ export function Glance({ streak }: { streak: WeekStreak }) {
             <p className={g.echo}>{echo}</p>
           </>
         )}
-        <p className={g.tip}>
-          <Icon name="spark" size={14} />
-          {latest.summary.tip}
-        </p>
         <button className={g.full} onClick={() => openScan(latest)}>
           This scan, in full
           <Icon name="chevronR" size={11} stroke={1.8} />
