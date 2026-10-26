@@ -6,10 +6,22 @@
   top: var(--tabs-top, 0px);
   z-index: 5;
   padding: 15px 0 16px;
-  background: rgba(255, 255, 255, 0.86);
-  -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  backdrop-filter: saturate(1.4) blur(12px);
   view-transition-name: skin-tabs;
+}
+
+/* The scroll edge: content softens and fades as it slides under the chips,
+   instead of meeting a hard bar. */
+.bar::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -18px;
+  z-index: -1;
+  background: linear-gradient(to bottom, rgba(255, 253, 248, 0.92) 45%, rgba(255, 253, 248, 0));
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  pointer-events: none;
 }
 
 .row {
@@ -32,8 +44,11 @@
   flex: none;
   height: 40px;
   padding: 0 16px;
-  border-radius: 12px;
-  background: var(--sand);
+  border-radius: 20px;
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), 0 6px 16px -8px rgba(46, 38, 32, 0.22);
   color: var(--bark);
   font-size: 14px;
   font-weight: 500;
@@ -80,7 +95,10 @@ button.chip:active {
 }
 
 .active .chip {
-  background: var(--forest);
+  background: var(--lg-sheen-dark), var(--forest);
+  box-shadow: var(--lg-rim-dark), 0 8px 18px -8px rgba(20, 36, 26, 0.45);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   color: var(--bone);
   font-weight: 600;
 }
@@ -88,5 +106,16 @@ button.chip:active {
 @media (prefers-reduced-motion: reduce) {
   .active[data-ready="true"] {
     transition-duration: 0ms;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .bar::before {
+    inset: 0;
+    background: var(--paper);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }

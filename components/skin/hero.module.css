@@ -153,11 +153,12 @@
   margin-top: 12px;
   padding: 16px 16px 16px 16px;
   border-radius: 20px;
-  background: rgba(244, 239, 230, 0.38);
-  border: 1px solid rgba(244, 239, 230, 0.9);
-  box-shadow: 0 6px 18px rgba(128, 96, 31, 0.18);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: var(--lg-sheen), rgba(251, 246, 236, 0.32);
+  box-shadow:
+    var(--lg-rim),
+    0 14px 30px -16px rgba(128, 96, 31, 0.5);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
 }
 
 .cardText {
@@ -227,11 +228,15 @@
   margin-top: 12px;
   padding: 0 18px 0 8px;
   border-radius: 28px;
-  background: var(--forest);
+  background: var(--lg-sheen-dark), var(--lg-forest);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
   color: var(--bone);
   font-size: 15px;
   font-weight: 500;
-  box-shadow: 0 6px 18px rgba(20, 36, 26, 0.22);
+  box-shadow:
+    var(--lg-rim-dark),
+    0 12px 26px -12px rgba(20, 36, 26, 0.45);
   transition: transform 160ms var(--ease-out);
 }
 
@@ -410,7 +415,12 @@
   padding: 0 16px;
   background:
     radial-gradient(60px 45px at 50px 35px, rgba(244, 239, 230, 0.5), transparent 100%),
-    var(--sunrise-x);
+    linear-gradient(90deg, rgba(230, 207, 159, 0.9) 0%, rgba(215, 180, 111, 0.9) 55%, rgba(192, 145, 63, 0.92) 100%);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow:
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.45),
+    0 10px 24px -14px rgba(128, 96, 31, 0.55);
   border-radius: 0 0 20px 20px;
   color: var(--evergreen);
   view-transition-name: skin-head;
@@ -471,10 +481,10 @@
   gap: 6px;
   padding: 6px 12px 6px 10px;
   border-radius: 14px;
-  background: rgba(244, 239, 230, 0.45);
-  border: 1px solid rgba(251, 248, 242, 0.7);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  background: var(--lg-sheen), rgba(251, 246, 236, 0.4);
+  box-shadow: var(--lg-rim);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
   font-size: 13px;
   font-weight: 600;
   color: var(--bark);
@@ -486,7 +496,10 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--forest);
+  background: var(--lg-sheen-dark), var(--lg-forest);
+  box-shadow:
+    var(--lg-rim-dark),
+    0 6px 14px -6px rgba(20, 36, 26, 0.45);
   color: var(--gold);
   flex: none;
   transition: transform 160ms var(--ease-out);
@@ -494,4 +507,12 @@
 
 .play:active {
   transform: scale(0.94);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .slim {
+    background:
+      radial-gradient(60px 45px at 50px 35px, rgba(244, 239, 230, 0.5), transparent 100%),
+      var(--sunrise-x);
+  }
 }

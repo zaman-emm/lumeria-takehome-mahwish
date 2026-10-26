@@ -336,13 +336,13 @@
 }
 
 .row {
+  composes: glass from "./glass.module.css";
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
   padding: 8px 14px 8px 8px;
   border-radius: 16px;
-  background: var(--paper);
   text-align: left;
   transition: transform 160ms var(--ease-out);
 }

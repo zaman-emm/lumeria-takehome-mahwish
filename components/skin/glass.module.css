@@ -1,0 +1,17 @@
+/* Liquid glass for every surface on the report. Cards compose `glass`, the
+   forest surfaces compose `deep`; the tokens live in app/globals.css and fall
+   back to solid fills under Reduce Transparency. */
+
+.glass {
+  background: var(--lg-sheen), var(--lg-fill);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), var(--lg-lift);
+}
+
+.deep {
+  background: var(--lg-sheen-dark), var(--lg-forest);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim-dark), 0 12px 30px -12px rgba(20, 36, 26, 0.4);
+}

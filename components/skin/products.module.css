@@ -6,9 +6,9 @@
 }
 
 .card {
+  composes: glass from "./glass.module.css";
   padding: 16px 16px 14px;
   border-radius: 20px;
-  background: var(--paper);
 }
 
 .head {
@@ -313,6 +313,7 @@
 /* ------------------------------------------------ empty */
 
 .empty {
+  composes: glass from "./glass.module.css";
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -320,7 +321,6 @@
   margin-top: 12px;
   padding: 36px 24px;
   border-radius: 20px;
-  background: var(--paper);
   text-align: center;
 }
 

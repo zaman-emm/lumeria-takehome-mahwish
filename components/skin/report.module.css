@@ -38,6 +38,21 @@
   background: var(--white);
   color: var(--bark);
   padding-bottom: 104px;
+  isolation: isolate;
+}
+
+/* The light field: it stays with the screen while the glass scrolls over it,
+   so every card picks up a little more gold or sage as it moves. */
+.page::before {
+  content: "";
+  position: sticky;
+  top: 0;
+  z-index: -1;
+  display: block;
+  height: 100lvh;
+  margin-bottom: -100lvh;
+  background: var(--lg-field);
+  pointer-events: none;
 }
 
 /* The slim header stays put while its tab scrolls; tabs stick under it. */
@@ -76,7 +91,10 @@
   height: 52px;
   padding: 0 16px;
   border-radius: 20px;
-  background: var(--sand);
+  background: var(--lg-sheen), var(--lg-fill);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), var(--lg-lift);
   font-size: 15px;
   font-weight: 500;
   color: var(--bark);

@@ -22,11 +22,11 @@
 /* ------------------------------------------------ rings */
 
 .rings {
+  composes: glass from "./glass.module.css";
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   padding: 22px 6px 18px;
   border-radius: 20px;
-  background: var(--paper);
 }
 
 .metric {
@@ -64,21 +64,21 @@
 /* ------------------------------------------------ the read */
 
 .read {
+  composes: glass from "./glass.module.css";
   display: flex;
   flex-direction: column;
   padding: 16px 12px 14px;
   border-radius: 20px;
-  background: var(--paper);
 }
 
 .tip {
+  composes: deep from "./glass.module.css";
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 8px 0 0;
   padding: 14px 16px;
   border-radius: 16px;
-  background: var(--forest);
   color: var(--bone);
   font-size: 15px;
   line-height: 20px;
@@ -116,12 +116,12 @@
 /* ------------------------------------------------ streak */
 
 .streak {
+  composes: deep from "./glass.module.css";
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 18px 16px 20px;
   border-radius: 20px;
-  background: var(--forest);
   color: var(--bone);
 }
 
@@ -234,8 +234,8 @@
 /* ------------------------------------------------ more metrics */
 
 .more {
+  composes: glass from "./glass.module.css";
   border-radius: 24px;
-  background: var(--paper);
   overflow: hidden;
 }
 
