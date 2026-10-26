@@ -255,22 +255,51 @@
   margin: 22px 0 0;
 }
 
-.tags {
+/* Inside the note card: what she tagged and her stress, each with its label,
+   under a hairline from her words. */
+.tagged {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--sand-deep);
+}
+
+.tagged div {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 8px 0 0;
-  font-size: 13px;
+}
+
+.tagged dt {
+  width: 78px;
+  flex: none;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--bark-2);
 }
 
+.tagged dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+
+.tag,
 .stress {
-  padding: 4px 8px;
+  padding: 3px 9px;
   border-radius: 6px;
-  background: var(--clay-soft);
-  color: var(--clay-ink);
+  background: var(--sand);
+  color: var(--bark);
   font-size: 12px;
   font-weight: 600;
+}
+
+.stress[data-high="true"] {
+  background: var(--clay-soft);
+  color: var(--clay-ink);
 }
 
 .tiles,
@@ -319,29 +348,53 @@
   color: var(--bark);
 }
 
-.inUse {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin: 22px 0 0;
-  padding: 0;
-  list-style: none;
+/* The day's routine as an iOS grouped list: a section title, then one card of
+   rows, name left and schedule right, with inset hairlines between them. */
+.routine {
+  margin: 24px 0 0;
 }
 
-.inUse li {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
+.routine h3 {
+  margin: 0 0 8px 16px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
   color: var(--bark-2);
 }
 
-.inUse li > span {
+.routine ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 14px;
+  background: var(--card);
+  overflow: hidden;
+}
+
+.routine li {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  font-size: 14px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 16px;
+  font-size: 15px;
+  line-height: 20px;
   color: var(--bark);
+}
+
+.routine li + li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  border-top: 0.5px solid rgba(46, 38, 32, 0.16);
+}
+
+.routine li > :last-child {
+  flex: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

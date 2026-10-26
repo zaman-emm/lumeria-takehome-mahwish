@@ -13,6 +13,9 @@ import m from "./sheets.module.css";
 // the last scan of the same spot, what it saw, what was noted, and the day's
 // context.
 
+/** Self-reported stress, 1 to 5, in a word. */
+const stressWord = (n: number) => (n >= 4 ? "High" : n === 3 ? "Medium" : "Low");
+
 export function ScanSheet({ scan }: { scan: Scan }) {
   const { d } = useReportApi();
   const [light, setLight] = useState<Light>("ambient");
@@ -41,7 +44,8 @@ export function ScanSheet({ scan }: { scan: Scan }) {
           ["Stress", `${scan.checkin.stress} of 5`],
         ]
       : [];
-  const stress = ann?.stress ?? scan.checkin?.stress;
+  // The tiles already show a check-in's stress; the note card shows the stress she logged with her note.
+  const stress = ann?.stress;
 
   return (
     <article className={m.scan}>
@@ -124,12 +128,34 @@ export function ScanSheet({ scan }: { scan: Scan }) {
         {shortTip(scan.summary.tip)}
       </p>
 
-      {ann && <NoteCard scan={scan} addable className={m.note} />}
-      {(ann?.tags.length || (stress ?? 0) >= 4) && (
-        <p className={m.tags}>
-          {ann?.tags.join(" · ")}
-          {(stress ?? 0) >= 4 && <span className={m.stress}>High stress</span>}
-        </p>
+      {/* Her note, with what she tagged and how stressed she said she was that day. */}
+      {ann && (
+        <NoteCard scan={scan} addable className={m.note}>
+          <dl className={m.tagged}>
+            {ann.tags.length > 0 && (
+              <div>
+                <dt>You tagged</dt>
+                <dd>
+                  {ann.tags.map((t) => (
+                    <span key={t} className={m.tag}>
+                      {t}
+                    </span>
+                  ))}
+                </dd>
+              </div>
+            )}
+            {stress != null && (
+              <div>
+                <dt>Stress</dt>
+                <dd>
+                  <span className={m.stress} data-high={stress >= 4}>
+                    {stressWord(stress)} · {stress} of 5
+                  </span>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </NoteCard>
       )}
 
       {context.length > 0 && (
@@ -160,18 +186,19 @@ export function ScanSheet({ scan }: { scan: Scan }) {
         </dl>
       )}
 
+      {/* A grouped list, like Settings: one row per product, its schedule on the right. */}
       {products.length > 0 && (
-        <ul className={m.inUse} aria-label="Products in use">
-          {products.map((s) => (
-            <li key={s.id}>
-              <Icon name="bottle" size={15} />
-              <span>
-                {s.label}
+        <section className={m.routine} aria-labelledby={`${scan.id}-routine`}>
+          <h3 id={`${scan.id}-routine`}>In your routine that day</h3>
+          <ul>
+            {products.map((s) => (
+              <li key={s.id}>
+                <span>{s.label}</span>
                 <ScheduleChip product={s.product!} />
-              </span>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </article>
   );
