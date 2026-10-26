@@ -683,7 +683,10 @@
    single-letter weekdays, bare numbers, weekends and the days either side of
    the month quieter. Only two marks: a dot under each scanned day, and the
    latest scan filled like Calendar's today. */
+/* The calendar sets its numbers in bark, the guide's text colour. */
 .calWrap {
+  --ink: var(--bark);
+  --ink-soft: rgba(46, 38, 32, 0.8);
   flex: none;
   margin-top: 18px;
 }
@@ -693,7 +696,7 @@
   font-size: 22px;
   line-height: 28px;
   font-weight: 400;
-  color: var(--clay);
+  color: var(--bronze-deep);
 }
 
 .cal {
@@ -741,7 +744,7 @@
 
 /* Like Calendar's today: a filled circle, the number reversed out. */
 .calDay[data-latest] {
-  background: var(--clay);
+  background: var(--bronze-deep);
   animation: dot 420ms var(--ease-out) 900ms both;
 }
 
@@ -796,7 +799,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--clay);
+  background: var(--bronze-deep);
 }
 
 .slide[data-kind="showedUp"] .body {
