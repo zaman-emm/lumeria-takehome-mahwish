@@ -81,6 +81,40 @@
   height: 0;
 }
 
+/* Scroll edge: where content scrolls up under the grabber and the close button,
+   the strip behind them blurs and fades into the sheet, instead of the content
+   running hard under the controls. It covers only that strip (the controls end
+   at 54px), blurs at the app's glass strength, and fades out over its last 40%
+   so there is no line where it stops. Only shown once there is content under it. */
+.edge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 76px;
+  background: linear-gradient(to bottom, rgba(var(--canvas-rgb), 0.55), rgba(var(--canvas-rgb), 0));
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+  pointer-events: none;
+}
+
+.edge[data-on="true"] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  /* No blur: a solid fade of the sheet's own colour. */
+  .edge {
+    background: linear-gradient(to bottom, var(--canvas) 60%, rgba(var(--canvas-rgb), 0));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 .grabber {
   position: absolute;
   top: 8px;

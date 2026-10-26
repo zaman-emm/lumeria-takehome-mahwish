@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Drawer } from "@base-ui/react/drawer";
 import { Icon } from "./Icon";
 import s from "./sheet.module.css";
@@ -35,13 +35,19 @@ export function Sheet({
     popup.current?.scrollTo({ top: 0 });
   }, [shown.key]);
 
+  // Content only passes under the grabber and the close button once it has
+  // scrolled, so the scroll-edge blur (sheet.module.css .edge) shows only then.
+  // React skips the render when the value hasn't changed, so this costs nothing per scroll event.
+  const [scrolled, setScrolled] = useState(false);
+
   return (
     <Drawer.Root open={open} onOpenChange={(o) => !o && onClose()}>
       <Drawer.Portal container={container}>
         <Drawer.Backdrop className={s.backdrop} />
         <Drawer.Viewport className={s.viewport}>
-          <Drawer.Popup className={s.popup} ref={popup} aria-label={shown.label}>
+          <Drawer.Popup className={s.popup} ref={popup} aria-label={shown.label} onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 2)}>
             <div className={s.chrome}>
+              <div className={s.edge} data-on={scrolled} aria-hidden />
               <div className={s.grabber} aria-hidden />
               <Drawer.Close className={s.close} aria-label="Close">
                 <Icon name="close" size={14} stroke={1.8} />
