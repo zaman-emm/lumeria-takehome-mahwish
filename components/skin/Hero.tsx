@@ -1,8 +1,8 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
-import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
+import { band, dayOf as localDayOf, daysBetween, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useFirstTime } from "./hooks";
 import { Gauge } from "./Gauge";
@@ -28,6 +28,8 @@ function beforeAfter(d: Derived, lens: Scan): [Scan, Scan] | null {
   return [d.trend.from, d.trend.to];
 }
 
+const greetingFor = (hour: number) => (hour < 5 ? "Good evening" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening");
+
 export function Hero({
   d,
   lens,
@@ -46,6 +48,12 @@ export function Hero({
   const reduce = useReducedMotion();
   const first = useFirstTime("hero");
   const play = first && !reduce && !splash; // with a splash, the splash plays it
+
+  // Greeted by the hour where she's reading it; the report renders in the
+  // browser, so this is her own clock.
+  const [greeting] = useState(() => greetingFor(new Date().getHours()));
+  const scanDays = new Set(d.scans.map((s) => localDayOf(d, s))).size;
+  const days = daysBetween(d.start, d.end) + 1;
 
   const pair = beforeAfter(d, lens);
   const tz = scanTz(d.latest) ?? d.tz;
@@ -68,7 +76,14 @@ export function Hero({
         </button>
       )}
 
-      <p className={h.hi}>Hi {d.firstName},</p>
+      <div className={h.hi}>
+        <h2>
+          {greeting} <span>{d.firstName}</span>
+        </h2>
+        <p>
+          You made time for your skin on {scanDays} of {days} days.
+        </p>
+      </div>
       <div className={h.card}>
         <div className={h.cardText}>
           {d.trend?.delta ? (

@@ -103,22 +103,3 @@
   pointer-events: none;
   view-transition-name: skin-home;
 }
-
-/* Over a dark screen (the Scan viewfinder) the status bar and the home
-   indicator turn white, as iOS does. */
-:global(html:has([data-screen="dark"])) .status,
-:global(html:has([data-screen="dark"])) .home {
-  color: #fff;
-}
-
-:global(html:has([data-screen="dark"])) .home {
-  background: #fff;
-}
-
-:global(html:has([data-screen="dark"])) .battery {
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-:global(html:has([data-screen="dark"])) .battery::after {
-  background: rgba(255, 255, 255, 0.5);
-}

@@ -98,11 +98,11 @@
      one (DeviceChrome) on a laptop. */
   --chrome-top: 0px;
   --top-inset: max(env(safe-area-inset-top, 0px), var(--chrome-top));
-  /* How tall the At a glance hero's gold is on a phone (measured: 640px plus the
+  /* How tall the At a glance hero's gold is on a phone (measured: 680px plus the
      top inset on a 393-wide screen). The loading, error and empty screens and the phone
      frame's placeholder paint the same height, so the gold's edge never moves when
      the real hero takes over. Re-measure if the hero's layout changes. */
-  --hero-h: calc(var(--top-inset) + 640px);
+  --hero-h: calc(var(--top-inset) + 680px);
   /* The same for the bottom: room for the home indicator. */
   --chrome-bottom: 0px;
   --bottom-inset: max(env(safe-area-inset-bottom, 0px), var(--chrome-bottom));

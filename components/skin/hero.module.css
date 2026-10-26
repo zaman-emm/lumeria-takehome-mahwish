@@ -23,14 +23,35 @@
 }
 
 /* The greeting opens the part of the page that's about her, under the gold. */
+/* The greeting opens the part under the gold, set large and to the left: the
+   time of day in full ink, her name quieter, a line about her month below. */
 .hi {
   align-self: stretch;
+  width: 100%;
   max-width: 342px;
-  margin: 28px auto 0;
-  font-size: 22px;
-  line-height: 28px;
-  letter-spacing: -0.2px;
-  color: var(--bark);
+  margin: 32px auto 0;
+  text-align: left;
+}
+
+.hi h2 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 36px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+  color: var(--evergreen);
+}
+
+.hi h2 span {
+  font-weight: 400;
+  color: var(--bark-3);
+}
+
+.hi p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--bark-2);
 }
 
 .title {
@@ -147,7 +168,7 @@
   width: 100%;
   max-width: 342px;
   min-height: 104px;
-  margin-top: 12px;
+  margin-top: 16px;
   padding: 16px;
   border-radius: 20px;
   /* It sits where the gold has faded out, so it's a light card, not glass. */
