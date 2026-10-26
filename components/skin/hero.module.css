@@ -57,42 +57,63 @@
   overflow: visible;
 }
 
+/* Arc colourways, tried side by side (?gauge=forest|white|yellow). */
+.hero {
+  --arc-from: #14241a;
+  --arc-to: #2f4a35;
+  --track: rgba(20, 36, 26, 0.12);
+  --ray: #1f3326;
+}
+
+.hero[data-gauge="white"] {
+  --arc-from: #fff6e4;
+  --arc-to: #ffffff;
+  --track: rgba(255, 255, 255, 0.3);
+  --ray: #fffaf0;
+}
+
+.hero[data-gauge="yellow"] {
+  --arc-from: #f2b93b;
+  --arc-to: #ffd970;
+  --track: rgba(255, 236, 180, 0.4);
+  --ray: #f5c04a;
+}
+
+.arcFrom {
+  stop-color: var(--arc-from);
+}
+
+.arcTo {
+  stop-color: var(--arc-to);
+}
+
+/* Rays up to the score are fat and solid; the rest stay faint. */
 .ray {
-  stroke: #80601f;
-  stroke-width: 1.5;
+  stroke: var(--ray);
+  stroke-width: 2.5;
   stroke-linecap: round;
-  opacity: 0.55;
+  opacity: 0.22;
 }
 
 .ray[data-lit="true"] {
-  stroke-width: 3;
+  stroke-width: 5;
+  opacity: 1;
 }
 
+/* A thick, soft band: same hue for the track, rounded ends, no knob. */
 .track {
   fill: none;
-  stroke: rgba(244, 239, 230, 0.5);
-  stroke-width: 12;
+  stroke: var(--track);
+  stroke-width: 30;
   stroke-linecap: round;
 }
 
 .arc {
   fill: none;
   stroke: url(#hero-arc);
-  stroke-width: 12;
+  stroke-width: 30;
   stroke-linecap: round;
-}
-
-.knob {
-  transform-box: view-box;
-  transform-origin: 171px 185px;
-  transform: rotate(var(--rot));
-}
-
-.knob circle {
-  fill: var(--bone);
-  stroke: var(--forest);
-  stroke-width: 4;
-  filter: drop-shadow(0 2px 4px rgba(20, 36, 26, 0.3));
+  filter: drop-shadow(0 4px 10px rgba(20, 36, 26, 0.18));
 }
 
 .score {
@@ -107,29 +128,18 @@
 
 .value {
   display: block;
-  font-size: 104px;
+  font-size: 84px;
   line-height: 0.9;
-  font-weight: 300;
-  letter-spacing: -4.16px;
+  font-weight: 400;
+  letter-spacing: -3px;
   color: var(--evergreen);
   font-variant-numeric: tabular-nums;
   /* A touch of left room so the negative tracking stays centred. */
-  padding-left: 4px;
+  padding-left: 3px;
 }
 
-/* While it rolls the number is a little soft, then it settles sharp. */
 .digits {
   display: inline-block;
-  transition:
-    filter 260ms var(--ease-out),
-    opacity 260ms var(--ease-out),
-    transform 260ms var(--ease-out);
-}
-
-.digits[data-rolling="true"] {
-  filter: blur(1.2px);
-  opacity: 0.8;
-  transform: translateY(2px);
 }
 
 .label {
@@ -333,8 +343,8 @@
   animation: arcDraw 1100ms cubic-bezier(0.33, 1, 0.68, 1) 150ms both;
 }
 
-.hero[data-play="true"] .knob {
-  animation: knobRide 1100ms cubic-bezier(0.33, 1, 0.68, 1) 150ms both;
+.hero[data-play="true"] .digits {
+  animation: fade 300ms var(--ease-out) 150ms both;
 }
 
 .hero[data-play="true"] .label {
@@ -377,10 +387,11 @@
 
 @keyframes ignite {
   from {
-    stroke-width: 1.5;
+    stroke-width: 2.5;
+    opacity: 0.22;
   }
-  40% {
-    stroke-width: 4;
+  45% {
+    stroke-width: 6.5;
     opacity: 1;
   }
 }
@@ -391,12 +402,6 @@
   }
   to {
     stroke-dashoffset: 0;
-  }
-}
-
-@keyframes knobRide {
-  from {
-    transform: rotate(0deg);
   }
 }
 
@@ -424,13 +429,8 @@
 @media (prefers-reduced-motion: reduce) {
   .hero[data-play="true"] .ray,
   .hero[data-play="true"] .arc,
-  .hero[data-play="true"] .knob,
   .hero[data-play="true"] .segs i::after {
     animation: none;
-  }
-  .digits[data-rolling="true"] {
-    filter: none;
-    transform: none;
   }
 }
 

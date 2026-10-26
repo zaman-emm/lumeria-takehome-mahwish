@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
+import { useSearchParams } from "next/navigation";
 import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useFirstTime } from "./hooks";
@@ -12,36 +13,20 @@ import { Photo } from "./ui";
 import h from "./hero.module.css";
 
 // The At a glance hero: the score as a sunrise gauge on gold. On first load
-// the arc draws to the score with its knob riding the tip, each ray lights as
-// the tip passes it, and the number rolls through random values that close in
-// on the score before it lands. Once per load only.
+// the thick arc draws to the score, each ray up to it swells as the tip
+// passes, and the number counts up on the same curve so it lands with the
+// tip. Once per load only.
 
 const CX = 171;
 const CY = 185;
-const R = 126;
+const R = 118;
 const RAYS = 25;
-/** How long the arc takes to draw, in ms; the rays and the roll follow it. */
+/** How long the arc takes to draw, in ms; the rays and the count follow it. */
 const DRAW = 1100;
 /** Where the arc starts drawing, in ms. */
 const LEAD = 150;
-
-/**
- * The values the score rolls through: random at first, closing in on the
- * score, each held a little longer than the last, like a wheel slowing down.
- */
-function roll(value: number) {
-  const steps: { at: number; n: number }[] = [];
-  let at = 0;
-  for (let k = 0; k < 16; k++) {
-    const p = k / 16;
-    const spread = Math.round(45 * (1 - p) ** 1.6) + 2;
-    let n = value;
-    while (n === value) n = Math.max(0, Math.min(99, value + Math.round((Math.random() * 2 - 1) * spread)));
-    steps.push({ at, n });
-    at += 40 + 120 * p * p;
-  }
-  return { steps, end: at };
-}
+/** The arc's cubic ease-out, shared by the count so both land together. */
+const ease = (p: number) => 1 - (1 - p) ** 3;
 
 /** When the arc's tip reaches a share of its length, with the ease-out it draws on. */
 const reach = (share: number) => LEAD + DRAW * (1 - Math.cbrt(1 - Math.min(1, share)));
@@ -81,31 +66,28 @@ export function Hero({
   const first = useFirstTime("hero");
   const play = first && !reduce;
   const digits = useRef<HTMLSpanElement>(null);
+  const arc = useRef<SVGPathElement>(null);
+
+  const gauge = useSearchParams().get("gauge") ?? "forest";
 
   useEffect(() => {
     if (!play || !digits.current) return;
     const el = digits.current;
-    const { steps, end } = roll(value);
     const start = performance.now() + LEAD;
     let raf = 0;
-    const land = () => {
-      el.textContent = String(value);
-      el.dataset.rolling = "false";
-    };
+    // Read the arc's own clock when it has one, so the count never drifts from the tip.
     const tick = (now: number) => {
-      const t = now - start;
-      if (t >= end) return land();
-      let n = steps[0].n;
-      for (const st of steps) if (st.at <= t) n = st.n;
-      el.textContent = String(n);
-      raf = requestAnimationFrame(tick);
+      const draw = arc.current?.getAnimations()[0];
+      const t = draw?.currentTime != null ? Number(draw.currentTime) - LEAD : now - start;
+      const p = Math.max(0, Math.min(1, t / DRAW));
+      el.textContent = String(Math.round(value * ease(p)));
+      if (p < 1) raf = requestAnimationFrame(tick);
     };
-    el.textContent = String(steps[0].n);
-    el.dataset.rolling = "true";
+    el.textContent = "0";
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
-      land();
+      el.textContent = String(value);
     };
   }, [play, value]);
 
@@ -116,7 +98,7 @@ export function Hero({
   const dayOf = (s: Scan) => fmtDay(s.takenAt, scanTz(s) ?? d.tz);
 
   return (
-    <header className={h.hero} data-play={play} data-reduce={first && reduce}>
+    <header className={h.hero} data-gauge={gauge} data-play={play} data-reduce={first && reduce}>
       <Logo className={h.logo} />
       <p className={h.hi}>Hi {d.firstName},</p>
       <h1 className={h.title}>{headline(d)}</h1>
@@ -125,13 +107,13 @@ export function Hero({
         <svg viewBox="0 0 342 240" aria-hidden>
           <defs>
             <linearGradient id="hero-arc" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#14241a" />
-              <stop offset="1" stopColor="#2f4a35" />
+              <stop offset="0" className={h.arcFrom} />
+              <stop offset="1" className={h.arcTo} />
             </linearGradient>
           </defs>
           {Array.from({ length: RAYS }, (_, i) => {
             const deg = 180 - i * 7.5;
-            const [x1, y1] = polar(deg, 143);
+            const [x1, y1] = polar(deg, 146);
             const [x2, y2] = polar(deg, i % 2 ? 158 : 167);
             return (
               <line
@@ -149,14 +131,12 @@ export function Hero({
           <path d={`M${CX - R} ${CY}A${R} ${R} 0 0 1 ${CX + R} ${CY}`} className={h.track} />
           <path
             d={`M${CX - R} ${CY}A${R} ${R} 0 0 1 ${CX + R} ${CY}`}
+            ref={arc}
             className={h.arc}
             pathLength={100}
             strokeDasharray={`${value} 200`}
             style={{ "--v": value } as CSSProperties}
           />
-          <g className={h.knob} style={{ "--rot": `${(value / 100) * 180}deg` } as CSSProperties}>
-            <circle cx={CX - R} cy={CY} r="10" />
-          </g>
         </svg>
         <div className={h.score}>
           <span className={h.value} style={{ viewTransitionName: "skin-score" }}>
