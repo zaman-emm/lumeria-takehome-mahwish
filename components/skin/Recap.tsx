@@ -254,7 +254,7 @@ export function Recap({
 export function RecapPeek({ d }: { d: Derived }) {
   const pages = useMemo(() => buildRecap(d).slice(0, 2), [d]);
   return (
-    <span className={s.peek} aria-hidden>
+    <span className={s.peek} data-peek aria-hidden>
       {pages.map((sl, n) => (
         <span key={n} className={s.peekCard} data-peek-card style={{ "--n": n } as CSSProperties}>
           <span className={`${s.stage} ${s.peekPage}`} data-ink={THEMES[sl.kind].ink}>

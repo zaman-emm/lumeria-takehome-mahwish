@@ -157,21 +157,20 @@
   gap: 6px;
 }
 
-.pill {
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--evergreen-2);
-  color: var(--bronze-soft);
-  font-size: 12px;
-  line-height: 15px;
+/* The change since the first scan is the card's one fact, so it's the big thing. */
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--evergreen);
+  font-size: 40px;
+  line-height: 44px;
   font-weight: 500;
+  letter-spacing: -0.8px;
+  font-variant-numeric: tabular-nums;
 }
 
 .change {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 4px;
   font-size: 14px;
   font-weight: 500;
   color: var(--evergreen);
@@ -257,20 +256,38 @@
 
 /* Card-sized try: as big as the card above, with larger pages. */
 .month[data-size="card"] {
+  position: relative;
   height: auto;
   min-height: 113px;
+  overflow: hidden;
   padding: 0 20px 0 16px;
   border-radius: 20px;
-  font-size: 17px;
+  font-size: 16px;
+  white-space: nowrap;
 }
 
 .month[data-size="card"] .monthPlay {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
 }
 
+/* Only the top half of each page shows, rising out of the bottom edge. */
 .month[data-size="card"] :global(*) {
-  --ps: 0.105;
+  --ps: 0.13;
+}
+
+.month[data-size="card"] [data-peek] {
+  align-self: stretch;
+  width: 100px;
+  height: auto;
+  margin-right: -6px;
+}
+
+.month[data-size="card"] [data-peek-card] {
+  top: 36px;
+  bottom: auto;
+  left: calc(10px + var(--n) * 38px);
+  transform: rotate(calc((var(--n) * 2 - 1) * 9deg));
 }
 
 .month:active {

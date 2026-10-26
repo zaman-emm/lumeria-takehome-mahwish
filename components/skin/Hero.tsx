@@ -49,7 +49,6 @@ export function Hero({
   const play = first && !reduce && !splash; // with a splash, the splash plays it
 
   const pair = beforeAfter(d, lens);
-  const word = band(value).word;
   const tz = scanTz(d.latest) ?? d.tz;
   const dayOf = (s: Scan) => fmtDay(s.takenAt, scanTz(s) ?? d.tz);
 
@@ -66,11 +65,17 @@ export function Hero({
 
       <div className={h.card}>
         <div className={h.cardText}>
-          <span className={h.pill}>{word}</span>
-          <span className={h.change}>
-            {d.trend && <Icon name={d.trend.delta >= 0 ? "up" : "down"} size={14} stroke={1.8} />}
-            {sinceStart(d)}
-          </span>
+          {d.trend?.delta ? (
+            <>
+              <span className={h.delta}>
+                <Icon name={d.trend.delta > 0 ? "up" : "down"} size={22} stroke={2} />
+                {Math.abs(d.trend.delta)}
+              </span>
+              <span className={h.change}>since you started</span>
+            </>
+          ) : (
+            <span className={h.change}>{sinceStart(d)}</span>
+          )}
         </div>
         {pair ? (
           <button
