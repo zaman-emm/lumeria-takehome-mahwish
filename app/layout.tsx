@@ -24,7 +24,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={montserrat.variable}>
+    <html lang="en" className={montserrat.variable} suppressHydrationWarning>
+      <head>
+        {/* Inside the laptop phone frame (an iframe of this page), marked before first paint so the page
+            shows at once instead of waiting for hydration, and never flashes the page's own colour. */}
+        <script dangerouslySetInnerHTML={{ __html: "if(self!==top)document.documentElement.setAttribute('data-embedded','')" }} />
+      </head>
       <body>{children}</body>
     </html>
   );

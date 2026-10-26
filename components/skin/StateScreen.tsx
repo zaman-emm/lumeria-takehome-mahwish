@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReportState } from "@/lib/useReport";
 import { Logo } from "./Logo";
+import { SplashShell } from "./Splash";
 import st from "./state.module.css";
 
 // Error and empty, in the report's own gold (loading is only the empty home background), written for a person
@@ -19,6 +20,7 @@ export function StateScreen({
     return (
       <div className={st.home} data-skin>
         <div className={st.veil} aria-hidden />
+        <SplashShell className={st.shell} />
         <p className={st.sr} role="status">
           Opening your report
         </p>

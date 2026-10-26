@@ -48,6 +48,13 @@
   pointer-events: none;
 }
 
+/* The splash's ring track, already set down while the report loads. Above the glass, like the splash's own. */
+.shell {
+  position: fixed;
+  z-index: 61;
+  pointer-events: none;
+}
+
 .sr {
   position: absolute;
   width: 1px;

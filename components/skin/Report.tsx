@@ -21,6 +21,7 @@ import { Recap } from "./Recap";
 import { ScanSheet } from "./ScanSheet";
 import { Sheet } from "./Sheet";
 import { Splash } from "./Splash";
+import { markSplashed, willSplash } from "./splashState";
 import { Tabs } from "./Tabs";
 import { TrendsTab } from "./TrendsTab";
 import r from "./report.module.css";
@@ -44,16 +45,11 @@ const sheetLabel = (s: SheetState) =>
   s.kind === "scan" ? "Scan details" : s.kind === "metric" ? `${metricMeta(s.key).label} trend` : "Lumi";
 const sheetKey = (s: SheetState) => (s.kind === "scan" ? s.scan.id : s.kind === "metric" ? `${s.key}-${s.area}` : "lumi");
 
-// The splash opens the first load of a page, never again, and never for
-// people who asked for less motion.
-let splashed = false;
-
 export function Report({ d }: { d: Derived }) {
   const [tab, setTab] = useState<TabId>("glance");
-  const [splash, setSplash] = useState<"wait" | "go" | "done">(() => {
-    if (splashed || typeof window === "undefined") return "done";
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "done" : "wait";
-  });
+  // The splash opens the first load of a page, never again, and never for
+  // people who asked for less motion (splashState.ts).
+  const [splash, setSplash] = useState<"wait" | "go" | "done">(() => (willSplash() ? "wait" : "done"));
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [recap, setRecap] = useState(false);
   const [root, setRoot] = useState<HTMLDivElement | null>(null);
@@ -219,7 +215,7 @@ export function Report({ d }: { d: Derived }) {
 
           {splash !== "done" && (
             <Splash value={d.latest.scores.overall} onGo={() => {
-                splashed = true;
+                markSplashed();
                 setSplash("go");
               }} onDone={() => setSplash("done")} />
           )}

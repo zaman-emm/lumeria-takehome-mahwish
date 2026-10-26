@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Gauge } from "./Gauge";
+import { willSplash } from "./splashState";
 import s from "./splash.module.css";
 
 // The splash a first load opens on. The home page's own background stays put
@@ -20,6 +21,35 @@ const OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
 const DRAWER = "cubic-bezier(0.32, 0.72, 0, 1)";
 
 type Geo = { left: number; top: number; width: number; height: number; scale: number; cy: number };
+
+/** The hero's gauge box (hero.module.css .gaugeBox): 342 : 240, at most 326 wide, inside the hero's 24px sides. */
+const BOX_MAX = 326;
+const BOX_RATIO = 240 / 342;
+
+/** Where the splash holds the ring: centred, a little above the middle of the screen. */
+function held(vw: number, vh: number) {
+  const width = Math.min(BOX_MAX, Math.min(vw, 430) - 48);
+  const height = width * BOX_RATIO;
+  const scale = Math.min(1.25, (Math.min(vw, 430) - 24) / width);
+  return { width: width * scale, height: height * scale, left: (vw - width * scale) / 2, top: vh * 0.5 - height * scale * 0.48 };
+}
+
+/**
+ * The ring's empty track, set down where the splash will draw it. The loading
+ * screen shows this while the report is on its way, so the gold is never bare
+ * and the splash simply carries on from it.
+ */
+export function SplashShell({ className }: { className?: string }) {
+  const [at, setAt] = useState<ReturnType<typeof held> | null>(null);
+  // Only when the splash is actually coming; otherwise the ring would have nowhere to go.
+  useLayoutEffect(() => setAt(willSplash() ? held(window.innerWidth, window.innerHeight) : null), []);
+  if (!at) return null;
+  return (
+    <div className={className} style={{ left: at.left, top: at.top, width: at.width, height: at.height }} aria-hidden>
+      <Gauge value={0} play={false} idle decorative />
+    </div>
+  );
+}
 
 export function Splash({ value, onGo, onDone }: { value: number; onGo: () => void; onDone: () => void }) {
   const wrap = useRef<HTMLDivElement>(null);
@@ -47,22 +77,14 @@ export function Splash({ value, onGo, onDone }: { value: number; onGo: () => voi
     const tx = (vw - geo.width * geo.scale) / 2 - geo.left;
     const ty = geo.cy - geo.height * geo.scale * 0.48 - geo.top;
     const centred = `translate(${tx}px, ${ty}px) scale(${geo.scale})`;
-    const settling = `translate(${tx}px, ${ty}px) scale(${geo.scale * 0.94})`;
+    // The ring's track is already on the glass (the loading screen's SplashShell
+    // sits in this exact spot), so it draws without fading in.
     el.style.transform = centred;
-
-    // The ring eases in on the glass before it draws.
-    const enter = el.animate([{ opacity: 0, transform: settling }, { opacity: 1, transform: centred }], {
-      duration: 560,
-      easing: OUT,
-      fill: "both",
-    });
-
     const timers: number[] = [];
     let flown = false;
     const fly = () => {
       if (flown) return;
       flown = true;
-      enter.finish();
       // A tap mid-draw lets the arc and count land first.
       el.getAnimations({ subtree: true }).forEach((a) => a.finish());
       const box = document.querySelector("[data-skin-gauge]")?.getBoundingClientRect();
@@ -84,7 +106,6 @@ export function Splash({ value, onGo, onDone }: { value: number; onGo: () => voi
 
     return () => {
       timers.forEach(window.clearTimeout);
-      enter.cancel();
     };
   }, [geo]);
 

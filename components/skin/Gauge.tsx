@@ -27,6 +27,7 @@ export function Gauge({
   draw = 1100,
   named,
   decorative,
+  idle,
 }: {
   value: number;
   /** Draw the arc and count up; otherwise it simply is there. */
@@ -39,6 +40,8 @@ export function Gauge({
   named?: boolean;
   /** The splash copy is hidden from assistive tech; the hero's carries the label. */
   decorative?: boolean;
+  /** Just the empty track: the loading screen's set-down of the ring, before there is a score. */
+  idle?: boolean;
 }) {
   const id = useId().replace(/:/g, "");
   const digits = useRef<HTMLSpanElement>(null);
@@ -87,7 +90,7 @@ export function Gauge({
             <stop offset="1" className={h.arcTo} />
           </linearGradient>
         </defs>
-        {Array.from({ length: RAYS }, (_, i) => {
+        {!idle && Array.from({ length: RAYS }, (_, i) => {
           const deg = 180 - i * 7.5;
           const [x1, y1] = polar(deg, 146);
           const [x2, y2] = polar(deg, i % 2 ? 158 : 167);
@@ -105,23 +108,27 @@ export function Gauge({
           );
         })}
         <path d={`M${CX - R} ${CY}A${R} ${R} 0 0 1 ${CX + R} ${CY}`} className={h.track} />
-        <path
-          d={`M${CX - R} ${CY}A${R} ${R} 0 0 1 ${CX + R} ${CY}`}
-          ref={arc}
-          className={h.arc}
-          stroke={`url(#arc-${id})`}
-          pathLength={100}
-          strokeDasharray={`${value} 200`}
-          style={{ "--v": value } as CSSProperties}
-        />
+        {!idle && (
+          <path
+            d={`M${CX - R} ${CY}A${R} ${R} 0 0 1 ${CX + R} ${CY}`}
+            ref={arc}
+            className={h.arc}
+            stroke={`url(#arc-${id})`}
+            pathLength={100}
+            strokeDasharray={`${value} 200`}
+            style={{ "--v": value } as CSSProperties}
+          />
+        )}
       </svg>
-      <div className={h.score}>
-        <span className={h.value} style={named ? { viewTransitionName: "skin-score" } : undefined}>
-          <span ref={digits} className={h.digits} aria-hidden>
-            {value}
+      {!idle && (
+        <div className={h.score}>
+          <span className={h.value} style={named ? { viewTransitionName: "skin-score" } : undefined}>
+            <span ref={digits} className={h.digits} aria-hidden>
+              {value}
+            </span>
           </span>
-        </span>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

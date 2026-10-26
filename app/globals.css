@@ -136,6 +136,12 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* In the phone frame the page is the screen: no sand behind it, ever. */
+html[data-embedded],
+html[data-embedded] body {
+  background: var(--canvas);
+}
+
 h1,
 h2,
 h3 {

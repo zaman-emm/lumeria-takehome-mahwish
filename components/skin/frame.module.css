@@ -4,6 +4,12 @@
   .pending {
     visibility: hidden;
   }
+
+  /* Inside the phone's own iframe the page is already the phone: show it at
+     once, not after hydration (see the script in layout.tsx). */
+  :global(html[data-embedded]) .pending {
+    visibility: visible;
+  }
 }
 
 .desk {
@@ -60,5 +66,10 @@
   display: block;
   border: 0;
   border-radius: 51px;
-  background: var(--canvas);
+  /* What the loading screen looks like, behind the page while it loads, so the
+     screen never goes white first. */
+  background:
+    radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%) top / 100% 675px no-repeat,
+    var(--sunrise) top / 100% 675px no-repeat,
+    var(--canvas);
 }
