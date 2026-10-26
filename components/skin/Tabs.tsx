@@ -55,7 +55,9 @@ export function Tabs<T extends string>({
   }, [active]);
 
   return (
-    <div className={t.bar} ref={bar} data-stuck={stuck}>
+    <>
+    <div className={t.cap} data-on={stuck} aria-hidden />
+    <div className={t.bar} ref={bar} data-stuck={stuck} data-page-chrome>
       <div className={t.row} ref={row} role="tablist" aria-label="Report sections">
         {tabs.map((tab) => (
           <button
@@ -81,5 +83,6 @@ export function Tabs<T extends string>({
         </div>
       </div>
     </div>
+    </>
   );
 }

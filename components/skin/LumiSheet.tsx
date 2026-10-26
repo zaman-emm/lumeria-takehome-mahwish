@@ -35,10 +35,21 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
   const talking = lines.length > 0;
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
-  // Keep the newest line in view as the conversation grows.
+  // Keep the newest line in view, just above the composer, as the conversation
+  // grows. Once at the next frame, and again after the new line's entrance and
+  // the "thinking" row's exit have settled, since both change the height the
+  // first pass measured.
   useEffect(() => {
-    if (talking) end.current?.scrollIntoView({ block: "end", behavior: reduce ? "auto" : "smooth" });
-  }, [lines.length, thinking, talking, reduce]);
+    const el = end.current;
+    if (!talking || !el) return;
+    const go = () => el.scrollIntoView({ block: "end", behavior: reduce ? "auto" : "smooth" });
+    const raf = requestAnimationFrame(go);
+    const settle = window.setTimeout(go, 480);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(settle);
+    };
+  }, [lines.length, thinking, offer.length, talking, reduce]);
 
   const ask = (t: LumiTopic) => {
     if (thinking) return;

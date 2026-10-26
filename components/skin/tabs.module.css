@@ -20,33 +20,41 @@
     box-shadow 200ms var(--ease-out);
 }
 
-.bar[data-stuck="true"] {
+.bar[data-stuck="true"],
+.cap[data-on="true"] {
   background-color: rgba(var(--canvas-rgb), 0.78);
   -webkit-backdrop-filter: blur(24px) saturate(1.6);
   backdrop-filter: blur(24px) saturate(1.6);
+}
+
+.bar[data-stuck="true"] {
   box-shadow: 0 0.5px 0 rgba(46, 38, 32, 0.14);
 }
 
-/* Above a stuck bar, the status bar's strip is filled in to match, so the
-   page never shows behind the clock. */
-.bar::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100%;
+/* The strip behind the status bar, above a stuck bar, so the page never shows
+   behind the clock. It is the bar's own glass (the rule above is shared, so the
+   two can never drift apart) as a sibling, since a child of the bar can't see
+   what's behind it. */
+.cap {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 5;
+  width: min(100%, var(--phone));
   height: var(--top-inset);
-  background: rgba(var(--canvas-rgb), 0.96);
+  transform: translateX(-50%);
   opacity: 0;
   pointer-events: none;
+  transition: opacity 200ms var(--ease-out);
 }
 
-.bar[data-stuck="true"]::after {
+.cap[data-on="true"] {
   opacity: 1;
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .bar[data-stuck="true"] {
+  .bar[data-stuck="true"],
+  .cap[data-on="true"] {
     background-color: var(--canvas);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;

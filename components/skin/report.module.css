@@ -29,6 +29,21 @@
   overflow: hidden;
 }
 
+/* While a sheet is up, the page behind it shows in the strip above the sheet,
+   under the status bar. Its header controls and tab pills fade out there, so
+   no glass circles or icons are left behind the clock and the island. The
+   header and the bar keep their own surfaces. (!important: the hero's entrance
+   animations hold their final opacity otherwise.) */
+.page > header > *,
+.page > [data-page-chrome] > * {
+  transition: opacity 200ms var(--ease-out);
+}
+
+.indent[data-active] .page > header > *,
+.indent[data-active] .page > [data-page-chrome] > * {
+  opacity: 0 !important;
+}
+
 .page {
   position: relative;
   width: 100%;

@@ -42,7 +42,6 @@
      island never sit over its content. */
   max-height: calc(100dvh - var(--top-inset) - 6px + var(--bleed));
   margin-bottom: calc(-1 * var(--bleed));
-  padding-bottom: calc(var(--bleed) + var(--bottom-inset));
   border-radius: 28px 28px 0 0;
   background: var(--canvas);
   color: var(--bark);
@@ -83,35 +82,57 @@
 
 /* Scroll edge: where content scrolls up under the grabber and the close button,
    the strip behind them blurs and fades into the sheet, instead of the content
-   running hard under the controls. It covers only that strip (the controls end
-   at 54px), blurs at the app's glass strength, and fades out over its last 40%
-   so there is no line where it stops. Only shown once there is content under it. */
+   running hard under the controls. It is a progressive blur: six layers (Sheet.tsx
+   EDGE_BLURS, 16px down to 0.5px), the strongest at the top and each masked to
+   its own band, so the blur eases out to nothing with no edge where it stops,
+   under a soft fade of the sheet's colour. The strip is 88px; the controls end at
+   54px. Only shown once there is content under it. */
 .edge {
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
-  height: 76px;
-  background: linear-gradient(to bottom, rgba(var(--canvas-rgb), 0.55), rgba(var(--canvas-rgb), 0));
-  -webkit-backdrop-filter: var(--lg-blur);
-  backdrop-filter: var(--lg-blur);
-  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
-  mask-image: linear-gradient(to bottom, #000 60%, transparent);
-  opacity: 0;
-  transition: opacity 160ms var(--ease-out);
+  height: 88px;
   pointer-events: none;
 }
 
-.edge[data-on="true"] {
+.edge > * {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.edge > i {
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  /* Each layer is full strength at its own height and gone one step either side (a step is 1/7th of the strip). */
+  -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--at) - 14.3%), #000 var(--at), transparent calc(var(--at) + 14.3%));
+  mask-image: linear-gradient(to bottom, transparent calc(var(--at) - 14.3%), #000 var(--at), transparent calc(var(--at) + 14.3%));
+}
+
+/* The strongest layer holds from the very top. */
+.edge > i:first-child {
+  -webkit-mask-image: linear-gradient(to bottom, #000 var(--at), transparent calc(var(--at) + 14.3%));
+  mask-image: linear-gradient(to bottom, #000 var(--at), transparent calc(var(--at) + 14.3%));
+}
+
+.edge > b {
+  background: linear-gradient(to bottom, rgba(var(--canvas-rgb), 0.7), rgba(var(--canvas-rgb), 0));
+}
+
+.edge[data-on="true"] > * {
   opacity: 1;
 }
 
 @media (prefers-reduced-transparency: reduce) {
   /* No blur: a solid fade of the sheet's own colour. */
-  .edge {
-    background: linear-gradient(to bottom, var(--canvas) 60%, rgba(var(--canvas-rgb), 0));
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+  .edge > i {
+    display: none;
+  }
+
+  .edge > b {
+    background: linear-gradient(to bottom, var(--canvas) 55%, rgba(var(--canvas-rgb), 0));
   }
 }
 
@@ -151,8 +172,12 @@
   transform: scale(0.96);
 }
 
+/* The room under the content (the bleed below the screen's edge, and the home
+   indicator) is padding on the content, not on the scrolling popup: a sticky
+   child (Lumi's composer) measures its offset from inside a scroller's own
+   padding, so padding there would stack on top of the offset. */
 .content {
-  padding: 36px 20px 28px;
+  padding: 36px 20px calc(28px + var(--bleed) + var(--bottom-inset));
   animation: swap 260ms var(--ease-out) both;
 }
 

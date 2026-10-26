@@ -319,10 +319,11 @@
   transform: scale(0.96);
 }
 
-/* Room for the newest line to clear the pinned composer. */
+/* Room for the newest line to clear the pinned composer: the bleed and the
+   home indicator below it, its own 80px, and a 12px gap. */
 .end {
   height: 1px;
-  scroll-margin-bottom: 120px;
+  scroll-margin-bottom: calc(var(--bleed, 0px) + var(--bottom-inset) + 92px);
 }
 
 /* ------------------------------------------------ composer */
@@ -334,12 +335,17 @@
   align-items: center;
   gap: 8px;
   margin-top: auto;
+  /* Cancels the content's 28px bottom padding, so at the end of the thread the
+     composer rests exactly where it is pinned while you scroll. */
+  margin-bottom: -28px;
   padding: 24px 0 4px;
 }
 
 .composer::before {
   /* Reaches down through the sheet's bleed so there is no seam below. */
-  inset: -10px -20px calc(-4px - var(--bleed, 0px) - var(--bottom-inset));
+  /* Exactly to the popup's bottom edge, no further, or it adds scroll room and the
+     composer rests higher at the end of the thread than where it is pinned. */
+  inset: -10px -20px calc(-1 * (var(--bleed, 0px) + var(--bottom-inset)));
   background: linear-gradient(to top, rgba(var(--canvas-rgb), 0.96) 60%, rgba(var(--canvas-rgb), 0));
   -webkit-mask-image: linear-gradient(to top, #000 75%, transparent);
   mask-image: linear-gradient(to top, #000 75%, transparent);
