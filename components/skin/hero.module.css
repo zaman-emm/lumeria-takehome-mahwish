@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: calc(24px + var(--top-inset)) 24px 24px;
+  padding: calc(16px + var(--top-inset)) 24px 24px;
   background:
     radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
     var(--sunrise);
@@ -16,13 +16,13 @@
 }
 
 .logo {
-  width: 220px;
-  height: 41px;
+  width: 184px;
+  height: 34px;
   color: var(--evergreen);
 }
 
 .hi {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
   font-size: 20px;
   line-height: 28px;
   letter-spacing: -0.2px;
@@ -30,7 +30,7 @@
 }
 
 .title {
-  margin: 24px 0 0;
+  margin: 16px 0 0;
   font-size: 30px;
   line-height: 34px;
   font-weight: 300;
@@ -43,9 +43,9 @@
 
 .gaugeBox {
   width: 100%;
-  max-width: 342px;
+  max-width: 326px;
   aspect-ratio: 342 / 240;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .gauge {
@@ -141,7 +141,7 @@
   justify-content: space-between;
   width: 100%;
   max-width: 342px;
-  min-height: 113px;
+  min-height: 104px;
   margin-top: 12px;
   padding: 16px 16px 16px 16px;
   border-radius: 20px;
@@ -259,7 +259,7 @@
 .month[data-size="card"] {
   position: relative;
   height: auto;
-  min-height: 113px;
+  min-height: 104px;
   overflow: hidden;
   padding: 0 20px 0 16px;
   border-radius: 20px;
@@ -311,15 +311,10 @@
   background: var(--lg-btn);
   box-shadow: var(--lg-btn-rim);
   color: var(--evergreen);
-  transition: transform 160ms var(--ease-out);
 }
 
 .monthPlay svg {
   transform: translateX(1px);
-}
-
-.month:active .monthPlay {
-  transform: scale(0.96);
 }
 
 /* ------------------------------------------------ first-load sequence */

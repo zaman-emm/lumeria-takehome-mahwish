@@ -296,9 +296,11 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: min(100%, 320px);
+  width: min(100%, 288px);
   aspect-ratio: 1;
-  margin: 0 auto;
+  /* The score sticker overhangs the ring's top edge; this is its room, so it
+     never lands on the title above. */
+  margin: 36px auto 0;
 }
 
 .halo {
