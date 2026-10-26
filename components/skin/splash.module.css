@@ -1,6 +1,6 @@
-/* The splash: evergreen night, the score big in the middle, gold blooming out
-   from behind it in three petals, then the gauge and the gold sheet fly up
-   into the hero. Everything here moves on transform, opacity or clip-path. */
+/* The splash: one frosted glass layer over the home page's own background
+   (the gold hero with nothing on it), the score gauge big in the middle of it.
+   Everything here moves on transform or opacity. */
 
 .splash {
   position: fixed;
@@ -11,37 +11,24 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.dark,
-.petal {
+/* Glass, in the report's own terms: a thin warm fill, the sheen, the blur. It
+   fades in over the loading screen so nothing cuts. */
+.veil {
   position: absolute;
   inset: 0;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 45%),
+    rgba(255, 250, 238, 0.05);
+  -webkit-backdrop-filter: blur(26px);
+  backdrop-filter: blur(26px);
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.5);
+  animation: glassIn 320ms var(--ease-out) both;
 }
 
-/* The loading screen is gold; the night fades in over it rather than cutting. */
-.dark {
-  background: var(--evergreen);
-  animation: nightIn 260ms var(--ease-out) both;
-}
-
-@keyframes nightIn {
+@keyframes glassIn {
   from {
     opacity: 0;
   }
-}
-
-/* The last petal is the hero's own gold, so it can shrink into it. */
-.petal[data-petal="0"] {
-  background: var(--bronze);
-}
-
-.petal[data-petal="1"] {
-  background: var(--gold);
-}
-
-.petal[data-petal="2"] {
-  background:
-    radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
-    linear-gradient(180deg, #e6cf9f 0, #d7b46f calc(var(--h) * 0.45), #c0913f var(--h), #c0913f 100%);
 }
 
 /* The hero's own gauge box, lifted out and scaled up from its top-left. */
