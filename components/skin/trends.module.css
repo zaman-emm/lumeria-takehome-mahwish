@@ -1,12 +1,12 @@
 .view {
   display: flex;
   flex-direction: column;
-  /* Product range colours, a fixed categorical order (never cycled), checked
-     for colour-blind separation on this card: teal, blue, terracotta. They
-     stay clear of the trip's clay band and the period's gold hatch. */
-  --range-1: #2b9670;
-  --range-2: #3b74c0;
-  --range-3: #d0683a;
+  /* Product ranges in the brand's own colours, a fixed order (never cycled):
+     forest, bronze, bark. Each also has its own line (solid, dashed, dotted),
+     so they part by pattern, not just hue. */
+  --range-1: var(--forest);
+  --range-2: var(--bronze);
+  --range-3: var(--bark-2);
 }
 
 .delta {
@@ -410,9 +410,20 @@
 }
 
 .swatch[data-kind="product"] {
+  width: 16px;
   height: 4px;
   border-radius: 2px;
   background: var(--c);
+}
+
+.swatch[data-kind="product"][data-slot="1"] {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 7px);
+}
+
+.swatch[data-kind="product"][data-slot="2"] {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--c) 0 2px, transparent 2px 4px);
 }
 
 .swatch[data-kind="travel"] {

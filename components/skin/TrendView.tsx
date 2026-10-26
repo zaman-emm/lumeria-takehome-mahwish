@@ -146,8 +146,10 @@ const LANE_BAR = 4;
 
 /** The products, in the order they started; each keeps its colour slot wherever it shows. */
 const productSpans = (d: Derived) => d.spans.filter((s) => s.kind === "product");
-/** Fixed categorical slots (trends.module.css, CVD-checked), never cycled: a fourth product and on are plain. */
+/** Fixed slots (trends.module.css), never cycled: a fourth product and on are plain. */
 const rangeColor = (i: number) => `var(--range-${i + 1}, var(--bark-3))`;
+/** Each slot's line: solid, dashed, dotted. */
+const RANGE_DASH = [undefined, "5 2", "2 2"];
 
 function Chart({
   d,
@@ -308,15 +310,16 @@ function Chart({
               />
             )}
             {products.map((p, i) => (
-              <rect
+              <line
                 key={p.id}
-                x={x(p.start)}
-                y={H + LANE_GAP + i * LANE + (LANE - LANE_BAR) / 2}
-                width={Math.max(LANE_BAR, x(p.end) - x(p.start))}
-                height={LANE_BAR}
-                rx={LANE_BAR / 2}
+                x1={x(p.start)}
+                x2={Math.max(x(p.start) + 1, x(p.end))}
+                y1={H + LANE_GAP + i * LANE + LANE / 2}
+                y2={H + LANE_GAP + i * LANE + LANE / 2}
+                strokeWidth={LANE_BAR}
+                strokeDasharray={RANGE_DASH[i]}
                 className={t.lane}
-                style={{ fill: rangeColor(i) }}
+                style={{ stroke: rangeColor(i) }}
                 data-dim={dim(p.id)}
               />
             ))}
@@ -366,6 +369,7 @@ function Legend({ d, focus, onFocus }: { d: Derived; focus: string | null; onFoc
       kind: "product",
       label: sp.short,
       color: rangeColor(i),
+      slot: i,
       spoken: `${sp.label}, ${fmtDay(sp.start)} to ${sp.ongoing ? "now" : fmtDay(sp.end)}`,
     })),
     ...d.spans
@@ -375,6 +379,7 @@ function Legend({ d, focus, onFocus }: { d: Derived; focus: string | null; onFoc
         kind: "travel",
         label: `${sp.short} · ${fmtRange(sp.start, sp.end)}`,
         color: undefined,
+        slot: undefined,
         spoken: `${sp.label}, ${fmtDay(sp.start)} to ${fmtDay(sp.end)}`,
       })),
     ...d.moments.map((m) => ({
@@ -382,6 +387,7 @@ function Legend({ d, focus, onFocus }: { d: Derived; focus: string | null; onFoc
       kind: "period",
       label: `${m.label} · ${fmtRange(m.day, m.end)}`,
       color: undefined,
+      slot: undefined,
       spoken: `${m.label}, ${fmtDay(m.day)} to ${fmtDay(m.end)}`,
     })),
   ];
@@ -397,7 +403,7 @@ function Legend({ d, focus, onFocus }: { d: Derived; focus: string | null; onFoc
             data-dim={focus ? focus !== it.id : undefined}
             onClick={() => onFocus(focus === it.id ? null : it.id)}
           >
-            <i className={t.swatch} data-kind={it.kind} style={it.color ? ({ "--c": it.color } as CSSProperties) : undefined} aria-hidden />
+            <i className={t.swatch} data-kind={it.kind} data-slot={it.slot} style={it.color ? ({ "--c": it.color } as CSSProperties) : undefined} aria-hidden />
             <span aria-hidden>{it.label}</span>
             <span className="sr-only">{it.spoken}</span>
           </button>
