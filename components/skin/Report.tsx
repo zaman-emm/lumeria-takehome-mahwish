@@ -194,7 +194,6 @@ export function Report({ d }: { d: Derived }) {
           <LumiButton
             hidden={Boolean(sheet) || recap || splash !== "done"}
             count={d.factors.length}
-            month={d.isMonthly}
             onOpen={api.openLumi}
           />
 

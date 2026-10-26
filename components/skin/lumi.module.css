@@ -1,6 +1,5 @@
-/* Lumi: the orb floating at the bottom right of the phone column, its peek
-   bubble and the tuck it does while the page scrolls, then the conversation
-   in its sheet. */
+/* Lumi: the orb floating at the bottom right of the phone column, the tuck it
+   does while the page scrolls, then the conversation in its sheet. */
 
 .dock {
   position: fixed;
@@ -46,53 +45,6 @@
   width: 72px;
   height: 72px;
   filter: drop-shadow(0 8px 7px rgba(192, 145, 63, 0.22));
-}
-
-/* ------------------------------------------------ peek */
-
-.peek {
-  position: relative;
-  max-width: 220px;
-  transform-origin: 100% 50%;
-}
-
-.peekBody {
-  display: block;
-  padding: 12px 30px 12px 14px;
-  border-radius: 18px 18px 6px 18px;
-  background: var(--lg-sheen), var(--lg-fill-strong);
-  -webkit-backdrop-filter: var(--lg-blur);
-  backdrop-filter: var(--lg-blur);
-  color: var(--bark);
-  font-size: 14px;
-  line-height: 19px;
-  font-weight: 500;
-  text-align: left;
-  box-shadow:
-    var(--lg-rim),
-    0 10px 28px rgba(20, 36, 26, 0.18);
-}
-
-.peekKicker {
-  display: block;
-  margin-bottom: 2px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: var(--bronze-deep);
-}
-
-.peekClose {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  color: var(--bark-2);
 }
 
 /* ------------------------------------------------ sheet */
