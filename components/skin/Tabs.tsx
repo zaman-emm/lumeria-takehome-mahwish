@@ -26,7 +26,13 @@ export function Tabs<T extends string>({
   const [stuck, setStuck] = useState(false);
 
   useEffect(() => {
-    const check = () => setStuck((bar.current?.getBoundingClientRect().top ?? 1) <= 0.5 && window.scrollY > 0);
+    // Stuck means it sits at its sticky offset (under the header, or at the top).
+    const check = () => {
+      const el = bar.current;
+      if (!el) return;
+      const at = parseFloat(getComputedStyle(el).top) || 0;
+      setStuck(window.scrollY > 0 && el.getBoundingClientRect().top <= at + 0.5);
+    };
     check();
     window.addEventListener("scroll", check, { passive: true });
     return () => window.removeEventListener("scroll", check);

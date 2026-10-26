@@ -40,7 +40,32 @@
   padding-bottom: 104px;
 }
 
-/* The slim header scrolls away with the page; only the tabs stay, as glass. */
+/* The slim header slides up out of view while you scroll down and drops
+   back in when you scroll up; the glass tabs follow it. */
+.page:not([data-tab="glance"]) > header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  transition: transform 280ms var(--ease-out);
+}
+
+.page:not([data-tab="glance"])[data-head="away"] > header {
+  transform: translateY(calc(-100% - 2px));
+}
+
+.page:not([data-tab="glance"]) {
+  --tabs-top: 72px;
+}
+
+.page:not([data-tab="glance"])[data-head="away"] {
+  --tabs-top: 0px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page > header {
+    transition-duration: 0ms;
+  }
+}
 /* Under the splash the tabs and what's beneath them wait, then rise behind the hero. */
 .page[data-splash="wait"] > :not(header) {
   opacity: 0;

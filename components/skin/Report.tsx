@@ -144,6 +144,23 @@ export function Report({ d }: { d: Derived }) {
     };
   }, [recap]);
 
+  // The slim header slides away as you scroll down and comes back the moment
+  // you scroll up, like an iOS navigation bar.
+  const [headAway, setHeadAway] = useState(false);
+  useEffect(() => {
+    if (tab === "glance") return setHeadAway(false);
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y < 80) setHeadAway(false);
+      else if (y > last + 4) setHeadAway(true);
+      else if (y < last - 4) setHeadAway(false);
+      if (Math.abs(y - last) > 4) last = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [tab]);
+
   const latestTz = scanTz(d.latest) ?? d.tz;
 
   return (
@@ -152,7 +169,7 @@ export function Report({ d }: { d: Derived }) {
         <div className={r.root} data-skin ref={setRoot}>
           <Drawer.IndentBackground className={r.indentBg} />
           <Drawer.Indent className={r.indent} style={{ "--origin": `${origin}px` } as CSSProperties}>
-            <div className={r.page} data-tab={tab} data-splash={splash === "done" ? undefined : splash}>
+            <div className={r.page} data-tab={tab} data-head={headAway ? "away" : "shown"} data-splash={splash === "done" ? undefined : splash}>
               {tab === "glance" ? (
                 <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} slides={slides} onPlay={slides ? playRecap : undefined} splash={splash} />
               ) : (

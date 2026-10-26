@@ -15,6 +15,7 @@
    view-transition-name would stop a child from seeing what's behind it. */
 .bar {
   transition:
+    top 280ms var(--ease-out),
     background-color 200ms var(--ease-out),
     box-shadow 200ms var(--ease-out);
 }
