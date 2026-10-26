@@ -14,8 +14,12 @@
 .track {
   display: flex;
   gap: 12px;
-  padding: 14px 0 22px;
+  /* Room above and below for the side cards' tilt and drop, and no vertical
+     scrolling: with overflow-x on, the tilt would otherwise make the row
+     scroll up and down too, and a diagonal swipe would cut the cards' tops. */
+  padding: 16px 0 48px;
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
@@ -108,7 +112,7 @@
   display: flex;
   justify-content: center;
   gap: 2px;
-  margin-top: -6px;
+  margin-top: -32px;
 }
 
 .dots button {
