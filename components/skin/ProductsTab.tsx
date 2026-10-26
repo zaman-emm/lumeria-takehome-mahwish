@@ -80,16 +80,6 @@ export function ProductsTab() {
       ))}
 
       <footer className={p.foot}>
-        <ul className={p.cues} aria-label="For scans you can compare">
-          <li className={p.cue}>
-            <Icon name="target" size={18} />
-            Same spot
-          </li>
-          <li className={p.cue}>
-            <Icon name="clock" size={18} />
-            Same time
-          </li>
-        </ul>
         <p className={p.disclaimer}>
           Lumeria reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the right next
           step.
