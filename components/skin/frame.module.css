@@ -111,10 +111,6 @@
   contain: layout paint;
 }
 
-.ring {
-  position: absolute;
-}
-
 .gold {
   position: absolute;
   top: -30px;

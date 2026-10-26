@@ -48,28 +48,6 @@
   pointer-events: none;
 }
 
-/* The splash's ring track, already set down while the report loads. Above the
-   glass, like the splash's own. It is placed in CSS alone, so it is in the very
-   first paint: the splash holds the ring (Splash.tsx) this wide (the hero's
-   gauge box scaled up to the screen less 12px each side), centred
-   horizontally and a little above the middle of the screen. */
-.shell {
-  --w: calc(min(100vw, 430px) - 24px);
-  position: fixed;
-  z-index: 61;
-  left: calc((100vw - var(--w)) / 2);
-  top: calc(50dvh - var(--w) * 0.7018 * 0.48);
-  width: var(--w);
-  height: calc(var(--w) * 0.7018);
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .shell {
-    display: none;
-  }
-}
-
 .sr {
   position: absolute;
   width: 1px;
