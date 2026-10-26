@@ -50,6 +50,8 @@ export type Slide =
       streak: number;
       /** The month the card turns over to, once the streak has counted up. */
       cover: string;
+      /** Three of the month's scans, first to latest, stacked like polaroids on the cover. */
+      snaps: Scan[];
       stats: Stat[];
       /** The calendar month the period ends in, e.g. "October". */
       month: string;
@@ -185,6 +187,9 @@ export function buildRecap(d: Derived): Slide[] {
     const day = addDays(gridStart, i);
     return { day, date: Number(day.slice(8)), inMonth: day.slice(0, 7) === d.end.slice(0, 7), scanned: counts.has(day), latest: day === latestDay };
   });
+  // The cover's snapshots: the first scan, one from the middle and the latest.
+  const inOrder = [...d.scans].sort(byTime);
+  const snaps = [...new Set([0, Math.floor((inOrder.length - 1) / 2), inOrder.length - 1])].map((i) => inOrder[i]).filter(Boolean);
   const next = ws.milestones.find((m) => !m.earned);
   const run = ws.current || ws.best;
   out.push({
@@ -193,6 +198,7 @@ export function buildRecap(d: Derived): Slide[] {
     title: t("Look at you, ", "showing up", "."),
     streak: run,
     cover: new Intl.DateTimeFormat("en-US", { month: "long", timeZone: "UTC" }).format(new Date(`${d.end}T12:00:00Z`)),
+    snaps,
     stats: [
       { label: "Scan days", value: `${counts.size}/${days}` },
       { label: "Scans", value: String(d.scans.length) },

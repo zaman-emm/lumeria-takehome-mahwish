@@ -362,6 +362,14 @@ function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
             </span>
           </span>
           <span className={s.cover} aria-hidden>
+            {/* A few of the month's scans, stacked like polaroids above its name. */}
+            <span className={s.snaps}>
+              {slide.snaps.map((scan, i) => (
+                <span key={scan.id} className={s.snap} style={{ "--i": i } as CSSProperties}>
+                  <Photo scan={scan} alt="" />
+                </span>
+              ))}
+            </span>
             <span className={s.coverName}>{slide.cover}</span>
           </span>
         </button>
