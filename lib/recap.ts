@@ -53,9 +53,10 @@ export type Slide =
       /** The photo on that cover: the month's newest real photo, else the latest scan. */
       coverScan: Scan;
       stats: Stat[];
-      /** Monday-first weeks; null pads the first and last week. */
-      weeks: ({ day: string; date: number; score: number | null; latest: boolean } | null)[][];
-      milestones: { weeks: number; earned: boolean }[];
+      /** The calendar month the period ends in, e.g. "October". */
+      month: string;
+      /** That month as a Sunday-first grid, padded with the days either side of it. */
+      days: { day: string; date: number; inMonth: boolean; scanned: boolean; latest: boolean }[];
       body: string;
     }
   | { kind: "scanTime"; title: Title; hour: number; minutes: number[]; stats: Stat[]; body: string }
@@ -167,22 +168,25 @@ export function buildRecap(d: Derived): Slide[] {
     body: `${fmtDay(dayOf(d, best))} was your best scan ${span}${note ? `, and you felt it too: “${note.replace(/^honestly,?\s*/i, "")}”` : "."}`,
   });
 
-  // 2. Showing up: scan days, the week streak and its milestones.
+  // 2. Showing up: the week streak, scan days, and the month they fell in.
   const counts = new Map<string, number>();
   for (const s of d.scans) {
     const day = dayOf(d, s);
     counts.set(day, Math.max(counts.get(day) ?? 0, s.scores.overall));
   }
   const ws = weekStreak(d);
-  const lead = (new Date(`${d.start}T12:00:00Z`).getUTCDay() + 6) % 7;
-  const cells = [
-    ...Array.from({ length: lead }, () => null),
-    ...Array.from({ length: days }, (_, i) => {
-      const day = addDays(d.start, i);
-      return { day, date: Number(day.slice(8)), score: counts.get(day) ?? null, latest: day === dayOf(d, d.latest) };
-    }),
-  ];
-  while (cells.length % 7) cells.push(null);
+  // The month the period ends in, Sunday first, with the days either side
+  // filling out its first and last weeks, the way the Calendar app draws it.
+  const monthStart = `${d.end.slice(0, 7)}-01`;
+  const [yy, mm] = d.end.split("-").map(Number);
+  const monthLength = new Date(Date.UTC(yy, mm, 0)).getUTCDate();
+  const lead = new Date(`${monthStart}T12:00:00Z`).getUTCDay();
+  const gridStart = addDays(monthStart, -lead);
+  const latestDay = dayOf(d, d.latest);
+  const grid = Array.from({ length: Math.ceil((lead + monthLength) / 7) * 7 }, (_, i) => {
+    const day = addDays(gridStart, i);
+    return { day, date: Number(day.slice(8)), inMonth: day.slice(0, 7) === d.end.slice(0, 7), scanned: counts.has(day), latest: day === latestDay };
+  });
   const next = ws.milestones.find((m) => !m.earned);
   const run = ws.current || ws.best;
   out.push({
@@ -197,8 +201,8 @@ export function buildRecap(d: Derived): Slide[] {
       { label: "Scans", value: String(d.scans.length) },
       { label: "Areas", value: String(d.areas.length) },
     ],
-    weeks: Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7)),
-    milestones: ws.milestones,
+    month: new Intl.DateTimeFormat("en-US", { month: "long", timeZone: "UTC" }).format(new Date(`${monthStart}T12:00:00Z`)),
+    days: grid,
     body:
       `${cap(word(run))} ${run === 1 ? "week" : "weeks"} in a row, and it shows.` +
       (next

@@ -420,8 +420,8 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   background:
-    radial-gradient(80% 70% at 50% 40%, rgba(215, 180, 111, 0.16), transparent 70%),
-    #1d3024;
+    radial-gradient(80% 70% at 50% 40%, rgba(215, 180, 111, 0.18), transparent 70%),
+    #2a2522;
   box-shadow:
     inset 0 0 0 1px rgba(244, 239, 230, 0.12),
     0 18px 40px -20px rgba(0, 0, 0, 0.6);
@@ -461,7 +461,7 @@
   position: absolute;
   inset: auto 0 0;
   padding: 40px 14px 14px;
-  background: linear-gradient(transparent, rgba(20, 36, 26, 0.85));
+  background: linear-gradient(transparent, rgba(42, 37, 34, 0.88));
   font-family: Georgia, "Times New Roman", serif;
   font-size: 28px;
   line-height: 1;
@@ -575,91 +575,105 @@
   flex-direction: column-reverse;
 }
 
-/* The month, Lapse-style: bare numbers under a hairline of weekdays; only the
-   scanned days get a disc, and each develops out of the dark in turn. */
+/* The month as the Calendar app draws it: the month's name in the accent,
+   single-letter weekdays, bare numbers, weekends and the days either side of
+   the month quieter. Only two marks: a dot under each scanned day, and the
+   latest scan filled like Calendar's today. */
 .calWrap {
   flex: none;
-  margin-top: 16px;
+  margin-top: 18px;
+}
+
+.calMonth {
+  margin: 0 0 10px 4px;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 400;
+  color: var(--clay);
 }
 
 .cal {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px 0;
+  row-gap: 2px;
   justify-items: center;
 }
 
 .calHead {
-  justify-self: stretch;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(244, 239, 230, 0.16);
-  margin-bottom: 4px;
-  text-align: center;
+  padding-bottom: 6px;
   font-size: 12px;
-  font-weight: 500;
-  color: rgba(244, 239, 230, 0.6);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.calHead[data-weekend="true"] {
+  color: var(--ink-soft);
+  opacity: 0.6;
 }
 
 .calDay {
+  position: relative;
   display: grid;
   place-items: center;
-  width: clamp(28px, 4.2dvh, 34px);
-  height: clamp(28px, 4.2dvh, 34px);
+  width: clamp(32px, 4.6dvh, 38px);
+  height: clamp(32px, 4.6dvh, 38px);
   border-radius: 50%;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--evergreen);
   font-variant-numeric: tabular-nums;
-  animation: develop 700ms var(--ease-out) both;
-  animation-delay: calc(500ms + var(--k, 0) * 30ms);
 }
 
-/* Like a print in the tray: dark and soft first, then the colour comes up. */
-@keyframes develop {
-  from {
-    background-color: rgba(20, 36, 26, 0.6);
-    color: rgba(244, 239, 230, 0.4);
-    filter: blur(3px) brightness(0.6);
-    transform: scale(0.86);
-  }
-  55% {
-    filter: blur(0) brightness(0.85);
-  }
+.calDay b {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
 }
 
-.calDay[data-tone="good"] {
-  background-color: var(--bone);
+.calDay[data-weekend] b {
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
 }
 
-.calDay[data-tone="fair"] {
-  background-color: #c0913f;
+.calDay[data-out] b {
+  color: color-mix(in srgb, var(--ink) 30%, transparent);
 }
 
-.calDay[data-tone="low"] {
-  background-color: var(--clay);
-}
-
-.calDay[data-tone="none"] {
-  color: rgba(244, 239, 230, 0.4);
-  font-weight: 500;
-  animation: none;
-}
-
-/* The latest scan wears a ring, like Lapse's today. */
+/* Like Calendar's today: a filled circle, the number reversed out. */
 .calDay[data-latest] {
-  box-shadow:
-    0 0 0 2px var(--stage-bg, #2f4a35),
-    0 0 0 3.5px #e6cf9f;
+  background: var(--clay);
+  animation: dot 420ms var(--ease-out) 900ms both;
+}
+
+.calDay[data-latest] b {
+  color: var(--white);
+}
+
+/* The scanned-day dot sits under the number, as Calendar marks events. */
+.calDot {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--bronze);
+  animation: dot 300ms var(--ease-out) both;
+  animation-delay: calc(500ms + var(--k, 0) * 25ms);
+}
+
+@keyframes dot {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
 }
 
 .calKey {
   display: flex;
   justify-content: center;
-  gap: 14px;
-  margin-top: 12px;
+  gap: 18px;
+  margin-top: 10px;
   font-size: 12px;
   font-weight: 500;
-  color: rgba(244, 239, 230, 0.75);
+  color: var(--ink-soft);
 }
 
 .calKey span {
@@ -668,49 +682,17 @@
   gap: 6px;
 }
 
-.calKey i {
-  width: 8px;
-  height: 8px;
+.calKey .calDot {
+  position: static;
+  margin: 0;
+  animation: none;
+}
+
+.calLatest {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-}
-
-.calKey i[data-tone="good"] {
-  background: var(--bone);
-}
-
-.calKey i[data-tone="fair"] {
-  background: #c0913f;
-}
-
-.calKey i[data-tone="low"] {
   background: var(--clay);
-}
-
-/* The milestones as small pills; earned ones carry a tick. */
-.miles {
-  flex: none;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.miles span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 28px;
-  padding: 0 12px;
-  border-radius: 14px;
-  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, 0.25);
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(244, 239, 230, 0.75);
-}
-
-.miles span[data-earned="true"] {
-  box-shadow: inset 0 0 0 1.5px #e6cf9f;
-  color: #e6cf9f;
 }
 
 .slide[data-kind="showedUp"] .body {
@@ -1224,6 +1206,7 @@
   }
   .sticker,
   .calDay,
+  .calDot,
   .minute,
   .hour,
   .mark,
@@ -1249,7 +1232,7 @@
   .face {
     animation: none;
   }
-  .calDay {
+  .calDot {
     animation-delay: calc(200ms + var(--k, 0) * 10ms);
   }
 }

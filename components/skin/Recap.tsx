@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import NumberFlow from "@number-flow/react";
 import { motion, useReducedMotion } from "motion/react";
-import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
+import { fmtDay, scanTz, type Derived } from "@/lib/insights";
 import { buildRecap, type Slide, type Stat, type Title } from "@/lib/recap";
 import { useReportApi } from "./context";
 import { useCountUp } from "./hooks";
@@ -31,9 +31,9 @@ const THEMES: Record<Slide["kind"], Theme> = {
     ink: "dark",
   },
   showedUp: {
-    bg: "#2f4a35",
-    glows: [glow(40, 120, 200, "rgba(192,145,63,.35)"), glow(380, 700, 200, "rgba(20,36,26,.7)")].join(","),
-    ink: "light",
+    bg: "#efe6d5",
+    glows: [glow(330, 110, 210, "rgba(255,250,240,.9)"), glow(20, 640, 220, "rgba(192,145,63,.2)")].join(","),
+    ink: "dark",
   },
   scanTime: {
     bg: "#2e2620",
@@ -307,16 +307,9 @@ function Highs({ slide }: { slide: Extract<Slide, { kind: "highs" }> }) {
   );
 }
 
-const dotTone = (v: number) => {
-  const t = band(v).tone;
-  return t === "good" ? "good" : t === "fair" ? "fair" : "low";
-};
-
 /**
- * The month as a streak, the way Lapse develops its snaps: a card with a rim of
- * light running round it holds the streak, and under it the month's days
- * develop one after another, each scanned day surfacing out of the dark into
- * how that day's skin looked.
+ * Showing up: the streak on a card that turns over to the month (after
+ * Lapse), then the month itself, drawn like the Calendar app.
  */
 function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
   const reduce = useReducedMotion();
@@ -329,7 +322,6 @@ function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
     const id = setTimeout(() => setSide("cover"), 1450);
     return () => clearTimeout(id);
   }, [reduce]);
-  const tones = new Set(slide.weeks.flat().filter((c) => c && c.score != null).map((c) => dotTone(c!.score!)));
   let n = 0;
   return (
     <>
@@ -363,57 +355,40 @@ function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
       <In i={2} className={`${s.glass} ${s.strip}`}>
         <Stats stats={slide.stats} />
       </In>
+      {/* The month as the Calendar app draws it. Only two things are marked:
+          a dot under each day she scanned, and her latest scan, filled. */}
       <In i={3} className={s.calWrap}>
-        <div className={s.cal}>
-          {["M", "T", "W", "T", "F", "S", "S"].map((w, k) => (
-            <span key={k} className={s.calHead}>
+        <p className={s.calMonth}>{slide.month}</p>
+        <div className={s.cal} role="grid" aria-label={`${slide.month}: scanned days`}>
+          {["S", "M", "T", "W", "T", "F", "S"].map((w, k) => (
+            <span key={k} className={s.calHead} data-weekend={k === 0 || k === 6} aria-hidden>
               {w}
             </span>
           ))}
-          {slide.weeks.flat().map((c, k) =>
-            c ? (
-              <span
-                key={k}
-                className={s.calDay}
-                data-tone={c.score == null ? "none" : dotTone(c.score)}
-                data-latest={c.latest || undefined}
-                style={c.score == null ? undefined : ({ "--k": n++ } as CSSProperties)}
-              >
-                {c.date}
-              </span>
-            ) : (
-              <span key={k} />
-            ),
-          )}
+          {slide.days.map((c, k) => (
+            <span
+              key={c.day}
+              className={s.calDay}
+              data-out={!c.inMonth || undefined}
+              data-weekend={k % 7 === 0 || k % 7 === 6 || undefined}
+              data-latest={c.latest || undefined}
+              aria-label={c.scanned ? `${c.day}, scanned${c.latest ? ", latest scan" : ""}` : undefined}
+            >
+              <b>{c.date}</b>
+              {c.scanned && !c.latest && <i className={s.calDot} style={{ "--k": n++ } as CSSProperties} aria-hidden />}
+            </span>
+          ))}
         </div>
-        <span className={s.calKey}>
-          {tones.has("good") && (
-            <span>
-              <i data-tone="good" />
-              Looking good
-            </span>
-          )}
-          {tones.has("fair") && (
-            <span>
-              <i data-tone="fair" />
-              Steady
-            </span>
-          )}
-          {tones.has("low") && (
-            <span>
-              <i data-tone="low" />
-              Needs care
-            </span>
-          )}
-        </span>
-      </In>
-      <In i={4} className={s.miles}>
-        {slide.milestones.map((m) => (
-          <span key={m.weeks} data-earned={m.earned}>
-            {m.earned && <Icon name="check" size={11} stroke={2.2} />}
-            {m.weeks} wk
+        <span className={s.calKey} aria-hidden>
+          <span>
+            <i className={s.calDot} data-key />
+            Scanned
           </span>
-        ))}
+          <span>
+            <i className={s.calLatest} />
+            Latest scan
+          </span>
+        </span>
       </In>
       <In i={5} className={s.body}>
         {slide.body}
