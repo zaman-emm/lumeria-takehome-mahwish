@@ -10,8 +10,8 @@ import { Photo } from "./ui";
 import c from "./calendar.module.css";
 
 // The month as a calendar: each scan day is a dot shaded by its score, with
-// trips and the period marked. Pick a day (or the best and lowest tiles) to
-// see its scans underneath.
+// trips and the period marked. Pick a day to see its scans
+// underneath.
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -48,8 +48,6 @@ export function CalendarTab() {
     return out;
   }, [d]);
 
-  const best = d.trend?.high ?? [...d.scans].sort((a, b) => b.scores.overall - a.scores.overall)[0];
-  const low = d.trend?.low ?? [...d.scans].sort((a, b) => a.scores.overall - b.scores.overall)[0];
   const [picked, setPicked] = useState(dayOf(d, d.latest));
   const [month, setMonthRaw] = useState(monthKey(picked));
   // Which way the last month change went, so the grid slides in from that side.
@@ -163,25 +161,6 @@ export function CalendarTab() {
           )}
         </div>
       </section>
-
-      <div className={c.stats}>
-        <div className={c.stat}>
-          <b>{byDay.size}</b>
-          <span>scan {byDay.size === 1 ? "day" : "days"}</span>
-        </div>
-        {best.id !== low.id && (
-          <>
-            <button className={c.stat} data-on={picked === dayOf(d, best)} onClick={() => pick(dayOf(d, best))}>
-              <b>{best.scores.overall}</b>
-              <span>Best · {fmtDay(dayOf(d, best))}</span>
-            </button>
-            <button className={c.stat} data-on={picked === dayOf(d, low)} onClick={() => pick(dayOf(d, low))}>
-              <b>{low.scores.overall}</b>
-              <span>Lowest · {fmtDay(dayOf(d, low))}</span>
-            </button>
-          </>
-        )}
-      </div>
 
       <section key={picked} className={c.dayCard} aria-live="polite">
         <h2>
