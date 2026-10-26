@@ -580,41 +580,23 @@ export function shortTip(tip: string) {
   return m ? `Try ${m[1].toLowerCase()} ${m[2]}.` : tip;
 }
 
-export type FaceRegion = "forehead" | "tzone" | "nose" | "cheeks" | "chin";
-
-const MARKS: [RegExp, FaceRegion, string, "good" | "watch"][] = [
-  [/shine.*T-zone/i, "tzone", "T-zone shine", "watch"],
-  [/more shine/i, "tzone", "More shine", "watch"],
-  [/redness is calm/i, "cheeks", "Redness calm", "good"],
-  [/redness, especially around the nose/i, "nose", "Redness by nose", "watch"],
-  [/more visible redness/i, "cheeks", "More redness", "watch"],
-  [/well hydrated/i, "cheeks", "Well hydrated", "good"],
-  [/drier/i, "cheeks", "Drier", "watch"],
-  [/patchier/i, "cheeks", "Patchier tone", "watch"],
-  [/dark spots/i, "cheeks", "Spots showing", "watch"],
-  [/tone looks even/i, "forehead", "Even tone", "good"],
-  [/texture looks smooth/i, "forehead", "Smooth texture", "good"],
+/** Short labels for what a scan saw. */
+const OBS_LABELS: [RegExp, string][] = [
+  [/shine.*T-zone/i, "T-zone shine"],
+  [/more shine/i, "More shine"],
+  [/redness is calm/i, "Redness calm"],
+  [/redness, especially around the nose/i, "Redness by nose"],
+  [/more visible redness/i, "More redness"],
+  [/well hydrated/i, "Well hydrated"],
+  [/drier/i, "Drier"],
+  [/patchier/i, "Patchier tone"],
+  [/dark spots/i, "Spots showing"],
+  [/tone looks even/i, "Even tone"],
+  [/texture looks smooth/i, "Smooth texture"],
 ];
 
-export interface FaceMark {
-  region: FaceRegion;
-  label: string;
-  /** good reads as calm, watch as worth a look. Shown by pattern and label, never colour alone. */
-  tone: "good" | "watch";
-}
-
 /** One observation as its short label, or as written when we have no label for it. */
-export const obsLabel = (o: string) => MARKS.find(([re]) => re.test(o))?.[2] ?? o;
-
-/** What we saw, as short labels pinned to a part of the face. */
-export function faceMarks(observations: string[]): FaceMark[] {
-  const out: FaceMark[] = [];
-  for (const o of observations) {
-    const hit = MARKS.find(([re]) => re.test(o));
-    if (hit && !out.some((m) => m.region === hit[1])) out.push({ region: hit[1], label: hit[2], tone: hit[3] });
-  }
-  return out.slice(0, 3);
-}
+export const obsLabel = (o: string) => OBS_LABELS.find(([re]) => re.test(o))?.[1] ?? o;
 
 export interface LumiQuestion {
   id: string;

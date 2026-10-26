@@ -17,6 +17,9 @@ import p from "./products.module.css";
 // when it's used, other key ingredients, a trial's progress, and gentler
 // swaps when one was stopped for irritation.
 
+/** Gentler swaps: future scope, hidden for now. */
+const SHOW_SWAPS = false;
+
 export function ProductsTab() {
   const { d } = useReportApi();
   const products = [...(d.report.products ?? [])].sort((a, b) =>
@@ -45,7 +48,9 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
   const [ref, reveal] = useReveal<HTMLElement>(`product-${product.id}`);
   const f = factorFor(d, product);
   const tr = trial(d, product);
-  const swaps = swapsFor(product);
+  // Gentler swaps are parked for a later iteration; the list is kept so it
+  // can come back by flipping SHOW_SWAPS.
+  const swaps = SHOW_SWAPS ? swapsFor(product) : [];
   const id = `product-${product.id}`;
   // An ingredient the name already says ("Retinol" in "Retinol 0.3% Night Serum") isn't repeated.
   const extra = product.keyIngredients.filter((k) => !product.name.toLowerCase().includes(k.toLowerCase()));

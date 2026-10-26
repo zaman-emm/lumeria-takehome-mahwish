@@ -2,13 +2,13 @@
 
 import { useState, type CSSProperties } from "react";
 import { AnimatePresence } from "motion/react";
-import { METRICS, dayOf, faceMarks, fmtDay, fmtTime, previousSameArea, scanTz, score, shortTip, signed, spansOn } from "@/lib/insights";
+import { METRICS, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, score, shortTip, signed, spansOn } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
 import { TipToast } from "./TipToast";
-import { FaceMap, LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, type Light } from "./ui";
+import { LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, type Light } from "./ui";
 import m from "./sheets.module.css";
 
 // Everything about one scan: the photo under each light, every score against
@@ -122,10 +122,6 @@ export function ScanSheet({ scan }: { scan: Scan }) {
         </div>
       </div>
       <i className={m.band} aria-hidden />
-
-      <div className={m.face}>
-        <FaceMap marks={faceMarks(scan.summary.observations)} area={scan.area} />
-      </div>
 
       {/* Her note, with what she tagged and how stressed she said she was that day. */}
       {ann && (

@@ -9,7 +9,6 @@ import {
   byTime,
   dayOf,
   daysBetween,
-  faceMarks,
   fmtDay,
   fmtRange,
   metricMeta,
@@ -47,9 +46,15 @@ export type Slide =
   | {
       kind: "showedUp";
       title: Title;
+      /** Weeks in a row with a scan: the number on the streak card. */
+      streak: number;
+      /** The month the card turns over to, once the streak has counted up. */
+      cover: string;
+      /** The photo on that cover: the month's newest real photo, else the latest scan. */
+      coverScan: Scan;
       stats: Stat[];
       /** Monday-first weeks; null pads the first and last week. */
-      weeks: ({ day: string; date: number; score: number | null } | null)[][];
+      weeks: ({ day: string; date: number; score: number | null; latest: boolean } | null)[][];
       milestones: { weeks: number; earned: boolean }[];
       body: string;
     }
@@ -174,7 +179,7 @@ export function buildRecap(d: Derived): Slide[] {
     ...Array.from({ length: lead }, () => null),
     ...Array.from({ length: days }, (_, i) => {
       const day = addDays(d.start, i);
-      return { day, date: Number(day.slice(8)), score: counts.get(day) ?? null };
+      return { day, date: Number(day.slice(8)), score: counts.get(day) ?? null, latest: day === dayOf(d, d.latest) };
     }),
   ];
   while (cells.length % 7) cells.push(null);
@@ -182,17 +187,23 @@ export function buildRecap(d: Derived): Slide[] {
   const run = ws.current || ws.best;
   out.push({
     kind: "showedUp",
-    title: t("You scanned on ", `${counts.size} of ${days}`, " days."),
+    // Said the way a big sister would: proud, plain, a little nudge.
+    title: t("Look at you, ", "showing up", "."),
+    streak: run,
+    coverScan: d.realPhotos[d.realPhotos.length - 1] ?? d.latest,
+    cover: new Intl.DateTimeFormat("en-US", { month: "long", timeZone: "UTC" }).format(new Date(`${d.end}T12:00:00Z`)),
     stats: [
+      { label: "Scan days", value: `${counts.size}/${days}` },
       { label: "Scans", value: String(d.scans.length) },
-      { label: "Streak", value: `${run} wk` },
       { label: "Areas", value: String(d.areas.length) },
     ],
     weeks: Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7)),
     milestones: ws.milestones,
     body:
-      `${cap(word(run))} ${run === 1 ? "week" : "weeks"} in a row.` +
-      (next ? ` ${cap(word(next.weeks - run))} more ${next.weeks - run === 1 ? "week gets" : "weeks gets"} you to ${next.weeks} in a row.` : ""),
+      `${cap(word(run))} ${run === 1 ? "week" : "weeks"} in a row, and it shows.` +
+      (next
+        ? ` ${cap(word(next.weeks - run))} more and you’re at ${next.weeks}. Keep doing exactly this.`
+        : " Keep doing exactly this."),
   });
 
   // 3. Scan time: the hour most scans land in, one minute hand per scan.
@@ -404,30 +415,17 @@ export function buildRecap(d: Derived): Slide[] {
   const low = METRICS.map((m) => ({ m, v: score(latest, m.key) }))
     .filter((x): x is { m: (typeof METRICS)[number]; v: number } => x.v != null)
     .sort((a, b) => a.v - b.v)
-    .slice(0, 2);
-  const watch = faceMarks(latest.summary.observations).find((m) => m.tone === "watch");
+    .slice(0, 3);
   const tip = latest.summary.tip;
   out.push({
     kind: "tip",
     title: tipTitle(tip),
-    stats: [
-      ...low.map((x) => ({ label: x.m.label, value: String(x.v) })),
-      ...(watch ? [markStat(watch.label, watch.region)] : []),
-    ].slice(0, 3),
+    stats: low.map((x) => ({ label: x.m.label, value: String(x.v) })),
     chips: chipsOf(tip),
     tip,
   });
 
   return out;
-}
-
-const REGION_NAMES: Record<string, string> = { tzone: "T-zone", nose: "Nose", cheeks: "Cheeks", forehead: "Forehead", chin: "Chin" };
-
-/** "T-zone shine" → Shine: T-zone */
-function markStat(label: string, region: string): Stat {
-  const place = REGION_NAMES[region] ?? cap(region);
-  const what = label.replace(new RegExp(place, "i"), "").replace(/\b(by|more)\b/gi, "").trim();
-  return { label: cap(what || "Focus"), value: place };
 }
 
 /** The tip as next month's headline, with the one word that matters picked out. */

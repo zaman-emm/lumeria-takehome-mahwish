@@ -5,7 +5,6 @@ import {
   EXTRAS,
   METRICS,
   OVERALL,
-  faceMarks,
   fmtDay,
   metricMeta,
   obsLabel,
@@ -31,7 +30,7 @@ import { ScanDetail } from "./ScanDetail";
 import { ScanPhoto } from "./ScanPhoto";
 import { Sheet } from "./Sheet";
 import { TrendsTab } from "./TrendsTab";
-import { FaceMap, Icon, RhythmStrip, TabIcon, onFace } from "./Visuals";
+import { Icon, RhythmStrip, TabIcon } from "./Visuals";
 import o from "./oura.module.css";
 
 // The same report laid out the way Oura lays out readiness: the latest scan
@@ -273,8 +272,6 @@ function Hero({
 function Today({ d, rh, actions }: { d: Derived; rh: Rhythm; actions: ReportActions }) {
   const latest = d.latest;
   const prev = d.trend?.from ?? null;
-  const marks = faceMarks(latest.summary.observations);
-  const mapped = onFace(latest.area) && marks.length > 0;
 
   return (
     <>
@@ -304,15 +301,11 @@ function Today({ d, rh, actions }: { d: Derived; rh: Rhythm; actions: ReportActi
 
       <section className={o.card}>
         <span className={o.kicker}>Today’s read</span>
-        {mapped ? (
-          <FaceMap marks={marks} area={latest.area} />
-        ) : (
-          <ul className={o.seen}>
-            {latest.summary.observations.map(obsLabel).map((x) => (
-              <li key={x}>{x}</li>
-            ))}
-          </ul>
-        )}
+        <ul className={o.seen}>
+          {latest.summary.observations.map(obsLabel).map((x) => (
+            <li key={x}>{x}</li>
+          ))}
+        </ul>
         <p className={o.tip}>
           <Icon name="spark" size={16} />
           {shortTip(latest.summary.tip)}

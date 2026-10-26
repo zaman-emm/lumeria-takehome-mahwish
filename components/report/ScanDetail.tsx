@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   METRICS,
   dayOf,
-  faceMarks,
   fmtDay,
   fmtTime,
   obsLabel,
@@ -17,7 +16,7 @@ import {
 } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { LIGHTS, ScanPhoto, type Light } from "./ScanPhoto";
-import { FaceMap, Icon, TickAxis, TickBar, onFace } from "./Visuals";
+import { Icon, TickAxis, TickBar } from "./Visuals";
 import s from "./shared.module.css";
 
 /** Everything behind one scan. Shared by the sheets in Story and Journal. */
@@ -31,7 +30,6 @@ export function ScanDetail({ d, scan }: { d: Derived; scan: Scan }) {
   const water = scan.health?.waterGlasses ?? scan.checkin?.waterGlasses;
   const stress = a?.stress ?? scan.checkin?.stress;
   const env = scan.location?.environment;
-  const marks = faceMarks(scan.summary.observations);
 
   const context = [
     sleep != null && { k: "Sleep", v: `${sleep} h` },
@@ -112,15 +110,11 @@ export function ScanDetail({ d, scan }: { d: Derived; scan: Scan }) {
       {scan.scores.oiliness == null && <p className={s.fine}>Oil balance couldn’t be read on this scan.</p>}
 
       <section className={s.detailBlock}>
-        {onFace(scan.area) && marks.length > 0 ? (
-          <FaceMap marks={marks} area={scan.area} />
-        ) : (
-          <ul className={s.obs}>
-            {scan.summary.observations.map(obsLabel).map((o) => (
-              <li key={o}>{o}</li>
-            ))}
-          </ul>
-        )}
+        <ul className={s.obs}>
+          {scan.summary.observations.map(obsLabel).map((o) => (
+            <li key={o}>{o}</li>
+          ))}
+        </ul>
         <p className={s.tip}>
           <Icon name="spark" size={16} />
           {shortTip(scan.summary.tip)}

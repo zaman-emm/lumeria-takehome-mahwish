@@ -22,10 +22,9 @@ export function TrendsTab() {
       </section>
       {d.factors.length > 0 && (
         <section aria-labelledby="lined-up">
-          <div className={t.linedUp}>
-            <h2 id="lined-up">What lined up</h2>
-            <span>Clues, not causes</span>
-          </div>
+          <h2 id="lined-up" className={t.linedUp}>
+            What lined up
+          </h2>
           <ul className={t.factors}>
             {d.factors.map((f) => (
               <FactorCard key={f.id} f={f} />
@@ -61,7 +60,16 @@ function FactorCard({ f }: { f: Factor }) {
             ))}
           </ul>
         )}
-        {f.evidence.caveat && <p className={t.caveat}>{f.evidence.caveat}</p>}
+        {/* Marked as information, so it never reads as advice. */}
+        {f.evidence.caveat && (
+          <p className={t.caveat}>
+            <Icon name="info" size={14} />
+            <span>
+              <span className="sr-only">Note: </span>
+              {f.evidence.caveat}
+            </span>
+          </p>
+        )}
       </div>
     </li>
   );

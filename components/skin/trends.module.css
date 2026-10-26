@@ -602,21 +602,9 @@
 }
 
 .linedUp {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
   margin: 0 0 10px;
-}
-
-.linedUp h2 {
-  margin: 0;
   font-size: 18px;
   font-weight: 500;
-}
-
-.linedUp span {
-  font-size: 13px;
-  color: var(--bark-2);
 }
 
 .factors {
@@ -706,6 +694,9 @@
 }
 
 .caveat {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   margin: 4px 0 0;
   padding: 10px 12px;
   border-radius: 12px;
@@ -713,6 +704,12 @@
   font-size: 13px;
   line-height: 18.9px;
   color: var(--bark);
+}
+
+.caveat svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--bark-2);
 }
 
 /* Where the chart would be, when a spot has no line to draw yet: the same

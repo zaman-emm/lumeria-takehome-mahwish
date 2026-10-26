@@ -3,7 +3,6 @@
 import {
   EXTRAS,
   METRICS,
-  faceMarks,
   fmtDay,
   obsLabel,
   score,
@@ -14,18 +13,16 @@ import {
   type Rhythm,
 } from "@/lib/insights";
 import type { ReportActions } from "./Report";
-import { FaceMap, Gauge, Icon, RhythmStrip, onFace } from "./Visuals";
+import { Gauge, Icon, RhythmStrip } from "./Visuals";
 import r from "./report.module.css";
 
-// "How is my skin today?" Rings first, then the face map of what we saw, then
-// the rhythm. Words only where a picture can't carry it.
+// "How is my skin today?" Rings first, then what we saw, then the
+// rhythm. Words only where a picture can't carry it.
 
 export function Glance({ d, rh, actions }: { d: Derived; rh: Rhythm; actions: ReportActions }) {
   const latest = d.latest;
   const tz = scanTz(latest) ?? d.tz;
   const prevSame = d.trend ? d.trend.from : null;
-  const marks = faceMarks(latest.summary.observations);
-  const mapped = onFace(latest.area) && marks.length > 0;
 
   return (
     <>
@@ -63,15 +60,11 @@ export function Glance({ d, rh, actions }: { d: Derived; rh: Rhythm; actions: Re
       </section>
 
       <section className={r.card}>
-        {mapped ? (
-          <FaceMap marks={marks} area={latest.area} />
-        ) : (
-          <ul className={r.seen}>
-            {latest.summary.observations.map(obsLabel).map((o) => (
-              <li key={o}>{o}</li>
-            ))}
-          </ul>
-        )}
+        <ul className={r.seen}>
+          {latest.summary.observations.map(obsLabel).map((o) => (
+            <li key={o}>{o}</li>
+          ))}
+        </ul>
         <p className={r.tip}>
           <Icon name="spark" size={16} />
           {shortTip(latest.summary.tip)}

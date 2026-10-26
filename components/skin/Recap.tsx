@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import { buildRecap, type Slide, type Stat, type Title } from "@/lib/recap";
 import { useReportApi } from "./context";
+import { useCountUp } from "./hooks";
 import { Icon } from "./Icon";
 import { LIGHTS, Photo, type Light } from "./ui";
 import s from "./recap.module.css";
@@ -311,67 +312,110 @@ const dotTone = (v: number) => {
   return t === "good" ? "good" : t === "fair" ? "fair" : "low";
 };
 
+/**
+ * The month as a streak, the way Lapse develops its snaps: a card with a rim of
+ * light running round it holds the streak, and under it the month's days
+ * develop one after another, each scanned day surfacing out of the dark into
+ * how that day's skin looked.
+ */
 function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
-  const tones = new Set(slide.weeks.flat().filter(Boolean).map((c) => (c!.score == null ? "none" : dotTone(c!.score))));
+  const reduce = useReducedMotion();
+  // As in Lapse: the card opens on the streak and counts up while a light runs
+  // round its rim, then turns over to the month's cover. Tap to turn it back.
+  const count = useCountUp<HTMLElement>(slide.streak, !reduce, { delay: 450, duration: 450, from: Math.min(1, slide.streak) });
+  const [side, setSide] = useState<"streak" | "cover">("streak");
+  useEffect(() => {
+    if (reduce) return;
+    const id = setTimeout(() => setSide("cover"), 1450);
+    return () => clearTimeout(id);
+  }, [reduce]);
+  const tones = new Set(slide.weeks.flat().filter((c) => c && c.score != null).map((c) => dotTone(c!.score!)));
   let n = 0;
   return (
     <>
-      <In i={0}>
+      <In i={0} className={s.streakCard}>
+        <button
+          type="button"
+          className={s.flip}
+          data-side={side}
+          onClick={() => setSide((v) => (v === "streak" ? "cover" : "streak"))}
+          aria-label={`${slide.streak} week streak. ${slide.cover}. Turn the card over`}
+        >
+          <span className={s.face}>
+            <span className={s.streakRim} aria-hidden />
+            <span className={s.streakNum} aria-hidden>
+              <Icon name="spark" size={30} />
+              <b ref={count}>{slide.streak}</b>
+            </span>
+            <span className={s.streakWord} aria-hidden>
+              week streak
+            </span>
+          </span>
+          <span className={s.cover} aria-hidden>
+            <Photo scan={slide.coverScan} alt="" className={s.coverPhoto} />
+            <span className={s.coverName}>{slide.cover}</span>
+          </span>
+        </button>
+      </In>
+      <In i={1} className={s.streakHead}>
         <Head t={slide.title} />
       </In>
-      <In i={1}>
+      <In i={2} className={`${s.glass} ${s.strip}`}>
         <Stats stats={slide.stats} />
       </In>
-      <div className={s.middle}>
-        <In i={2} className={s.glass}>
-          <div className={s.cal}>
-            {["M", "T", "W", "T", "F", "S", "S"].map((w, k) => (
-              <span key={k} className={s.calHead}>
-                {w}
+      <In i={3} className={s.calWrap}>
+        <div className={s.cal}>
+          {["M", "T", "W", "T", "F", "S", "S"].map((w, k) => (
+            <span key={k} className={s.calHead}>
+              {w}
+            </span>
+          ))}
+          {slide.weeks.flat().map((c, k) =>
+            c ? (
+              <span
+                key={k}
+                className={s.calDay}
+                data-tone={c.score == null ? "none" : dotTone(c.score)}
+                data-latest={c.latest || undefined}
+                style={c.score == null ? undefined : ({ "--k": n++ } as CSSProperties)}
+              >
+                {c.date}
               </span>
-            ))}
-            {slide.weeks.flat().map((c, k) =>
-              c ? (
-                <span key={k} className={s.calDay} data-tone={c.score == null ? "none" : dotTone(c.score)} style={{ "--k": n++ } as CSSProperties}>
-                  {c.date}
-                </span>
-              ) : (
-                <span key={k} />
-              ),
-            )}
-          </div>
-        </In>
-        <In i={3} className={`${s.glass} ${s.miles}`}>
-          <ul>
-            {slide.milestones.map((m) => (
-              <li key={m.weeks} data-earned={m.earned}>
-                {m.weeks} wk
-              </li>
-            ))}
-          </ul>
-          <span className={s.calKey}>
-            {tones.has("good") && (
-              <span>
-                <i data-tone="good" />
-                Looking good
-              </span>
-            )}
-            {tones.has("fair") && (
-              <span>
-                <i data-tone="fair" />
-                Steady
-              </span>
-            )}
-            {tones.has("low") && (
-              <span>
-                <i data-tone="low" />
-                Needs care
-              </span>
-            )}
+            ) : (
+              <span key={k} />
+            ),
+          )}
+        </div>
+        <span className={s.calKey}>
+          {tones.has("good") && (
+            <span>
+              <i data-tone="good" />
+              Looking good
+            </span>
+          )}
+          {tones.has("fair") && (
+            <span>
+              <i data-tone="fair" />
+              Steady
+            </span>
+          )}
+          {tones.has("low") && (
+            <span>
+              <i data-tone="low" />
+              Needs care
+            </span>
+          )}
+        </span>
+      </In>
+      <In i={4} className={s.miles}>
+        {slide.milestones.map((m) => (
+          <span key={m.weeks} data-earned={m.earned}>
+            {m.earned && <Icon name="check" size={11} stroke={2.2} />}
+            {m.weeks} wk
           </span>
-        </In>
-      </div>
-      <In i={4} className={s.body}>
+        ))}
+      </In>
+      <In i={5} className={s.body}>
         {slide.body}
       </In>
     </>

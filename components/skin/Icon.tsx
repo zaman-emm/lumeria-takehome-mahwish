@@ -8,6 +8,7 @@ const PATHS = {
   chevronL: "M10 3L5 8l5 5",
   chevronR: "M6 3l5 5-5 5",
   chevronD: "M3.5 6l4.5 4.5L12.5 6",
+  info: "M8 1.8a6.2 6.2 0 100 12.4A6.2 6.2 0 008 1.8zM8 7.2v4M8 5h.01",
   up: "M8 13V3M4 7l4-4 4 4",
   arrowUR: "M5 11l6-6M6.5 5H11v4.5",
   down: "M8 3v10M4 9l4 4 4-4",

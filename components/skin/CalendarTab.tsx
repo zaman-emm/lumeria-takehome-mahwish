@@ -69,7 +69,11 @@ export function CalendarTab() {
   d.spans.filter((s) => s.kind === "travel").forEach((s) => {
     for (let day = s.start; day <= s.end; day = addDays(day, 1)) travelDays.add(day);
   });
-  const periodDays = new Set(d.moments.map((m) => m.day));
+  // Every day of a period gets the dot, not just the first, so its length shows.
+  const periodDays = new Set<string>();
+  d.moments.forEach((m) => {
+    for (let day = m.day; day <= m.end; day = addDays(day, 1)) periodDays.add(day);
+  });
 
   // Sunday-first grid for the shown month.
   const first = `${month}-01`;
@@ -126,13 +130,13 @@ export function CalendarTab() {
                 style={{ "--fill": lvl!.fill, "--ink": lvl!.ink } as CSSProperties}
                 onClick={() => pick(day)}
                 aria-pressed={isPicked}
-                aria-label={`${fmtDay(day)}, ${ss.length} ${ss.length === 1 ? "scan" : "scans"}, best ${v}${travelDays.has(day) ? ", away" : ""}${periodDays.has(day) ? ", period started" : ""}`}
+                aria-label={`${fmtDay(day)}, ${ss.length} ${ss.length === 1 ? "scan" : "scans"}, best ${v}${travelDays.has(day) ? ", away" : ""}${periodDays.has(day) ? ", period" : ""}`}
               >
                 <span>{date}</span>
                 {marks}
               </button>
             ) : (
-              <span key={day} className={c.day} data-out={!inPeriod} aria-label={inPeriod ? `${fmtDay(day)}, no scan` : undefined}>
+              <span key={day} className={c.day} data-out={!inPeriod} aria-label={inPeriod ? `${fmtDay(day)}, no scan${periodDays.has(day) ? ", period" : ""}` : undefined}>
                 <span>{date}</span>
                 {marks}
               </span>
