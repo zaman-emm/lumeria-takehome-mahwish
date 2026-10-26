@@ -57,26 +57,12 @@
   overflow: visible;
 }
 
-/* Arc colourways, tried side by side (?gauge=forest|white|yellow). */
+/* A white sun arc on the gold: warm white at the start, pure white at the tip. */
 .hero {
-  --arc-from: #14241a;
-  --arc-to: #2f4a35;
-  --track: rgba(20, 36, 26, 0.12);
-  --ray: #1f3326;
-}
-
-.hero[data-gauge="white"] {
   --arc-from: #fff6e4;
   --arc-to: #ffffff;
   --track: rgba(255, 255, 255, 0.3);
   --ray: #fffaf0;
-}
-
-.hero[data-gauge="yellow"] {
-  --arc-from: #f2b93b;
-  --arc-to: #ffd970;
-  --track: rgba(255, 236, 180, 0.4);
-  --ray: #f5c04a;
 }
 
 .arcFrom {
@@ -130,7 +116,7 @@
   display: block;
   font-size: 84px;
   line-height: 0.9;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: -3px;
   color: var(--evergreen);
   font-variant-numeric: tabular-nums;

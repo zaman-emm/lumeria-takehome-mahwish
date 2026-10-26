@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
-import { useSearchParams } from "next/navigation";
 import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useFirstTime } from "./hooks";
@@ -68,8 +67,6 @@ export function Hero({
   const digits = useRef<HTMLSpanElement>(null);
   const arc = useRef<SVGPathElement>(null);
 
-  const gauge = useSearchParams().get("gauge") ?? "forest";
-
   useEffect(() => {
     if (!play || !digits.current) return;
     const el = digits.current;
@@ -98,7 +95,7 @@ export function Hero({
   const dayOf = (s: Scan) => fmtDay(s.takenAt, scanTz(s) ?? d.tz);
 
   return (
-    <header className={h.hero} data-gauge={gauge} data-play={play} data-reduce={first && reduce}>
+    <header className={h.hero} data-play={play} data-reduce={first && reduce}>
       <Logo className={h.logo} />
       <p className={h.hi}>Hi {d.firstName},</p>
       <h1 className={h.title}>{headline(d)}</h1>
