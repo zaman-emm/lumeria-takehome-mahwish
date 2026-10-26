@@ -1017,22 +1017,23 @@
 
 /* Two real pages at 1/16 size, hinged at the bottom and leaning apart. */
 .peek {
+  --ps: 0.0615;
   position: relative;
   display: block;
   flex: none;
-  width: 52px;
-  height: 48px;
+  width: calc(var(--ps) * 845px);
+  height: calc(var(--ps) * 780px);
   margin-left: auto;
 }
 
 .peekCard {
   position: absolute;
   bottom: 0;
-  left: calc(4px + var(--n) * 20px);
-  width: 24px;
-  height: 52px;
+  left: calc(var(--ps) * (65px + var(--n) * 325px));
+  width: calc(var(--ps) * 390px);
+  height: calc(var(--ps) * 844px);
   border: 1.5px solid rgba(244, 239, 230, 0.9);
-  border-radius: 5px;
+  border-radius: calc(var(--ps) * 80px);
   overflow: hidden;
   transform: rotate(calc((var(--n) * 2 - 1) * 12deg));
   transform-origin: 50% 100%;
@@ -1052,7 +1053,7 @@
   height: 844px;
   max-width: none;
   padding-top: 40px;
-  transform: scale(0.0615);
+  transform: scale(var(--ps));
   transform-origin: 0 0;
   pointer-events: none;
 }

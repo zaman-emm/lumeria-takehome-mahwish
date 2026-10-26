@@ -255,6 +255,24 @@
   transition: transform 160ms var(--ease-out);
 }
 
+/* Card-sized try: as big as the card above, with larger pages. */
+.month[data-size="card"] {
+  height: auto;
+  min-height: 113px;
+  padding: 0 20px 0 16px;
+  border-radius: 20px;
+  font-size: 17px;
+}
+
+.month[data-size="card"] .monthPlay {
+  width: 48px;
+  height: 48px;
+}
+
+.month[data-size="card"] :global(*) {
+  --ps: 0.105;
+}
+
 .month:active {
   transform: scale(0.96);
 }

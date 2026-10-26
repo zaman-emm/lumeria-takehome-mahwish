@@ -100,7 +100,7 @@ export function Hero({
       </div>
 
       {onPlay && (
-        <button className={h.month} onClick={(e) => onPlay(e.currentTarget)}>
+        <button className={h.month} data-size="card" onClick={(e) => onPlay(e.currentTarget)}>
           <span className={h.monthPlay}>
             <Icon name="play" size={14} />
           </span>
