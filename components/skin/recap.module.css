@@ -411,8 +411,8 @@
   transform: rotateY(180deg);
 }
 
-/* The card's look, as tokens, so it can be tried in other finishes
-   (data-tone on .flip): charcoal, white, bronze or gold. */
+/* The card's look, as tokens, in four finishes (data-tone on .flip). The
+   default here is charcoal; the story uses gold (Recap.tsx). */
 .flip {
   --card-bg: radial-gradient(80% 70% at 50% 40%, rgba(215, 180, 111, 0.18), transparent 70%), #2a2522;
   --card-ink: #e6cf9f;
@@ -442,8 +442,10 @@
 
 .flip[data-tone="gold"] {
   --card-bg: radial-gradient(80% 70% at 40% 25%, rgba(255, 250, 240, 0.45), transparent 70%), linear-gradient(160deg, #ead6a8, #d7b46f 55%, #c0913f);
-  --card-ink: #4a3510;
-  --card-soft: rgba(74, 53, 16, 0.75);
+  /* White on gold, lifted by a soft bronze shadow so it holds on the light top. */
+  --card-ink: #ffffff;
+  --card-soft: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 1px 2px rgba(128, 96, 31, 0.45), 0 2px 10px rgba(128, 96, 31, 0.35);
   --card-edge: rgba(255, 250, 240, 0.4);
   --streak: #fff2cf;
   --streak-hot: #ffffff;
@@ -536,6 +538,7 @@
   line-height: 1;
   text-align: left;
   color: var(--card-ink);
+  text-shadow: var(--card-shadow, none);
 }
 
 /* A short arc of gold that runs once round the rim, from the left edge. */
@@ -584,24 +587,56 @@
 }
 
 .streakNum {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
   color: var(--card-ink);
+  text-shadow: var(--card-shadow, none);
+}
+
+.streakNum svg {
+  filter: drop-shadow(0 1px 3px rgba(128, 96, 31, 0.4));
 }
 
 .streakNum b {
   font-size: 64px;
   line-height: 1;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -2px;
   font-variant-numeric: tabular-nums;
 }
 
 .streakWord {
+  position: relative;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--card-soft);
+  text-shadow: var(--card-shadow, none);
+}
+
+/* The small stars: white, faint glow, each twinkling on its own beat. */
+.spark {
+  position: absolute;
+  display: block;
+  line-height: 0;
+  color: var(--card-ink);
+  filter: drop-shadow(0 0 3px rgba(255, 250, 240, 0.9));
+  transform: translate(-50%, -50%);
+  animation: twinkle 2400ms ease-in-out infinite;
+  animation-delay: calc(var(--i) * -400ms);
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .streakHead {
@@ -1298,7 +1333,8 @@
     transition: none;
   }
   .streakRim,
-  .face {
+  .face,
+  .spark {
     animation: none;
   }
   .calDot {

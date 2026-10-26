@@ -307,6 +307,16 @@ function Highs({ slide }: { slide: Extract<Slide, { kind: "highs" }> }) {
   );
 }
 
+/** Where the small stars sit on the streak card, as [left %, top %, size]. */
+const SPARKS: [number, number, number][] = [
+  [16, 18, 10],
+  [80, 14, 8],
+  [86, 46, 11],
+  [12, 62, 8],
+  [72, 80, 9],
+  [30, 84, 7],
+];
+
 /**
  * Showing up: the streak on a card that turns over to the month (after
  * Lapse), then the month itself, drawn like the Calendar app.
@@ -330,11 +340,18 @@ function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
           type="button"
           className={s.flip}
           data-side={side}
+          data-tone="gold"
           onClick={() => setSide((v) => (v === "streak" ? "cover" : "streak"))}
           aria-label={`${slide.streak} week streak. ${slide.cover}. Turn the card over`}
         >
           <span className={s.face}>
             <span className={s.streakRim} aria-hidden />
+            {/* A few small stars around the number, twinkling out of step. */}
+            {SPARKS.map(([x, y, size], i) => (
+              <span key={i} className={s.spark} style={{ left: `${x}%`, top: `${y}%`, "--i": i } as CSSProperties} aria-hidden>
+                <Icon name="spark" size={size} />
+              </span>
+            ))}
             <span className={s.streakNum} aria-hidden>
               <Icon name="spark" size={30} />
               <b ref={count}>{slide.streak}</b>
