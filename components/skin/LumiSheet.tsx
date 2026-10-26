@@ -93,13 +93,12 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
         exit: { opacity: 0, filter: "blur(2px)" },
       };
   const ease = [0.23, 1, 0.32, 1] as const;
-  const open = qs.filter((q) => !answers[q.id]).length;
 
   return (
     <div className={l.chat}>
       <header className={l.chatHead}>
         <span className={l.chatOrb} data-busy={reading || thinking}>
-          <ThinkingOrb state={orb} size={64} theme="dark" color="#d7b46f" aria-hidden="true" />
+          <ThinkingOrb state={orb} size={64} theme="light" color="#b8913f" aria-hidden="true" />
         </span>
         <h2>Lumi</h2>
       </header>
@@ -146,10 +145,7 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
 
       {!reading && qs.length > 0 && (
         <section className={l.asks} aria-label="Lumi's questions for you">
-          <h3>
-            Lumi’s questions
-            {open > 0 && <span>{open}</span>}
-          </h3>
+          <h3>Lumi’s questions</h3>
           <ul className={m.questions}>
             {qs.map((q) => {
               const given = answers[q.id];

@@ -1,11 +1,11 @@
-/* Lumi: the edge dock (a half-pill on the right edge of the phone column, its
-   peek bubble and the tuck it does while the page scrolls), then the
-   conversation in its sheet. */
+/* Lumi: the orb floating at the bottom right of the phone column, its peek
+   bubble and the tuck it does while the page scrolls, then the conversation
+   in its sheet. */
 
 .dock {
   position: fixed;
   z-index: 30;
-  right: max(0px, calc((100vw - var(--phone)) / 2));
+  right: max(8px, calc((100vw - var(--phone)) / 2 + 8px));
   bottom: calc(28px + env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;
@@ -16,7 +16,7 @@
 }
 
 .dock[data-tucked="true"] {
-  transform: translateX(34px);
+  transform: translateX(40px);
 }
 
 .dock[data-hidden="true"] {
@@ -29,18 +29,9 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 72px;
+  width: 64px;
   height: 64px;
-  padding: 0 4px 0 0;
-  border-radius: 32px 0 0 32px;
-  background:
-    radial-gradient(40px 40px at 34px 32px, rgba(215, 180, 111, 0.28), transparent 100%),
-    var(--evergreen);
-  box-shadow:
-    inset 1px 0 0 rgba(215, 180, 111, 0.45),
-    inset 0 1px 0 rgba(215, 180, 111, 0.3),
-    inset 0 -1px 0 rgba(215, 180, 111, 0.2),
-    -6px 10px 28px rgba(20, 36, 26, 0.32);
+  border-radius: 50%;
   transition: transform 180ms var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
@@ -48,7 +39,6 @@
 .tab:active,
 .tab[data-pressed="true"] {
   transform: scale(0.94);
-  transform-origin: 100% 50%;
 }
 
 .orb {
@@ -60,12 +50,9 @@
 /* A slow gold breath behind the orb, so the dock reads as alive. */
 .halo {
   position: absolute;
-  left: 8px;
-  top: 4px;
-  width: 56px;
-  height: 56px;
+  inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(215, 180, 111, 0.45), transparent 70%);
+  background: radial-gradient(circle, rgba(215, 180, 111, 0.4), transparent 70%);
   animation: breathe 3.6s var(--ease-in-out) infinite;
 }
 
@@ -85,31 +72,6 @@
   50% {
     transform: scale(1.18);
     opacity: 1;
-  }
-}
-
-.badge {
-  position: absolute;
-  top: 2px;
-  left: 4px;
-  display: grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
-  border-radius: 10px;
-  background: var(--gold);
-  color: var(--evergreen);
-  font-size: 11px;
-  font-weight: 700;
-  box-shadow: 0 0 0 2px var(--evergreen);
-  animation: badgeIn 260ms var(--ease-out) both;
-}
-
-@keyframes badgeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
   }
 }
 
@@ -188,10 +150,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(215, 180, 111, 0.3), transparent 70%),
-    var(--evergreen);
-  box-shadow: inset 0 0 0 1px rgba(215, 180, 111, 0.45);
+  background: radial-gradient(circle, rgba(215, 180, 111, 0.28), transparent 70%);
 }
 
 /* While Lumi reads or thinks, its glow swells a little. */
@@ -362,19 +321,6 @@
   font-weight: 600;
 }
 
-.asks h3 span {
-  display: grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
-  border-radius: 10px;
-  background: var(--gold);
-  color: var(--evergreen);
-  font-size: 11px;
-  font-weight: 700;
-}
-
 .chat > :last-child {
   margin-top: auto;
   padding-top: 24px;
@@ -382,8 +328,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .written span[aria-hidden],
-  .chips button,
-  .badge {
+  .chips button {
     animation-name: fadeOnly;
   }
   .shimmer {

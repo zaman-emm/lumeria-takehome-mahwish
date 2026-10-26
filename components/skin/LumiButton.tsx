@@ -96,12 +96,7 @@ export function LumiButton({ hidden, count, onOpen, month = true }: { hidden: bo
         tabIndex={hidden ? -1 : 0}
       >
         <span className={l.halo} aria-hidden />
-        <ThinkingOrb state="breathing" size={64} theme="dark" aria-hidden="true" className={l.orb} paused={hidden} />
-        {count > 0 && (
-          <span key={count} className={l.badge} aria-hidden>
-            {count}
-          </span>
-        )}
+        <ThinkingOrb state="breathing" size={64} theme="light" color="#b8913f" aria-hidden="true" className={l.orb} paused={hidden} />
       </button>
     </div>
   );
