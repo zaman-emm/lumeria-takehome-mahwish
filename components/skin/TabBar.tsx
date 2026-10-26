@@ -47,7 +47,7 @@ export function TabBar({
           );
         })}
       </div>
-      <button className={b.lumi} onClick={onLumi} aria-label={lumiCount ? `Ask Lumi, ${things} to talk about` : "Ask Lumi"}>
+      <button className={b.lumi} onClick={onLumi} aria-label={lumiCount ? `Ask Lumi AI, ${things} to talk about` : "Ask Lumi AI"}>
         <span className={b.orb} aria-hidden>
           <SunOrb paused={hidden || lumiPaused} />
         </span>

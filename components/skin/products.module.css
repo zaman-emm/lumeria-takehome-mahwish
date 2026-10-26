@@ -1,154 +1,493 @@
+/* The Products tab (ProductsTab.tsx): one card per product, then context
+   cards after the newest, then the cues for comparable scans. */
+
 .list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 12px;
+  gap: 12px;
+  padding-top: 6px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ------------------------------------------------ product card */
+
+.card,
+.fold {
+  composes: card from "./surface.module.css";
+  border-radius: 20px;
 }
 
 .card {
-  composes: card from "./surface.module.css";
-  padding: 16px 16px 14px;
-  border-radius: 20px;
+  padding: 16px 16px 4px;
 }
 
 .head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 12px;
 }
 
-.name {
+/* The bottle, tinted by how the score moved while she used it. */
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+.card[data-tone="down"] .icon {
+  background: var(--clay-soft);
+  color: var(--clay-ink);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  padding-top: 9px;
+}
+
+.title h2 {
   margin: 0;
-  font-size: 15px;
-  line-height: 18px;
+  font-size: 16px;
+  line-height: 22px;
   font-weight: 600;
   color: var(--bark);
-  text-wrap: balance;
+}
+
+.stopped {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--clay-ink);
+}
+
+.overlap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 2px;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.summary span {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--bark);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary .delta {
+  margin-left: 0;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+/* Folded, the card closes up under its overview. */
+.card:has(.body[data-open="false"]) {
+  padding-bottom: 12px;
+}
+
+.toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -2px -12px 0 0;
+  color: var(--bark-2);
+}
+
+.toggle svg {
+  transform: rotate(180deg);
+  transition: transform 240ms var(--ease-out);
+}
+
+.toggle[aria-expanded="false"] svg {
+  transform: none;
+}
+
+.body {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 280ms var(--ease-out);
+}
+
+.body[data-open="false"] {
+  grid-template-rows: 0fr;
+}
+
+.bodyInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* The spot picker: a native select dressed as a pill, chevron on the right. */
+.spot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.spot select {
+  appearance: none;
+  height: 36px;
+  padding: 0 34px 0 14px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1px var(--sand);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bark);
+}
+
+.spot svg {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: var(--bark-2);
+}
+
+.spotStatic {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.range {
+  font-size: 12px;
+  color: var(--bark-2);
+  font-variant-numeric: tabular-nums;
 }
 
 .metric {
-  flex: none;
-  margin-top: -3px;
+  margin: 18px 0 0;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.fromTo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 0;
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+  color: var(--bark);
+}
+
+.arrow {
+  font-size: 30px;
+  color: var(--bark-2);
+}
+
+/* The change as a pill: forest when it rose, clay when it fell. */
+.delta {
+  margin-left: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--forest-soft);
+  color: var(--forest);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.card[data-tone="down"] .delta {
+  background: var(--clay-soft);
+  color: var(--clay-ink);
+}
+
+.card[data-tone="flat"] .delta {
+  background: var(--sand);
+  color: var(--bark-2);
+}
+
+.thin {
+  margin: 6px 0 12px;
+  font-size: 14px;
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ chart */
+
+.chart {
+  position: relative;
+  margin-top: 14px;
+}
+
+.chart svg {
+  display: block;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--sand);
+  stroke-width: 1;
+}
+
+.gridLabel {
+  font-size: 10px;
+  fill: var(--bark-3);
+}
+
+.trip {
+  fill: var(--clay-soft);
+  opacity: 0.6;
+}
+
+.startRule {
+  stroke: var(--bark-3);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.line,
+.lineBefore {
+  fill: none;
+  stroke: var(--evergreen);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.lineBefore {
+  stroke: var(--bark-3);
+  stroke-dasharray: 3 4;
+}
+
+.dot {
+  fill: var(--evergreen);
+}
+
+.valueLabel {
+  font-size: 10px;
+  fill: var(--bark-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.startTag,
+.tripTag {
+  position: absolute;
+  top: -8px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--bark-3);
+  white-space: nowrap;
+}
+
+.tripTag {
+  color: var(--clay-ink);
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 8px 0 26px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bark-2);
+}
+
+.verdict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--sand);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--forest);
+}
+
+.card[data-tone="down"] .verdict {
+  color: var(--clay-ink);
+}
+
+.card[data-tone="flat"] .verdict {
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ context cards */
+
+.foldHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 4px 0 16px;
+  text-align: left;
+}
+
+.foldHead h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--bark);
+}
+
+.chev {
+  width: 44px;
+  color: var(--bark-2);
+  transform: rotate(180deg);
+  transition: transform 240ms var(--ease-out);
+}
+
+.fold[data-open="false"] .chev {
+  transform: none;
+}
+
+.foldBody {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 280ms var(--ease-out);
+}
+
+.fold[data-open="false"] .foldBody {
+  grid-template-rows: 0fr;
+}
+
+.foldInner {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 16px;
+}
+
+.fold[data-open="true"] .foldInner {
+  padding-bottom: 16px;
+}
+
+.changes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.changes li {
+  display: grid;
+  grid-template-columns: 16px 52px 1fr;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--bark);
+}
+
+.changes svg {
+  color: var(--clay-ink);
+}
+
+.changeDay {
+  color: var(--bark-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.about {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--bark-2);
+}
+
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bronze-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ------------------------------------------------ foot */
+
+.foot {
+  padding: 8px 0 0;
+}
+
+.cues {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cue {
+  composes: card from "./surface.module.css";
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 16px;
   font-size: 14px;
   font-weight: 500;
   color: var(--bark);
 }
 
-/* ------------------------------------------------ day curve */
-
-.days {
-  padding: 0;
-}
-
-.dayLabels {
-  position: relative;
-  height: 22px;
-  margin-top: 6px;
+.disclaimer {
+  margin: 18px 12px 0;
   font-size: 12px;
-  font-weight: 500;
+  line-height: 18px;
+  text-align: center;
   color: var(--bark-2);
 }
 
-.dayLabels > span {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  white-space: nowrap;
-}
-
-.dayLabels[data-empty="true"] {
-  height: 0;
-}
-
-.stopTag {
-  color: var(--clay-ink);
-}
-
-/* ------------------------------------------------ details */
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.trial {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-top: 14px;
-}
-
-.trialHead {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--bark-2);
-}
-
-.trialHead b {
-  font-weight: 600;
-  color: var(--forest);
-}
-
-.trialBar {
-  display: grid;
-  grid-template-columns: repeat(14, 1fr);
-  gap: 3px;
-}
-
-.trialBar i {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--sand);
-}
-
-.trialBar i[data-on="true"] {
-  background: var(--forest);
-  transform-origin: left;
-}
-
-/* The days used so far fill in one by one, after the bars grow. */
-.trialBar[data-reveal="out"] i[data-on="true"] {
-  transform: scaleX(0);
-}
-
-.trialBar[data-reveal="in"] i[data-on="true"] {
-  transition: transform 260ms var(--ease-out);
-  transition-delay: calc(300ms + var(--i) * 45ms);
-}
-
-.stopped {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 12px 0 0;
-  font-size: 13px;
-  color: var(--clay-ink);
-}
-
-.swaps {
-  margin-top: 18px;
-}
+/* ------------------------------------------------ swaps (future scope) */
 
 .swaps h3 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--bark);
+  font-weight: 600;
 }
 
 .swaps ul {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin: 0;
+  margin: 0 0 14px;
   padding: 0;
   list-style: none;
 }
@@ -156,79 +495,50 @@
 .swaps li {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  min-height: 78px;
-  padding: 12px 10px;
-  border-radius: 14px;
-  background: var(--bone);
-  opacity: 0.7;
-}
-
-.swaps li b {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--bronze-deep);
-}
-
-.swaps li span {
+  gap: 4px;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--sand);
   font-size: 12px;
-  line-height: 15px;
-  font-weight: 500;
-  color: var(--bark);
 }
 
 .swaps li[data-match="true"] {
-  opacity: 1;
   box-shadow: inset 0 0 0 1.5px var(--forest);
-}
-
-.swaps li[data-match="true"] b {
-  color: var(--forest);
 }
 
 /* ------------------------------------------------ empty */
 
 .empty {
-  composes: card from "./surface.module.css";
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 36px 24px;
-  border-radius: 20px;
+  gap: 14px;
+  padding: 48px 24px;
   text-align: center;
 }
 
 .emptyIcon {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: var(--sand);
+  background: var(--card);
   color: var(--bark-2);
 }
 
 .empty h2 {
-  max-width: 280px;
-  margin: 6px 0 0;
-  font-size: 17px;
-  line-height: 24px;
-  font-weight: 500;
-  text-wrap: balance;
-}
-
-.empty p {
   margin: 0;
-  max-width: 260px;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--bark-2);
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .trialBar[data-reveal] i {
-    transition-duration: 0ms;
+  .body,
+  .foldBody,
+  .toggle svg,
+  .chev {
+    transition: none;
   }
 }

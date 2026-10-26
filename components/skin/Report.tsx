@@ -46,7 +46,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 const sheetLabel = (s: SheetState) =>
-  s.kind === "scan" ? "Scan details" : s.kind === "metric" ? `${metricMeta(s.key).label} trend` : "Lumi";
+  s.kind === "scan" ? "Scan details" : s.kind === "metric" ? `${metricMeta(s.key).label} trend` : "Lumi AI";
 const sheetKey = (s: SheetState) => (s.kind === "scan" ? s.scan.id : s.kind === "metric" ? `${s.key}-${s.area}` : "lumi");
 
 export function Report({ d }: { d: Derived }) {

@@ -98,7 +98,7 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
         <AnimatePresence mode="popLayout" initial={false}>
           {talking ? (
             <motion.h2 key="name" className={l.name} {...rise} transition={{ duration: 0.3, ease: EASE, delay: 0.1 }}>
-              Lumi
+              Lumi AI
             </motion.h2>
           ) : (
             <motion.h2 key="hello" className={l.hello} {...rise} transition={{ duration: 0.3, ease: EASE }}>
@@ -109,7 +109,7 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
       </motion.header>
 
       {!talking ? (
-        <ul className={l.starters} aria-label="Questions to ask Lumi">
+        <ul className={l.starters} aria-label="Questions to ask Lumi AI">
           {script.start.map((id, i) => (
             <li key={id} style={{ "--i": i } as CSSProperties}>
               <button onClick={() => ask(script.topics[id])}>
@@ -125,10 +125,7 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
             {lines.map((line) => (
               <motion.div key={line.key} className={l.line} data-from={line.from} {...rise} transition={{ duration: 0.3, ease: EASE }}>
                 {line.from === "lumi" ? (
-                  <>
-                    <Written text={line.text} />
-                    <small className={l.ai}>AI-generated · not medical advice</small>
-                  </>
+                  <Written text={line.text} />
                 ) : (
                   <p>{line.text}</p>
                 )}
@@ -156,19 +153,21 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
       <form className={l.composer} onSubmit={send}>
         <ScrollEdge side="bottom" tint={0.9} className={l.composerEdge} />
         <label className="sr-only" htmlFor="lumi-ask">
-          Ask Lumi
+          Ask Lumi AI
         </label>
         <input
           id="lumi-ask"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Ask Lumi"
+          placeholder="Ask Lumi AI"
           autoComplete="off"
           enterKeyHint="send"
         />
         <button type="submit" aria-label="Send" disabled={!draft.trim() || thinking}>
           <Icon name="up" size={16} stroke={2} />
         </button>
+        {/* Said once, small, under where she asks, rather than after every reply. */}
+        <p className={l.ai}>AI-generated · not medical advice</p>
       </form>
     </div>
   );
