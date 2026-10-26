@@ -2,16 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ThinkingOrb, type OrbState } from "thinking-orbs";
 import { metricMeta } from "@/lib/insights";
 import { lumiScript, type LumiTab } from "@/lib/lumi";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
+import { SunOrb } from "./SunOrb";
 import l from "./lumi.module.css";
 import m from "./sheets.module.css";
 
 // Lumi as a short conversation about the tab you opened it from. The first
-// time, the orb visibly reads your scans before it says anything. It greets
+// time, Lumi visibly reads your scans before it says anything. It greets
 // you with what's on that tab and offers three questions; tap one and the orb
 // thinks, then the answer writes itself in with two more to follow. Below,
 // Lumi's own questions for you. Everything is written ahead from the data:
@@ -35,7 +35,6 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
   const [thinking, setThinking] = useState(false);
   const [asked, setAsked] = useState<string[]>([]);
   const [offer, setOffer] = useState(script.start);
-  const [orb, setOrb] = useState<OrbState>(read ? "breathing" : "searching");
   const timer = useRef(0);
   const end = useRef<HTMLDivElement>(null);
 
@@ -44,7 +43,6 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
     timer.current = window.setTimeout(() => {
       read = true;
       setReading(false);
-      setOrb("breathing");
       setLines([{ id: "hi", from: "lumi", text: script.greeting }]);
     }, reduce ? 0 : READ_MS);
     return () => window.clearTimeout(timer.current);
@@ -65,11 +63,9 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
     setOffer([]);
     setLines((ls) => [...ls, { id: `q-${id}`, from: "you", text: t.ask }]);
     setThinking(true);
-    setOrb("composing");
     timer.current = window.setTimeout(
       () => {
         setThinking(false);
-        setOrb("breathing");
         setLines((ls) => [...ls, { id: `a-${id}`, from: "lumi", text: t.answer, ai: true }]);
         const fresh = (ids: string[]) => ids.filter((x) => !done.includes(x));
         const next = fresh(t.next);
@@ -79,11 +75,7 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
     );
   };
 
-  const answer = (id: string, a: string) => {
-    lumi.answer(id, a);
-    setOrb("weaving");
-    window.setTimeout(() => setOrb("breathing"), 900);
-  };
+  const answer = (id: string, a: string) => lumi.answer(id, a);
 
   const rise = reduce
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
@@ -98,7 +90,7 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
     <div className={l.chat}>
       <header className={l.chatHead}>
         <span className={l.chatOrb} data-busy={reading || thinking}>
-          <ThinkingOrb state={orb} size={64} theme="light" color="#b8913f" aria-hidden="true" />
+          <SunOrb />
         </span>
         <h2>Lumi</h2>
       </header>
@@ -124,7 +116,6 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
           ))}
           {thinking && (
             <motion.p key="thinking" className={l.status} role="status" {...rise} transition={{ duration: 0.2, ease }}>
-              <ThinkingOrb state="composing" size={20} theme="light" color="#24452f" aria-hidden="true" />
               <span className={l.shimmer}>Looking at your scans…</span>
             </motion.p>
           )}

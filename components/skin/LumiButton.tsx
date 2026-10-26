@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ThinkingOrb } from "thinking-orbs";
 import { Icon } from "./Icon";
+import { SunOrb } from "./SunOrb";
 import l from "./lumi.module.css";
 
-// Lumi lives on the right edge, near the bottom where a thumb rests: a
-// half-pill docked to the column edge with a slowly breathing dotted orb.
+// Lumi lives on the right edge, near the bottom where a thumb rests: the
+// sun orb, pearl and gold silk turning slowly inside a frosted sphere.
 // Once per load it peeks out with a line about what it noticed. While the
 // page scrolls it tucks halfway into the edge and slides back when you stop.
 
@@ -95,8 +95,9 @@ export function LumiButton({ hidden, count, onOpen, month = true }: { hidden: bo
         aria-label={count ? `Ask Lumi, ${things} to talk about` : "Ask Lumi"}
         tabIndex={hidden ? -1 : 0}
       >
-        <span className={l.halo} aria-hidden />
-        <ThinkingOrb state="breathing" size={64} theme="light" color="#b8913f" aria-hidden="true" className={l.orb} paused={hidden} />
+        <span className={l.face}>
+          <SunOrb paused={hidden} />
+        </span>
       </button>
     </div>
   );

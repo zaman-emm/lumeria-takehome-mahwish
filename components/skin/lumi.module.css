@@ -29,8 +29,8 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   transition: transform 180ms var(--ease-out);
   -webkit-tap-highlight-color: transparent;
@@ -41,38 +41,11 @@
   transform: scale(0.94);
 }
 
-.orb {
-  position: relative;
-  width: 56px;
-  height: 56px;
-}
-
-/* A slow gold breath behind the orb, so the dock reads as alive. */
-.halo {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(215, 180, 111, 0.4), transparent 70%);
-  animation: breathe 3.6s var(--ease-in-out) infinite;
-}
-
-.tab[data-pressed="true"] .halo {
-  animation: none;
-  transform: scale(1.5);
-  opacity: 1;
-  transition: transform 180ms var(--ease-out);
-}
-
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scale(0.85);
-    opacity: 0.55;
-  }
-  50% {
-    transform: scale(1.18);
-    opacity: 1;
-  }
+.face {
+  display: block;
+  width: 72px;
+  height: 72px;
+  filter: drop-shadow(0 8px 7px rgba(192, 145, 63, 0.22));
 }
 
 /* ------------------------------------------------ peek */
@@ -145,12 +118,10 @@
 
 .chatOrb {
   position: relative;
-  display: grid;
-  place-items: center;
+  display: block;
   width: 64px;
   height: 64px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(215, 180, 111, 0.28), transparent 70%);
+  filter: drop-shadow(0 6px 6px rgba(192, 145, 63, 0.2));
 }
 
 /* While Lumi reads or thinks, its glow swells a little. */
@@ -348,8 +319,5 @@
   .dock[data-hidden="true"] {
     transform: none;
     transition: opacity 200ms ease;
-  }
-  .halo {
-    animation: none;
   }
 }
