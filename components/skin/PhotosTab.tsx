@@ -9,8 +9,8 @@ import { Icon } from "./Icon";
 import { Delta, LIGHTS, Photo, photoFor, type Light } from "./ui";
 import ph from "./photos.module.css";
 
-// Photos: first against latest under a drag-to-compare slider, then every
-// scan as a polaroid wall, or as details (what each scan saw, your note, and
+// Photos: first against latest under a drag-to-compare slider, then about a
+// dozen scans (first, latest and evenly spaced between) as a polaroid wall, or as details (what each scan saw, your note, and
 // how it moved since the last scan of that spot), filtered by spot.
 
 const ALL = "All";
@@ -22,7 +22,8 @@ export function PhotosTab() {
   const [view, setView] = useState<"grid" | "rows">("grid");
   const reduce = useReducedMotion();
   const anyReal = d.realPhotos.length > 0;
-  const shown = [...d.scans].reverse().filter((s) => area === ALL || s.area === area);
+  // The wall lists the gallery's dozen (lib/insights pickGallery), not every scan.
+  const shown = [...d.gallery].reverse().filter((s) => area === ALL || s.area === area);
   const spring = reduce ? { duration: 0 } : { type: "spring" as const, duration: 0.35, bounce: 0 };
 
   return (

@@ -207,6 +207,40 @@ export interface Derived {
   notes: Note[];
   dip: Dip | null;
   realPhotos: Scan[];
+  /** The scans whose photos are listed (the Photos wall): at most GALLERY_MAX, oldest first. */
+  gallery: Scan[];
+}
+
+/** How many scan photos a list shows. A month of scans is too many to scroll. */
+export const GALLERY_MAX = 12;
+
+/**
+ * The photos worth listing: only scans with a photo; always the first and the
+ * latest, the first and last of every spot (so each spot's filter has its own
+ * then and now), then evenly spaced picks between, up to `max`.
+ */
+export function pickGallery(scans: Scan[], max = GALLERY_MAX): Scan[] {
+  const lit = scans.filter((s) => s.photoUrl || s.photos);
+  if (lit.length <= max) return lit;
+  const keep = new Set<Scan>([lit[0], lit[lit.length - 1]]);
+  const areas = [...new Set(lit.map((s) => s.area))];
+  for (const a of areas) {
+    const of = lit.filter((s) => s.area === a);
+    for (const s of [of[0], of[of.length - 1]]) if (keep.size < max) keep.add(s);
+  }
+  // Evenly spaced through the rest; a slot already taken moves to its nearest free neighbour.
+  const slots = max - keep.size;
+  for (let i = 1; i <= slots; i++) {
+    const at = Math.round((i * (lit.length - 1)) / (slots + 1));
+    for (let off = 0; off < lit.length; off++) {
+      const hit = [lit[at + off], lit[at - off]].find((s) => s && !keep.has(s));
+      if (hit) {
+        keep.add(hit);
+        break;
+      }
+    }
+  }
+  return lit.filter((s) => keep.has(s));
 }
 
 export const byTime = (a: Scan, b: Scan) => new Date(a.takenAt).getTime() - new Date(b.takenAt).getTime();
@@ -504,6 +538,7 @@ export function derive(report: SkinReport): Derived | null {
     notes,
     dip,
     realPhotos,
+    gallery: pickGallery(scans),
   };
 }
 
