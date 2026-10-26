@@ -51,6 +51,17 @@ const polar = (deg: number, r: number) => {
   return [CX + r * Math.cos(a), CY - r * Math.sin(a)] as const;
 };
 
+/**
+ * Then and now for the card: the first and newest real photos of the spot,
+ * else the two scans the trend compares. Never a real photo beside a stand-in.
+ */
+function beforeAfter(d: Derived, lens: Scan): [Scan, Scan] | null {
+  const real = d.realPhotos.filter((s) => s.area === lens.area);
+  if (real.length >= 2) return [real[0], real[real.length - 1]];
+  if (real.length || !d.trend?.from.photoUrl || !d.trend.to.photoUrl) return null;
+  return [d.trend.from, d.trend.to];
+}
+
 export function Hero({
   d,
   lens,
@@ -98,9 +109,11 @@ export function Hero({
     };
   }, [play, value]);
 
+  const pair = beforeAfter(d, lens);
   const lit = Math.round((value / 100) * (RAYS - 1));
   const word = band(value).word;
   const tz = scanTz(d.latest) ?? d.tz;
+  const dayOf = (s: Scan) => fmtDay(s.takenAt, scanTz(s) ?? d.tz);
 
   return (
     <header className={h.hero} data-play={play} data-reduce={first && reduce}>
@@ -163,10 +176,31 @@ export function Hero({
             {sinceStart(d)}
           </span>
         </div>
-        <button className={h.scan} onClick={onScan} aria-label={`Open your scan from ${fmtDay(lens.takenAt, tz)}`}>
-          <Photo scan={lens} priority alt="" className={h.scanPhoto} style={{ viewTransitionName: "skin-photo" }} />
-          <span>Your scan</span>
-        </button>
+        {pair ? (
+          <button
+            className={h.pair}
+            onClick={onScan}
+            aria-label={`Your skin on ${dayOf(pair[0])} and ${dayOf(pair[1])}. Open your latest scan`}
+          >
+            {pair.map((s, i) => (
+              <span key={s.id} className={h.pairItem} data-now={i === 1}>
+                <Photo
+                  scan={s}
+                  priority
+                  alt=""
+                  className={h.scanPhoto}
+                  style={i === 1 ? { viewTransitionName: "skin-photo" } : undefined}
+                />
+                <span>{dayOf(s)}</span>
+              </span>
+            ))}
+          </button>
+        ) : (
+          <button className={h.scan} onClick={onScan} aria-label={`Open your scan from ${fmtDay(lens.takenAt, tz)}`}>
+            <Photo scan={lens} priority alt="" className={h.scanPhoto} style={{ viewTransitionName: "skin-photo" }} />
+            <span>Your scan</span>
+          </button>
+        )}
       </div>
 
       {onPlay && (
