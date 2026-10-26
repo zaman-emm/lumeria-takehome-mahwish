@@ -23,10 +23,11 @@
   --green: #4d7a58;
   --clay-ink: #7d3524;
   --white: #ffffff;
-  /* A bone page, and flat paper cards that stand off it by colour alone. */
-  --canvas: #f4efe6;
+  /* The guide's surfaces: a bone page, and flat sand cards that stand off it
+     by colour alone. */
+  --canvas: var(--bone);
   --canvas-rgb: 244, 239, 230;
-  --card: #fbf8f2;
+  --card: var(--sand);
   --sunrise: linear-gradient(180deg, #e6cf9f 0%, #d7b46f 45%, #c0913f 100%);
   --sunrise-x: linear-gradient(90deg, #e6cf9f 0%, #d7b46f 55%, #c0913f 100%);
   /* The At a glance ground: the sunrise, then easing back into the page's own
