@@ -1,12 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import t from "./tabs.module.css";
 
 // Chip tabs. The active chip is a second, forest-coloured copy of the row,
 // clipped to the active chip; moving the clip slides the colour across, so
 // text and fill change together with no colour tween. The row scrolls
-// sideways at 375px and keeps the active chip in view.
+// sideways at 375px and keeps the active chip in view. Once it reaches the
+// top it becomes a frosted glass bar the page scrolls under.
 
 export function Tabs<T extends string>({
   tabs,
@@ -21,6 +22,15 @@ export function Tabs<T extends string>({
   const copy = useRef<HTMLDivElement>(null);
   const [clip, setClip] = useState<CSSProperties>({ clipPath: "inset(0 100% 0 0)" });
   const [ready, setReady] = useState(false);
+  const bar = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    const check = () => setStuck((bar.current?.getBoundingClientRect().top ?? 1) <= 0.5 && window.scrollY > 0);
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    return () => window.removeEventListener("scroll", check);
+  }, []);
 
   useLayoutEffect(() => {
     const list = row.current;
@@ -39,7 +49,7 @@ export function Tabs<T extends string>({
   }, [active]);
 
   return (
-    <div className={t.bar}>
+    <div className={t.bar} ref={bar} data-stuck={stuck}>
       <div className={t.row} ref={row} role="tablist" aria-label="Report sections">
         {tabs.map((tab) => (
           <button

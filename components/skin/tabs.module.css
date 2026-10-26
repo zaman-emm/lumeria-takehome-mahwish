@@ -9,19 +9,29 @@
   view-transition-name: skin-tabs;
 }
 
-/* The scroll edge: content softens and fades as it slides under the chips,
-   instead of meeting a hard bar. */
-.bar::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 -18px;
-  z-index: -1;
-  background: linear-gradient(to bottom, rgba(var(--canvas-rgb), 0.94) 45%, rgba(var(--canvas-rgb), 0));
-  -webkit-backdrop-filter: blur(14px) saturate(1.4);
-  backdrop-filter: blur(14px) saturate(1.4);
-  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
-  mask-image: linear-gradient(to bottom, #000 70%, transparent);
-  pointer-events: none;
+/* At rest the bar is just the page. Stuck at the top it turns to frosted
+   glass, like an iOS navigation bar: the content blurs as it slides under,
+   with a hairline at the edge. The glass sits on the bar itself, because its
+   view-transition-name would stop a child from seeing what's behind it. */
+.bar {
+  transition:
+    background-color 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out);
+}
+
+.bar[data-stuck="true"] {
+  background-color: rgba(var(--canvas-rgb), 0.78);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow: 0 0.5px 0 rgba(46, 38, 32, 0.14);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .bar[data-stuck="true"] {
+    background-color: var(--canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .row {

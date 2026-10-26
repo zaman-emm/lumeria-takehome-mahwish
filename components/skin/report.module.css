@@ -40,17 +40,7 @@
   padding-bottom: 104px;
 }
 
-/* The slim header stays put while its tab scrolls; tabs stick under it. */
-.page:not([data-tab="glance"]) > header {
-  position: sticky;
-  top: 0;
-  z-index: 6;
-}
-
-.page:not([data-tab="glance"]) {
-  --tabs-top: 72px;
-}
-
+/* The slim header scrolls away with the page; only the tabs stay, as glass. */
 /* Under the splash the tabs and what's beneath them wait, then rise behind the hero. */
 .page[data-splash="wait"] > :not(header) {
   opacity: 0;
