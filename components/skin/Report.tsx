@@ -11,6 +11,7 @@ import { CalendarTab } from "./CalendarTab";
 import { ReportContext, type ReportApi, type SheetState } from "./context";
 import { Glance } from "./Glance";
 import { Hero, SlimHeader } from "./Hero";
+import { HomeScreen } from "./HomeScreen";
 import { withViewTransition } from "./hooks";
 import { LumiButton } from "./LumiButton";
 import { LumiSheet } from "./LumiSheet";
@@ -18,9 +19,11 @@ import { MetricSheet } from "./MetricSheet";
 import { PhotosTab } from "./PhotosTab";
 import { ProductsTab } from "./ProductsTab";
 import { Recap } from "./Recap";
+import { ScanScreen } from "./ScanScreen";
 import { ScanSheet } from "./ScanSheet";
 import { Sheet } from "./Sheet";
 import { Splash } from "./Splash";
+import { TabBar, type Dest } from "./TabBar";
 import { markSplashed, willSplash } from "./splashState";
 import { Tabs } from "./Tabs";
 import { TrendsTab } from "./TrendsTab";
@@ -31,6 +34,9 @@ import r from "./report.module.css";
 // into the slim header (score and photo travel) and slides the panel in the
 // direction of the tab. Details open in one bottom sheet; the month plays as
 // a full-screen story.
+//
+// The report is the app's Trends destination; the floating tab bar at the
+// bottom switches between it, Home and Scan, crossfading the page.
 
 const TABS = [
   { id: "glance", label: "At a glance" },
@@ -46,6 +52,7 @@ const sheetLabel = (s: SheetState) =>
 const sheetKey = (s: SheetState) => (s.kind === "scan" ? s.scan.id : s.kind === "metric" ? `${s.key}-${s.area}` : "lumi");
 
 export function Report({ d }: { d: Derived }) {
+  const [dest, setDest] = useState<Dest>("trends");
   const [tab, setTab] = useState<TabId>("glance");
   // The splash opens the first load of a page, never again, and never for
   // people who asked for less motion (splashState.ts).
@@ -80,6 +87,14 @@ export function Report({ d }: { d: Derived }) {
     }),
     [d, open, tab],
   );
+
+  const go = (to: Dest) => {
+    if (to === dest) return;
+    withViewTransition(() => {
+      setDest(to);
+      if (window.scrollY > 0) window.scrollTo({ top: 0 });
+    });
+  };
 
   const changeTab = (id: TabId) => {
     if (id === tab) return;
@@ -144,7 +159,7 @@ export function Report({ d }: { d: Derived }) {
   // you scroll up, like an iOS navigation bar.
   const [headAway, setHeadAway] = useState(false);
   useEffect(() => {
-    if (tab === "glance") return setHeadAway(false);
+    if (tab === "glance" || dest !== "trends") return setHeadAway(false);
     let last = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
@@ -155,7 +170,7 @@ export function Report({ d }: { d: Derived }) {
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [tab]);
+  }, [tab, dest]);
 
   const latestTz = scanTz(d.latest) ?? d.tz;
 
@@ -165,36 +180,42 @@ export function Report({ d }: { d: Derived }) {
         <div className={r.root} data-skin ref={setRoot}>
           <Drawer.IndentBackground className={r.indentBg} />
           <Drawer.Indent className={r.indent} style={{ "--origin": `${origin}px` } as CSSProperties}>
-            <div className={r.page} data-tab={tab} data-head={headAway ? "away" : "shown"} data-splash={splash === "done" ? undefined : splash}>
-              {tab === "glance" ? (
-                <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} splash={splash} />
-              ) : (
-                <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} />
-              )}
+            {dest === "home" && <HomeScreen d={d} onScan={() => go("scan")} onTrends={() => go("trends")} />}
+            {dest === "scan" && <ScanScreen d={d} />}
+            {dest === "trends" && (
+              <div className={r.page} data-tab={tab} data-head={headAway ? "away" : "shown"} data-splash={splash === "done" ? undefined : splash}>
+                {tab === "glance" ? (
+                  <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} splash={splash} />
+                ) : (
+                  <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} />
+                )}
 
-              <Tabs tabs={TABS} active={tab} onChange={changeTab} />
+                <Tabs tabs={TABS} active={tab} onChange={changeTab} />
 
-              <main className={r.panel} id="skin-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
-                {tab === "glance" && <Glance streak={streak} />}
-                {tab === "products" && <ProductsTab />}
-                {tab === "trends" && <TrendsTab />}
-                {tab === "calendar" && <CalendarTab />}
-                {tab === "photos" && <PhotosTab />}
-              </main>
+                <main className={r.panel} id="skin-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
+                  {tab === "glance" && <Glance streak={streak} />}
+                  {tab === "products" && <ProductsTab />}
+                  {tab === "trends" && <TrendsTab />}
+                  {tab === "calendar" && <CalendarTab />}
+                  {tab === "photos" && <PhotosTab />}
+                </main>
 
-              {tab === "glance" && (
-                <footer className={r.foot}>
-                  <p className={r.disclaimer}>
-                    Lumeria’s AI reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the
-                    right next step.
-                  </p>
-                </footer>
-              )}
-            </div>
+                {tab === "glance" && (
+                  <footer className={r.foot}>
+                    <p className={r.disclaimer}>
+                      Lumeria’s AI reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the
+                      right next step.
+                    </p>
+                  </footer>
+                )}
+              </div>
+            )}
           </Drawer.Indent>
 
+          <TabBar active={dest} onChange={go} hidden={recap || splash !== "done"} />
+
           <LumiButton
-            hidden={Boolean(sheet) || recap || splash !== "done"}
+            hidden={Boolean(sheet) || recap || splash !== "done" || dest === "scan"}
             count={d.factors.length}
             onOpen={api.openLumi}
           />

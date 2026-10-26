@@ -52,7 +52,8 @@
   margin: 0 auto;
   background: var(--canvas);
   color: var(--bark);
-  padding-bottom: 104px;
+  /* Room for the floating tab bar and Lumi above it. */
+  padding-bottom: calc(max(16px, var(--bottom-inset)) + 62px + 40px);
 }
 
 /* The slim header slides up out of view while you scroll down and drops

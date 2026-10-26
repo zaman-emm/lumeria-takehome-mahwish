@@ -1,0 +1,147 @@
+/* The floating tab bar (TabBar.tsx): a Liquid Glass capsule and the Scan
+   circle, fixed to the bottom of the phone column, above the home indicator. */
+
+.bar {
+  --tabbar-h: 62px;
+  position: fixed;
+  z-index: 30;
+  left: 50%;
+  bottom: max(16px, var(--bottom-inset));
+  display: flex;
+  gap: 10px;
+  width: min(100%, var(--phone));
+  padding: 0 20px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition:
+    transform 420ms var(--ease-drawer),
+    opacity 220ms var(--ease-out);
+}
+
+/* Under a story or the splash it sinks out of the way. */
+.bar[data-hidden="true"] {
+  opacity: 0;
+  transform: translate(-50%, 24px);
+}
+
+/* The glass: thin fill, blur and saturation, a sheen, a bright rim and a soft lift. */
+.capsule,
+.scan {
+  position: relative;
+  height: var(--tabbar-h);
+  /* The strong fill: labels stay legible over whatever scrolls beneath. */
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), var(--lg-lift);
+  pointer-events: auto;
+}
+
+.capsule {
+  display: flex;
+  flex: 1;
+  padding: 4px;
+  border-radius: calc(var(--tabbar-h) / 2);
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 27px;
+  color: var(--bark);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 200ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.item svg,
+.item span {
+  position: relative;
+}
+
+.item[aria-current="page"] {
+  color: var(--forest);
+}
+
+/* Feedback on the press, not the release. */
+.item:active,
+.scan:active {
+  transform: scale(0.95);
+}
+
+/* The selected tab's lighter glass pill. */
+.pill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--lg-well);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.7);
+}
+
+.scan {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tabbar-h);
+  border-radius: 50%;
+  color: var(--bark);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 200ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.scan[data-on="true"] {
+  color: var(--bone);
+  background: var(--lg-sheen-dark), var(--lg-forest);
+  box-shadow: var(--lg-rim-dark), var(--lg-lift);
+}
+
+/* Over the dark viewfinder the glass turns forest-tinted and the selected
+   Scan circle lights up in bone. */
+.bar[data-tone="dark"] .capsule,
+.bar[data-tone="dark"] .scan {
+  background: var(--lg-sheen-dark), rgba(29, 51, 37, 0.5);
+  box-shadow: var(--lg-rim-dark), 0 10px 30px -14px rgba(0, 0, 0, 0.5);
+}
+
+.bar[data-tone="dark"] .item {
+  color: rgba(244, 239, 230, 0.86);
+}
+
+.bar[data-tone="dark"] .scan[data-on="true"] {
+  background: var(--bone);
+  color: var(--forest);
+}
+
+.item:focus-visible,
+.scan:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar,
+  .item,
+  .scan {
+    transition-duration: 0ms;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .capsule,
+  .scan {
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--bark-2);
+  }
+}

@@ -5,7 +5,7 @@ import { useReducedMotion } from "motion/react";
 import { SunOrb } from "./SunOrb";
 import l from "./lumi.module.css";
 
-// Lumi lives on the right edge, near the bottom where a thumb rests: the
+// Lumi lives on the right edge, just above the tab bar where a thumb rests: the
 // sun orb, pearl and gold silk turning slowly inside a frosted sphere. It
 // never announces itself. While the page scrolls it tucks halfway into the
 // edge and slides back when you stop.

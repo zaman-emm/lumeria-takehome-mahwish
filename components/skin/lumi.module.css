@@ -1,11 +1,13 @@
 /* Lumi: the orb floating at the bottom right of the phone column, the tuck it
    does while the page scrolls, then the conversation in its sheet. */
 
+/* It rides just above the tab bar, centred over the Scan circle (the bar's
+   right gutter is 20px and the circle 62px wide, so its centre is 51px in). */
 .dock {
   position: fixed;
   z-index: 30;
-  right: max(8px, calc((100vw - var(--phone)) / 2 + 8px));
-  bottom: calc(28px + var(--bottom-inset));
+  right: max(15px, calc((100vw - var(--phone)) / 2 + 15px));
+  bottom: calc(max(16px, var(--bottom-inset)) + 62px + 10px);
   display: flex;
   align-items: center;
   gap: 10px;

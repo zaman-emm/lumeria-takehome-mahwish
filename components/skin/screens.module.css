@@ -1,0 +1,329 @@
+/* Home and Scan, the two destinations beside the report (HomeScreen.tsx,
+   ScanScreen.tsx). Same canvas, gold and forest as the report. */
+
+/* Room under each for the floating tab bar. */
+.home,
+.scan {
+  min-height: 100dvh;
+  padding-bottom: calc(max(16px, var(--bottom-inset)) + 62px + 32px);
+}
+
+/* ------------------------------------------------ home */
+
+.home {
+  display: flex;
+  flex-direction: column;
+  padding-top: calc(var(--top-inset) + 12px);
+  padding-left: 16px;
+  padding-right: 16px;
+  background: linear-gradient(180deg, #efe3c9 0%, var(--canvas) 280px);
+}
+
+.homeHead {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 4px;
+}
+
+.logo {
+  width: 112px;
+  color: var(--evergreen);
+}
+
+.greet {
+  margin: 18px 4px 0;
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--bark);
+}
+
+.lede {
+  margin: 8px 4px 0;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--bark-2);
+  text-wrap: pretty;
+}
+
+.scoreCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: var(--radius-m);
+  background: var(--sunrise);
+  color: var(--evergreen);
+  text-align: left;
+  transition: transform 160ms var(--ease-out);
+}
+
+.scoreCard:active,
+.ctaBtn:active,
+.link:active {
+  transform: scale(0.98);
+}
+
+.scoreText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(20, 36, 26, 0.72);
+}
+
+.score {
+  margin-top: 2px;
+  font-size: 64px;
+  line-height: 68px;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  color: var(--white);
+  text-shadow: 0 2px 12px rgba(128, 96, 31, 0.28);
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.scorePhoto {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.55);
+}
+
+.cta {
+  composes: card from "./surface.module.css";
+  margin-top: 12px;
+  padding: 20px;
+  border-radius: var(--radius-m);
+}
+
+.ctaTitle {
+  margin: 0;
+  font-size: 19px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ctaBody {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--bark-2);
+}
+
+.ctaBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 50px;
+  margin-top: 16px;
+  border-radius: 25px;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform 160ms var(--ease-out);
+}
+
+.ctaBtn svg {
+  color: var(--gold);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 16px 18px;
+  border-radius: var(--radius-m);
+  background: var(--card);
+  color: var(--bark);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  transition: transform 160ms var(--ease-out);
+}
+
+.link span {
+  flex: 1;
+}
+
+.link svg:first-child {
+  color: var(--forest);
+}
+
+.link svg:last-child {
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ scan */
+
+.scan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: calc(var(--top-inset) + 16px);
+  background: radial-gradient(120% 70% at 50% 42%, var(--evergreen-2) 0%, var(--evergreen) 70%);
+  color: var(--bone);
+}
+
+.spots {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 20px;
+  background: var(--glass-dark);
+  box-shadow: inset 0 0 0 1px var(--glass-dark-edge);
+}
+
+.spots button {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(244, 239, 230, 0.7);
+  transition:
+    background-color 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+
+.spots button[aria-checked="true"] {
+  background: rgba(244, 239, 230, 0.16);
+  color: var(--bone);
+}
+
+.finder {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin-top: 48px;
+}
+
+/* Four corner marks, drawn as one masked border. */
+.corners {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(244, 239, 230, 0.85);
+  border-radius: 36px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / calc(100% - 140px) 100% no-repeat exclude,
+    linear-gradient(#000 0 0) left / 100% calc(100% - 140px) no-repeat exclude,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) top / calc(100% - 140px) 100% no-repeat exclude,
+    linear-gradient(#000 0 0) left / 100% calc(100% - 140px) no-repeat exclude,
+    linear-gradient(#000 0 0);
+}
+
+.guide {
+  position: absolute;
+  inset: 40px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(215, 180, 111, 0.7);
+  background: radial-gradient(circle, rgba(215, 180, 111, 0.12), transparent 70%);
+}
+
+.finder[data-shot="true"] .guide {
+  animation: flash 600ms var(--ease-out);
+}
+
+@keyframes flash {
+  0% {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.hint {
+  min-height: 44px;
+  max-width: 280px;
+  margin: 28px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  text-align: center;
+  color: rgba(244, 239, 230, 0.86);
+}
+
+.lights {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lights li {
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--glass-dark);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(244, 239, 230, 0.75);
+}
+
+.shutter {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  margin-top: auto;
+  border-radius: 50%;
+  border: 4px solid rgba(244, 239, 230, 0.92);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shutter i {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: var(--bone);
+  transition: transform 140ms var(--ease-out);
+}
+
+.shutter:active i {
+  transform: scale(0.9);
+}
+
+.shutter:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .finder[data-shot="true"] .guide {
+    animation: none;
+  }
+}
