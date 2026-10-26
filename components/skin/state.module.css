@@ -7,7 +7,7 @@
   align-items: center;
   height: var(--hero-h);
   padding: calc(24px + var(--top-inset)) 32px 40px;
-  color: var(--bark);
+  color: var(--evergreen);
   text-align: center;
 }
 

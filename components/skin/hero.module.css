@@ -11,7 +11,7 @@
   background:
     radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
     var(--sunrise-fade);
-  color: var(--bark);
+  color: var(--evergreen);
   view-transition-name: skin-head;
   overflow: hidden;
 }
@@ -19,7 +19,7 @@
 .logo {
   width: 184px;
   height: 34px;
-  color: var(--bark);
+  color: var(--evergreen);
 }
 
 /* The greeting opens the part of the page that's about her, under the gold. */
@@ -39,7 +39,7 @@
   line-height: 36px;
   font-weight: 600;
   letter-spacing: -0.8px;
-  color: var(--bark);
+  color: var(--evergreen);
 }
 
 .hi h2 span {
@@ -90,7 +90,7 @@
 /* A white sun arc on the gold: warm white at the start, pure white at the tip. */
 .gauge {
   --arc-from: #fff6e4;
-  --arc-to: var(--white);
+  --arc-to: #ffffff;
   --track: rgba(255, 255, 255, 0.3);
   --ray: #fffaf0;
 }
@@ -148,8 +148,8 @@
   line-height: 0.9;
   font-weight: 500;
   letter-spacing: -3px;
-  /* Bark on the gold: about 7:1, where white was 2.5:1. */
-  color: var(--bark);
+  color: var(--white);
+  text-shadow: 0 2px 18px rgba(128, 96, 31, 0.45), 0 1px 2px rgba(128, 96, 31, 0.3);
   font-variant-numeric: tabular-nums;
   /* A touch of left room so the negative tracking stays centred. */
   padding-left: 3px;
@@ -190,7 +190,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--bark);
+  color: var(--evergreen);
   font-size: 40px;
   line-height: 44px;
   font-weight: 500;
@@ -201,7 +201,7 @@
 .change {
   font-size: 14px;
   font-weight: 500;
-  color: var(--bark);
+  color: var(--evergreen);
 }
 
 .scan {
@@ -279,7 +279,7 @@
   box-shadow: var(--lg-rim);
   -webkit-backdrop-filter: var(--lg-blur);
   backdrop-filter: var(--lg-blur);
-  color: var(--bark);
+  color: var(--evergreen);
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
@@ -451,7 +451,7 @@
   backdrop-filter: var(--lg-blur);
   box-shadow: inset 0 -1px 0.5px rgba(255, 255, 255, 0.45);
   border-radius: 0 0 20px 20px;
-  color: var(--bark);
+  color: var(--evergreen);
   view-transition-name: skin-head;
 }
 
@@ -529,7 +529,7 @@
   -webkit-backdrop-filter: var(--lg-btn-blur);
   backdrop-filter: var(--lg-btn-blur);
   box-shadow: var(--lg-btn-rim);
-  color: var(--bark);
+  color: var(--evergreen);
   flex: none;
   transition: transform 160ms var(--ease-out);
 }
@@ -563,7 +563,7 @@
   -webkit-backdrop-filter: var(--lg-btn-blur);
   backdrop-filter: var(--lg-btn-blur);
   box-shadow: var(--lg-btn-rim);
-  color: var(--bark);
+  color: var(--evergreen);
   flex: none;
   transition: transform 160ms var(--ease-out);
 }

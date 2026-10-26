@@ -35,7 +35,7 @@ const THEMES: Record<Slide["kind"], Theme> = {
     glows: [glow(330, 110, 210, "rgba(255,250,240,.9)"), glow(20, 640, 220, "rgba(192,145,63,.2)")].join(","),
     ink: "dark",
   },
-  // Dark slides sit on evergreen, the guide's dark surface; bark is for text.
+  // The dark slide sits on evergreen, the guide's dark surface.
   scanTime: {
     bg: "#14241a",
     glows: [glow(210, 190, 170, "rgba(192,145,63,.35)"), glow(50, 730, 190, "rgba(184,83,58,.3)")].join(","),
@@ -46,12 +46,10 @@ const THEMES: Record<Slide["kind"], Theme> = {
     glows: [glow(70, 150, 210, "rgba(244,239,230,.95)"), glow(370, 530, 170, "rgba(192,145,63,.28)")].join(","),
     ink: "dark",
   },
-  // Clay is for what needs attention, used sparingly: the rough patch keeps
-  // it as a soft wash, with the clay itself left to the marks that dipped.
   rough: {
-    bg: "#f1ddd3",
-    glows: [glow(320, 110, 190, "rgba(251,248,242,.9)"), glow(30, 670, 210, "rgba(184,83,58,.18)")].join(","),
-    ink: "dark",
+    bg: "#b8533a",
+    glows: [glow(320, 110, 190, "rgba(192,145,63,.5)"), glow(30, 670, 210, "rgba(46,38,32,.45)")].join(","),
+    ink: "light",
   },
   helped: {
     bg: "#80601f",

@@ -2,11 +2,11 @@
 
 .carousel {
   /* One soft wash per score, all from the report's own palette. */
-  --tint-hydration: var(--forest-soft);
+  --tint-hydration: #dfe6dc;
   --tint-tone: #efe1c4;
-  --tint-calm: var(--clay-soft);
-  --tint-clarity: var(--sand);
-  --tint-oil: var(--bronze-soft);
+  --tint-calm: #f1ddd3;
+  --tint-clarity: #e8dfce;
+  --tint-oil: #e6cf9f;
   --tint-radiance: #f3e3bf;
   --tint-pores: #e4e1d6;
   /* Bleeds past the panel's 16px gutter so the side cards reach the edges. */

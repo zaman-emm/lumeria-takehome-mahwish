@@ -45,7 +45,12 @@
   max-height: calc(100dvh - var(--top-inset) - 6px + var(--bleed));
   margin-bottom: calc(-1 * var(--bleed));
   border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
-  /* A sheet is a page of its own: bone, with sand cards, as the guide has. */
+  /* A sheet is foreground, so it takes the paper; inside it the two swap, so
+     its own cards still sit one step darker, and its scroll edges blur to
+     the paper. */
+  --canvas: #fbf8f2;
+  --canvas-rgb: 251, 248, 242;
+  --card: var(--bone);
   background: var(--canvas);
   color: var(--bark);
   box-shadow: 0 -8px 40px rgba(20, 36, 26, 0.16);
