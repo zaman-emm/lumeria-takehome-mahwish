@@ -80,19 +80,14 @@
   text-align: left;
 }
 
-/* The thread softens as it slides under the header, like the tab bar. */
-.lumi[data-talking="true"] .head::before,
-.composer::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 -18px;
+/* The thread softens as it slides under the header: a progressive blur
+   (ScrollEdge) behind the header's own content, running 18px below it. */
+.headEdge {
+  top: 0;
+  right: 0;
+  bottom: -18px;
+  left: 0;
   z-index: -1;
-  background: linear-gradient(to bottom, rgba(var(--canvas-rgb), 0.96) 55%, rgba(var(--canvas-rgb), 0));
-  -webkit-backdrop-filter: blur(14px) saturate(1.4);
-  backdrop-filter: blur(14px) saturate(1.4);
-  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
-  mask-image: linear-gradient(to bottom, #000 72%, transparent);
-  pointer-events: none;
 }
 
 .orb {
@@ -341,14 +336,12 @@
   padding: 24px 0 4px;
 }
 
-.composer::before {
-  /* Reaches down through the sheet's bleed so there is no seam below. */
-  /* Exactly to the popup's bottom edge, no further, or it adds scroll room and the
-     composer rests higher at the end of the thread than where it is pinned. */
+/* The same under the composer: from 10px above it exactly to the popup's bottom edge, no
+   further, or it adds scroll room and the composer rests higher at the end of the thread
+   than where it is pinned. */
+.composerEdge {
   inset: -10px -20px calc(-1 * (var(--bleed, 0px) + var(--bottom-inset)));
-  background: linear-gradient(to top, rgba(var(--canvas-rgb), 0.96) 60%, rgba(var(--canvas-rgb), 0));
-  -webkit-mask-image: linear-gradient(to top, #000 75%, transparent);
-  mask-image: linear-gradient(to top, #000 75%, transparent);
+  z-index: -1;
 }
 
 .composer input {
@@ -421,16 +414,5 @@
   .dock[data-hidden="true"] {
     transform: none;
     transition: opacity 200ms ease;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .lumi[data-talking="true"] .head::before,
-  .composer::before {
-    background: var(--canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    -webkit-mask-image: none;
-    mask-image: none;
   }
 }

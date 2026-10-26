@@ -39,17 +39,20 @@ export function PhoneFrame({ children }: { children: ReactNode }) {
     <div className={f.desk}>
       <div className={f.phone} style={{ width: W + BEZEL * 2, height: H + BEZEL * 2, transform: `translate(-50%, -50%) scale(${scale})` }}>
         <span className={f.buttons} aria-hidden />
-        {/* Behind the iframe: what the loading screen looks like, status bar and all, for the
-            moment before the iframe's own page paints. Once it does, it covers this. */}
-        <div className={f.under} style={{ width: W, height: H }} aria-hidden>
-          <span className={f.gold} />
-          {/* The ring's track, where the splash holds it (Splash.tsx, state.module.css .shell). */}
-          <div className={f.ring} style={{ left: 12, width: W - 24, height: RING_H, top: H * 0.5 - RING_H * 0.48 }}>
-            <Gauge value={0} play={false} idle decorative />
+        <div className={f.clip}>
+          {/* Behind the iframe: what the loading screen looks like, status bar and all, for the
+              moment before the iframe's own page paints. Once it does, it covers this. */}
+          <div className={f.under} style={{ width: W, height: H }} aria-hidden>
+            <span className={f.gold} />
+            {/* The ring's track, where the splash holds it (Splash.tsx, state.module.css .shell). */}
+            <div className={f.ring} style={{ left: 12, width: W - 24, height: RING_H, top: H * 0.5 - RING_H * 0.48 }}>
+              <Gauge value={0} play={false} idle decorative />
+            </div>
+            <DeviceChrome />
           </div>
-          <DeviceChrome />
+          <iframe className={f.screen} src={location.href} title="Skin report" style={{ width: W, height: H }} />
+          <span className={f.bezel} aria-hidden />
         </div>
-        <iframe className={f.screen} src={location.href} title="Skin report" style={{ width: W, height: H }} />
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { lumiScript, type LumiTab, type LumiTopic } from "@/lib/lumi";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
+import { ScrollEdge } from "./ScrollEdge";
 import { SunOrb } from "./SunOrb";
 import l from "./lumi.module.css";
 
@@ -90,6 +91,7 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
   return (
     <div className={l.lumi} data-talking={talking}>
       <motion.header layout={!reduce} className={l.head} transition={move}>
+        {talking && <ScrollEdge side="top" tint={0.9} className={l.headEdge} />}
         <motion.span layout={!reduce} className={l.orb} data-busy={thinking} transition={move}>
           <SunOrb speed={thinking ? 3 : 1} />
         </motion.span>
@@ -152,6 +154,7 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
       )}
 
       <form className={l.composer} onSubmit={send}>
+        <ScrollEdge side="bottom" tint={0.9} className={l.composerEdge} />
         <label className="sr-only" htmlFor="lumi-ask">
           Ask Lumi
         </label>

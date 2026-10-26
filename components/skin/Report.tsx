@@ -205,6 +205,7 @@ export function Report({ d }: { d: Derived }) {
             label={sheet ? sheetLabel(sheet) : ""}
             contentKey={sheet ? sheetKey(sheet) : undefined}
             container={root}
+            edge={sheet?.kind !== "lumi"}
           >
             {sheet?.kind === "scan" && <ScanSheet scan={sheet.scan} />}
             {sheet?.kind === "metric" && (

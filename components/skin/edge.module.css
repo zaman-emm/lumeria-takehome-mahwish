@@ -1,0 +1,55 @@
+/* The progressive scroll-edge blur (ScrollEdge.tsx). The caller gives it its
+   position and size; each layer is full strength at its own height along the
+   strip and gone one step (1/7th of the strip) either side, and the strongest
+   layer holds from the very edge. */
+
+.edge {
+  position: absolute;
+  pointer-events: none;
+}
+
+.edge[data-side="top"] {
+  --dir: to bottom;
+}
+
+.edge[data-side="bottom"] {
+  --dir: to top;
+}
+
+.edge > * {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.edge[data-on="true"] > * {
+  opacity: 1;
+}
+
+.edge > i {
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  -webkit-mask-image: linear-gradient(var(--dir), transparent calc(var(--at) - 14.3%), #000 var(--at), transparent calc(var(--at) + 14.3%));
+  mask-image: linear-gradient(var(--dir), transparent calc(var(--at) - 14.3%), #000 var(--at), transparent calc(var(--at) + 14.3%));
+}
+
+.edge > i:first-child {
+  -webkit-mask-image: linear-gradient(var(--dir), #000 var(--at), transparent calc(var(--at) + 14.3%));
+  mask-image: linear-gradient(var(--dir), #000 var(--at), transparent calc(var(--at) + 14.3%));
+}
+
+.edge > b {
+  background: linear-gradient(var(--dir), rgba(var(--canvas-rgb), var(--tint, 0.7)), rgba(var(--canvas-rgb), 0));
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  /* No blur: a solid fade of the sheet's own colour. */
+  .edge > i {
+    display: none;
+  }
+
+  .edge > b {
+    background: linear-gradient(var(--dir), var(--canvas) 55%, rgba(var(--canvas-rgb), 0));
+  }
+}

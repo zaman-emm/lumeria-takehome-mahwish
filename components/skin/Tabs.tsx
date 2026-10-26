@@ -56,33 +56,33 @@ export function Tabs<T extends string>({
 
   return (
     <>
-    <div className={t.cap} data-on={stuck} aria-hidden />
-    <div className={t.bar} ref={bar} data-stuck={stuck} data-page-chrome>
-      <div className={t.row} ref={row} role="tablist" aria-label="Report sections">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            role="tab"
-            id={`tab-${tab.id}`}
-            data-id={tab.id}
-            aria-selected={tab.id === active}
-            aria-controls="skin-panel"
-            className={t.chip}
-            onClick={() => onChange(tab.id)}
-            data-label={tab.label}
-          >
-            <span>{tab.label}</span>
-          </button>
-        ))}
-        <div className={t.active} ref={copy} style={clip} data-ready={ready} aria-hidden>
+      <div className={t.cap} data-on={stuck} aria-hidden />
+      <div className={t.bar} ref={bar} data-stuck={stuck} data-page-chrome>
+        <div className={t.row} ref={row} role="tablist" aria-label="Report sections">
           {tabs.map((tab) => (
-            <span key={tab.id} className={t.chip} data-label={tab.label}>
+            <button
+              key={tab.id}
+              role="tab"
+              id={`tab-${tab.id}`}
+              data-id={tab.id}
+              aria-selected={tab.id === active}
+              aria-controls="skin-panel"
+              className={t.chip}
+              onClick={() => onChange(tab.id)}
+              data-label={tab.label}
+            >
               <span>{tab.label}</span>
-            </span>
+            </button>
           ))}
+          <div className={t.active} ref={copy} style={clip} data-ready={ready} aria-hidden>
+            {tabs.map((tab) => (
+              <span key={tab.id} className={t.chip} data-label={tab.label}>
+                <span>{tab.label}</span>
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

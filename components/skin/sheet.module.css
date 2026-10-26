@@ -80,60 +80,13 @@
   height: 0;
 }
 
-/* Scroll edge: where content scrolls up under the grabber and the close button,
-   the strip behind them blurs and fades into the sheet, instead of the content
-   running hard under the controls. It is a progressive blur: six layers (Sheet.tsx
-   EDGE_BLURS, 16px down to 0.5px), the strongest at the top and each masked to
-   its own band, so the blur eases out to nothing with no edge where it stops,
-   under a soft fade of the sheet's colour. The strip is 88px; the controls end at
-   54px. Only shown once there is content under it. */
-.edge {
-  position: absolute;
+/* Where the scroll-edge blur (ScrollEdge) sits: the strip behind the grabber and
+   the close button (the controls end at 54px) and a fade below them. */
+.edgeBox {
   top: 0;
   right: 0;
   left: 0;
   height: 88px;
-  pointer-events: none;
-}
-
-.edge > * {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 160ms var(--ease-out);
-}
-
-.edge > i {
-  -webkit-backdrop-filter: blur(var(--blur));
-  backdrop-filter: blur(var(--blur));
-  /* Each layer is full strength at its own height and gone one step either side (a step is 1/7th of the strip). */
-  -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--at) - 14.3%), #000 var(--at), transparent calc(var(--at) + 14.3%));
-  mask-image: linear-gradient(to bottom, transparent calc(var(--at) - 14.3%), #000 var(--at), transparent calc(var(--at) + 14.3%));
-}
-
-/* The strongest layer holds from the very top. */
-.edge > i:first-child {
-  -webkit-mask-image: linear-gradient(to bottom, #000 var(--at), transparent calc(var(--at) + 14.3%));
-  mask-image: linear-gradient(to bottom, #000 var(--at), transparent calc(var(--at) + 14.3%));
-}
-
-.edge > b {
-  background: linear-gradient(to bottom, rgba(var(--canvas-rgb), 0.7), rgba(var(--canvas-rgb), 0));
-}
-
-.edge[data-on="true"] > * {
-  opacity: 1;
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  /* No blur: a solid fade of the sheet's own colour. */
-  .edge > i {
-    display: none;
-  }
-
-  .edge > b {
-    background: linear-gradient(to bottom, var(--canvas) 55%, rgba(var(--canvas-rgb), 0));
-  }
 }
 
 .grabber {
