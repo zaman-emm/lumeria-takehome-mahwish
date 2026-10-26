@@ -45,10 +45,12 @@ const THEMES: Record<Slide["kind"], Theme> = {
     glows: [glow(70, 150, 210, "rgba(244,239,230,.95)"), glow(370, 530, 170, "rgba(192,145,63,.28)")].join(","),
     ink: "dark",
   },
+  // Clay is for what needs attention, used sparingly: the rough patch keeps
+  // it as a soft wash, with the clay itself left to the marks that dipped.
   rough: {
-    bg: "#b8533a",
-    glows: [glow(320, 110, 190, "rgba(192,145,63,.5)"), glow(30, 670, 210, "rgba(46,38,32,.45)")].join(","),
-    ink: "light",
+    bg: "#f1ddd3",
+    glows: [glow(320, 110, 190, "rgba(251,248,242,.9)"), glow(30, 670, 210, "rgba(184,83,58,.18)")].join(","),
+    ink: "dark",
   },
   helped: {
     bg: "#80601f",
