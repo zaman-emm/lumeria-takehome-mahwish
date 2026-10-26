@@ -382,3 +382,35 @@
     filter: none;
   }
 }
+
+/* The scan's suggestion, last in the sheet. */
+.tip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.tip svg {
+  flex: none;
+  color: var(--gold);
+}
+
+.tip span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tip small {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(244, 239, 230, 0.7);
+}

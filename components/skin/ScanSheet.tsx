@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { AnimatePresence } from "motion/react";
 import { METRICS, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, score, shortTip, signed, spansOn } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { TipToast } from "./TipToast";
 import { LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, type Light } from "./ui";
 import m from "./sheets.module.css";
 
@@ -29,7 +27,6 @@ export function ScanSheet({ scan }: { scan: Scan }) {
   const env = scan.location?.environment;
   const products = spansOn(d, dayOf(d, scan)).filter((s) => s.kind === "product" && s.product);
   const li = LIGHTS.findIndex((l) => l.key === light);
-  const [tipGone, setTipGone] = useState(false);
 
   const context: [string, string][] = h
     ? [
@@ -196,19 +193,14 @@ export function ScanSheet({ scan }: { scan: Scan }) {
         </section>
       )}
 
-      {/* The scan's suggestion rides the sheet's bottom edge, not the middle of what it saw. */}
-      <AnimatePresence>
-        {!tipGone && (
-          <TipToast
-            key="tip"
-            placement="sheet"
-            delay={450}
-            tip={shortTip(scan.summary.tip)}
-            from={`This ${fmtDay(scan.takenAt, tz)} scan`}
-            onDismiss={() => setTipGone(true)}
-          />
-        )}
-      </AnimatePresence>
+      {/* The scan's suggestion closes the sheet, under everything it's based on. */}
+      <p className={m.tip}>
+        <Icon name="spark" size={14} />
+        <span>
+          {shortTip(scan.summary.tip)}
+          <small>AI suggestion · not medical advice</small>
+        </span>
+      </p>
     </article>
   );
 }

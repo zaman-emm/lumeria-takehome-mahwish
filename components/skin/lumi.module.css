@@ -1,53 +1,5 @@
-/* Lumi: the orb floating at the bottom right of the phone column, the tuck it
-   does while the page scrolls, then the conversation in its sheet. */
-
-/* It rides just above the tab bar, centred over the Scan circle (the bar's
-   right gutter is 20px and the circle 62px wide, so its centre is 51px in). */
-.dock {
-  position: fixed;
-  z-index: 30;
-  right: max(15px, calc((100vw - var(--phone)) / 2 + 15px));
-  bottom: calc(max(16px, var(--bottom-inset)) + 62px + 10px);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition:
-    transform 420ms var(--ease-drawer),
-    opacity 220ms var(--ease-out);
-}
-
-.dock[data-tucked="true"] {
-  transform: translateX(40px);
-}
-
-.dock[data-hidden="true"] {
-  opacity: 0;
-  transform: translateX(72px);
-  pointer-events: none;
-}
-
-.tab {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  transition: transform 180ms var(--ease-out);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.tab:active,
-.tab[data-pressed="true"] {
-  transform: scale(0.96);
-}
-
-.face {
-  display: block;
-  width: 72px;
-  height: 72px;
-  filter: drop-shadow(0 8px 7px rgba(192, 145, 63, 0.22));
-}
+/* Lumi's conversation, in its sheet. The orb that opens it lives in the tab
+   bar (TabBar.tsx). */
 
 /* ------------------------------------------------ sheet */
 

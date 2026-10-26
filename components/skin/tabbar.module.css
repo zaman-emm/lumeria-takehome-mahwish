@@ -1,16 +1,18 @@
-/* The floating tab bar (TabBar.tsx): a Liquid Glass capsule and the Scan
-   circle, fixed to the bottom of the phone column, above the home indicator. */
+/* The floating tab bar (TabBar.tsx), sized like iOS 26's: a 62pt Liquid Glass
+   capsule 21pt in from the edges with a 62pt round button beside it, sitting
+   just above the home indicator. */
 
 .bar {
   --tabbar-h: 62px;
   position: fixed;
   z-index: 30;
   left: 50%;
-  bottom: max(16px, var(--bottom-inset));
+  bottom: max(12px, calc(var(--bottom-inset) - 13px));
   display: flex;
+  align-items: center;
   gap: 10px;
   width: min(100%, var(--phone));
-  padding: 0 20px;
+  padding: 0 21px;
   transform: translateX(-50%);
   pointer-events: none;
   transition:
@@ -24,16 +26,22 @@
   transform: translate(-50%, 24px);
 }
 
-/* The glass: thin fill, blur and saturation, a sheen, a bright rim and a soft lift. */
+/* Liquid Glass: mostly clear, so the page shows through; a blur that lifts
+   saturation, a bright specular edge on top, a fainter one below, a hairline
+   and a soft shadow to float it. */
 .capsule,
-.scan {
+.lumi {
   position: relative;
   height: var(--tabbar-h);
-  /* The strong fill: labels stay legible over whatever scrolls beneath. */
-  background: var(--lg-sheen), var(--lg-fill-strong);
-  -webkit-backdrop-filter: var(--lg-blur);
-  backdrop-filter: var(--lg-blur);
-  box-shadow: var(--lg-rim), var(--lg-lift);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.32));
+  -webkit-backdrop-filter: blur(14px) saturate(1.8);
+  backdrop-filter: blur(14px) saturate(1.8);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+    0 0 0 0.5px rgba(46, 38, 32, 0.08),
+    0 8px 24px -8px rgba(46, 38, 32, 0.22);
   pointer-events: auto;
 }
 
@@ -51,12 +59,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  border-radius: 27px;
+  gap: 1px;
+  border-radius: calc(var(--tabbar-h) / 2 - 4px);
   color: var(--bark);
-  font-size: 10.5px;
+  font-size: 10px;
+  line-height: 12px;
   font-weight: 600;
-  letter-spacing: 0.01em;
   -webkit-tap-highlight-color: transparent;
   transition:
     color 200ms var(--ease-out),
@@ -68,64 +76,69 @@
   position: relative;
 }
 
+/* The tint, as iOS colours the selected tab. */
 .item[aria-current="page"] {
   color: var(--forest);
 }
 
-/* Feedback on the press, not the release. */
-.item:active,
-.scan:active {
-  transform: scale(0.95);
-}
-
-/* The selected tab's lighter glass pill. */
+/* The selected tab's lighter glass: a soft grey lens with its own top edge. */
 .pill {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: var(--lg-well);
-  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.7);
+  background: rgba(120, 120, 128, 0.14);
+  box-shadow: inset 0 0.5px 0.5px rgba(255, 255, 255, 0.8);
 }
 
-.scan {
+/* Lumi, where Music keeps Search: the same glass, round, with the orb inside. */
+.lumi {
   display: grid;
   flex: none;
   place-items: center;
   width: var(--tabbar-h);
   border-radius: 50%;
-  color: var(--bark);
   -webkit-tap-highlight-color: transparent;
-  transition:
-    color 200ms var(--ease-out),
-    background-color 200ms var(--ease-out),
-    transform 140ms var(--ease-out);
+  transition: transform 140ms var(--ease-out);
 }
 
-.scan[data-on="true"] {
-  color: var(--bone);
-  background: var(--lg-sheen-dark), var(--lg-forest);
-  box-shadow: var(--lg-rim-dark), var(--lg-lift);
+.orb {
+  display: block;
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 3px 4px rgba(192, 145, 63, 0.3));
 }
 
-/* Over the dark viewfinder the glass turns forest-tinted and the selected
-   Scan circle lights up in bone. */
+/* Feedback on the press, not the release. */
+.item:active,
+.lumi:active {
+  transform: scale(0.95);
+}
+
+/* Over the dark viewfinder the glass darkens, as iOS's does over dark content. */
 .bar[data-tone="dark"] .capsule,
-.bar[data-tone="dark"] .scan {
-  background: var(--lg-sheen-dark), rgba(29, 51, 37, 0.5);
-  box-shadow: var(--lg-rim-dark), 0 10px 30px -14px rgba(0, 0, 0, 0.5);
+.bar[data-tone="dark"] .lumi {
+  background: linear-gradient(180deg, rgba(60, 60, 60, 0.42), rgba(30, 30, 30, 0.36));
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.22),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.14),
+    0 8px 24px -8px rgba(0, 0, 0, 0.5);
 }
 
 .bar[data-tone="dark"] .item {
-  color: rgba(244, 239, 230, 0.86);
+  color: rgba(255, 255, 255, 0.86);
 }
 
-.bar[data-tone="dark"] .scan[data-on="true"] {
-  background: var(--bone);
-  color: var(--forest);
+.bar[data-tone="dark"] .item[aria-current="page"] {
+  color: var(--gold);
+}
+
+.bar[data-tone="dark"] .pill {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0.5px 0.5px rgba(255, 255, 255, 0.3);
 }
 
 .item:focus-visible,
-.scan:focus-visible {
+.lumi:focus-visible {
   outline: 2px solid var(--forest);
   outline-offset: 2px;
 }
@@ -133,15 +146,20 @@
 @media (prefers-reduced-motion: reduce) {
   .bar,
   .item,
-  .scan {
+  .lumi {
     transition-duration: 0ms;
   }
 }
 
-@media (prefers-contrast: more) {
+/* Reduced transparency or more contrast: solid surfaces, as iOS does. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
   .capsule,
-  .scan {
+  .lumi {
     background: var(--paper);
-    box-shadow: inset 0 0 0 1px var(--bark-2);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+      inset 0 0 0 1px var(--sand-deep),
+      0 8px 24px -8px rgba(46, 38, 32, 0.22);
   }
 }

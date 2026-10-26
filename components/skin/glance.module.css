@@ -89,6 +89,25 @@
   color: var(--bark-2);
 }
 
+.tip {
+  composes: deep from "./surface.module.css";
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: var(--bone);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.tip svg {
+  flex: none;
+  color: var(--gold);
+}
+
 .full {
   display: inline-flex;
   align-items: center;

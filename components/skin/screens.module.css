@@ -5,7 +5,7 @@
 .home,
 .scan {
   min-height: 100dvh;
-  padding-bottom: calc(max(16px, var(--bottom-inset)) + 62px + 32px);
+  padding-bottom: calc(max(12px, calc(var(--bottom-inset) - 13px)) + 62px + 32px);
 }
 
 /* ------------------------------------------------ home */
