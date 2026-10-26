@@ -1,0 +1,184 @@
+/* The day-by-day score curve on each product card (DayCurve.tsx). */
+
+.curve {
+  --tone: var(--bark-2);
+  --tone-soft: rgba(217, 204, 180, 0.4);
+  position: relative;
+  height: 84px;
+  margin: 20px -2px 0;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.curve[data-tone="helped"] {
+  --tone: var(--forest);
+  --tone-soft: rgba(223, 230, 220, 0.85);
+}
+
+.curve[data-tone="held"] {
+  --tone: var(--clay);
+  --tone-soft: rgba(241, 221, 211, 0.85);
+}
+
+.curve svg {
+  display: block;
+  overflow: visible;
+}
+
+.band {
+  fill: var(--tone-soft);
+}
+
+.trip {
+  opacity: 0.9;
+}
+
+.hatchBg {
+  fill: rgba(255, 253, 249, 0.3);
+}
+
+.hatchLine {
+  stroke: rgba(184, 83, 58, 0.26);
+  stroke-width: 1.5;
+}
+
+.washTop {
+  stop-color: var(--tone);
+  stop-opacity: 0.22;
+}
+
+.washEnd {
+  stop-color: var(--tone);
+  stop-opacity: 0;
+}
+
+.rest,
+.line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+}
+
+.rest {
+  stroke: rgba(46, 38, 32, 0.24);
+  stroke-width: 1.75;
+}
+
+.curve[data-tone="neutral"] .rest {
+  stroke: var(--bark-2);
+  stroke-width: 2;
+}
+
+.line {
+  stroke: var(--tone);
+  stroke-width: 2.25;
+}
+
+.from,
+.to {
+  stroke: var(--white);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.from {
+  fill: var(--paper);
+  stroke: var(--tone);
+}
+
+.to {
+  fill: var(--tone);
+}
+
+.scrub line {
+  stroke: rgba(46, 38, 32, 0.28);
+  stroke-width: 1;
+}
+
+.scrub circle {
+  fill: var(--bark);
+  stroke: var(--white);
+  stroke-width: 2;
+}
+
+/* The trip's plane sits in a small glass disc at the top of its band. */
+.plane {
+  position: absolute;
+  top: 6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  border-radius: 50%;
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  box-shadow: var(--lg-rim), 0 4px 10px -4px rgba(46, 38, 32, 0.25);
+  color: var(--clay-ink);
+  pointer-events: none;
+}
+
+.pill {
+  position: absolute;
+  top: -26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), 0 6px 14px -6px rgba(46, 38, 32, 0.3);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.pill b {
+  font-weight: 600;
+  color: var(--bark);
+}
+
+/* ------------------------------------------------ first reveal */
+
+.curve[data-reveal] .rest,
+.curve[data-reveal] .line {
+  transition: stroke-dashoffset 900ms var(--ease-out);
+}
+
+.curve[data-reveal] .fill,
+.curve[data-reveal] .band,
+.curve[data-reveal] .trip,
+.curve[data-reveal] .plane {
+  transition: opacity 500ms ease 150ms;
+}
+
+.curve[data-reveal] .from,
+.curve[data-reveal] .to {
+  transition:
+    opacity 240ms ease 700ms,
+    transform 320ms var(--ease-out) 700ms;
+}
+
+.curve[data-reveal="out"] .rest,
+.curve[data-reveal="out"] .line {
+  stroke-dashoffset: 1;
+}
+
+.curve[data-reveal="out"] .fill,
+.curve[data-reveal="out"] .band,
+.curve[data-reveal="out"] .trip,
+.curve[data-reveal="out"] .plane {
+  opacity: 0;
+}
+
+.curve[data-reveal="out"] .from,
+.curve[data-reveal="out"] .to {
+  opacity: 0;
+  transform: scale(0.5);
+}

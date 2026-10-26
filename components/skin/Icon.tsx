@@ -18,7 +18,7 @@ const PATHS = {
   drop: "M8 1.8S3.6 6.6 3.6 9.6a4.4 4.4 0 008.8 0C12.4 6.6 8 1.8 8 1.8z",
   moon: "M13 9.6A5.4 5.4 0 016.4 3a5.6 5.6 0 106.6 6.6z",
   sun: "M8 5.2a2.8 2.8 0 100 5.6 2.8 2.8 0 000-5.6zM8 1v1.4M8 13.6V15M1 8h1.4M13.6 8H15M3 3l1 1M12 12l1 1M13 3l-1 1M4 12l-1 1",
-  plane: "M1.8 9.6l12.4-4.2-1-1.6-4.2 1L5 2.4l-1.2.4 2.4 3.6-3 1L1.8 6.4l-.6.5zM2 13.6h12",
+  plane: "M14.6 8c0-.6-.5-1-1.2-1H9.6L6.4 2.2H5.2L6.8 7H3.6L2.6 5.4H1.6L2.2 8l-.6 2.6h1l1-1.6h3.2l-1.6 4.8h1.2L9.6 9h3.8c.7 0 1.2-.4 1.2-1z",
   stop: "M8 1.8a6.2 6.2 0 100 12.4A6.2 6.2 0 008 1.8zM5.8 5.8l4.4 4.4M10.2 5.8l-4.4 4.4",
   pin: "M8 14.4s-4.6-4.3-4.6-7.6a4.6 4.6 0 019.2 0c0 3.3-4.6 7.6-4.6 7.6zM8 5a1.8 1.8 0 100 3.6A1.8 1.8 0 008 5z",
   grid: "M2.5 2.5h4.5v4.5H2.5zM9 2.5h4.5v4.5H9zM2.5 9h4.5v4.5H2.5zM9 9h4.5v4.5H9z",
@@ -38,7 +38,7 @@ const PATHS = {
 
 export type IconName = keyof typeof PATHS;
 
-const FILLED = new Set<string>(["play", "spark"]);
+const FILLED = new Set<string>(["play", "spark", "plane"]);
 
 export function Icon({
   name,

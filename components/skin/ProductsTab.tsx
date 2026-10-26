@@ -1,19 +1,20 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { daysBetween, fmtDay, metricMeta, type Derived, type Span } from "@/lib/insights";
+import { daysBetween, fmtDay, metricMeta, type Derived } from "@/lib/insights";
 import { BUDGET_TIER, dailySeries, factorFor, swapsFor, trial } from "@/lib/routine";
 import type { Product } from "@/lib/types";
 import { useReportApi } from "./context";
-import { useReveal, useWidth } from "./hooks";
+import { DayCurve, type CurvePoint } from "./DayCurve";
+import { useReveal, useWidth, type RevealState } from "./hooks";
 import { Icon } from "./Icon";
-import { Chip, FromTo, RangeBar, ScheduleChip } from "./ui";
+import { Chip, FromTo, ScheduleChip } from "./ui";
 import p from "./products.module.css";
 
-// The routine, one card per product: the score it lined up with (old dot,
-// new dot), that score day by day with the product's days lit, then what it
-// is, when it's used, how a trial is going, and gentler swaps when one was
-// stopped for irritation.
+// The routine, one card per product: the score it lined up with (was › now),
+// that score as a curve across the period with the product's days on a band,
+// then what it is, when it's used, how a trial is going, and gentler swaps
+// when one was stopped for irritation.
 
 export function ProductsTab() {
   const { d } = useReportApi();
@@ -58,24 +59,18 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
           <span className={p.name} id={`${id}-name`}>
             {product.name}
           </span>
-          {f && (
-            <span className={p.metric}>
-              <span>{metricMeta(f.change.key).label}</span>
-              <FromTo from={f.change.from} to={f.change.to} />
-            </span>
-          )}
         </span>
+        {f && (
+          <span className={p.metric} aria-label={`${metricMeta(f.change.key).label} ${f.change.from} to ${f.change.to}`}>
+            <FromTo from={f.change.from} to={f.change.to} />
+          </span>
+        )}
         <Icon name="chevronD" size={14} stroke={1.6} className={p.chevron} />
       </button>
-      {f && (
-        <div className={p.rangeWrap}>
-          <RangeBar from={f.change.from} to={f.change.to} tone={f.direction} reveal={reveal} />
-        </div>
-      )}
+      <ProductCurve d={d} product={product} reveal={reveal} />
 
       <div className={p.more} id={`${id}-more`} inert={!open}>
         <div className={p.moreInner}>
-          <DayBars d={d} product={product} reveal={reveal} />
           <div className={p.chips}>
             <Chip>{product.category}</Chip>
             {product.keyIngredients.map((k) => (
@@ -127,71 +122,60 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
 }
 
 /**
- * The product's score for every day of the period: one bar a day, a stub on
- * days without a scan. The product's own days carry its colour; on a product
- * that got worse, a trip shows as a band behind.
+ * The score the product lined up with, day by day across the period, with the
+ * product's own days on a band and the dots at "was" and "now". On a product
+ * that got worse, a trip shows as a band too, since it may share the blame.
  */
-function DayBars({ d, product, reveal }: { d: Derived; product: Product; reveal: string }) {
+function ProductCurve({ d, product, reveal }: { d: Derived; product: Product; reveal: RevealState }) {
   const f = factorFor(d, product);
   const key = f?.change.key ?? "overall";
   const series = dailySeries(d, key);
   const span = d.spans.find((s) => s.id === product.id);
-  // A trip only shows on a product that got worse, where it may share the blame.
   const trips = f?.direction === "held" ? d.spans.filter((s) => s.kind === "travel") : [];
   const n = series.length;
-  const xOf = (day: string) => `${(Math.max(0, Math.min(n - 1, daysBetween(d.start, day))) / Math.max(1, n - 1)) * 100}%`;
-  const inSpan = (day: string, s?: Span) => Boolean(s && day >= s.start && day <= s.end);
-  const tone = f?.direction ?? "helped";
+  const idx = (day: string) => Math.max(0, Math.min(n - 1, daysBetween(d.start, day)));
+  const points: CurvePoint[] = series.flatMap((v, i) => (v.value == null ? [] : [{ i, value: v.value, label: fmtDay(v.day) }]));
+  const band = span && f ? { id: span.id, from: idx(span.start), to: idx(span.end) } : undefined;
+  const before = band ? points.filter((pt) => pt.i < band.from) : [];
+  const during = band ? points.filter((pt) => pt.i >= band.from && pt.i <= band.to) : [];
+  const marks = band ? { from: (before[before.length - 1] ?? points[0])?.i, to: during[during.length - 1]?.i } : undefined;
   const start = span && span.start > d.start ? span.start : d.start;
   const [labels, w] = useWidth<HTMLDivElement>();
 
-  // Labels sit under their day, nudged right so none overlap. Widths are
+  // Dates sit under their day, nudged right so they never overlap. Widths are
   // estimated from the text (12px Montserrat runs about 6.6px a character).
-  const frac = (day: string) => Math.max(0, Math.min(n - 1, daysBetween(d.start, day))) / Math.max(1, n - 1);
   const wanted = [
-    { id: "start", kind: "start", text: fmtDay(start), at: frac(start), width: fmtDay(start).length * 6.6, centre: start !== d.start },
-    ...trips.map((t) => ({ id: t.id, kind: "trip", text: "", at: frac(t.start), width: 20, centre: true })),
-    ...(span && !span.ongoing ? [{ id: "stop", kind: "stop", text: fmtDay(span.end), at: frac(span.end), width: 14 + fmtDay(span.end).length * 6.6, centre: true }] : []),
-  ].sort((a, b) => a.at - b.at);
-  const placed: { id: string; kind: string; text: string; x: number }[] = [];
+    { id: "start", stop: false, text: fmtDay(start), at: idx(start) / Math.max(1, n - 1), width: fmtDay(start).length * 6.6, centre: start !== d.start },
+    ...(span && !span.ongoing ? [{ id: "stop", stop: true, text: fmtDay(span.end), at: idx(span.end) / Math.max(1, n - 1), width: 14 + fmtDay(span.end).length * 6.6, centre: true }] : []),
+  ];
+  const placed: { id: string; stop: boolean; text: string; x: number }[] = [];
   let edge = -Infinity;
   for (const l of wanted) {
     let x = l.at * w - (l.centre ? l.width / 2 : 0);
     x = Math.max(0, Math.min(w - l.width, Math.max(x, edge + 6)));
-    placed.push({ id: l.id, kind: l.kind, text: l.text, x });
+    placed.push({ id: l.id, stop: l.stop, text: l.text, x });
     edge = x + l.width;
   }
 
+  if (points.length < 2) return null;
   return (
-    <div className={p.days} data-reveal={reveal}>
-      <div
-        className={p.bars}
-        role="img"
-        aria-label={`${metricMeta(key).label}, day by day from ${fmtDay(d.start)} to ${fmtDay(d.end)}${span ? `, using it ${span.ongoing ? `since ${fmtDay(span.start)}` : `${fmtDay(span.start)} to ${fmtDay(span.end)}`}` : ""}`}
-      >
-        {trips.map((t) => (
-          <span
-            key={t.id}
-            className={p.trip}
-            style={{ left: xOf(t.start), width: `calc(${xOf(t.end)} - ${xOf(t.start)} + 6px)` }}
-            aria-hidden
-          />
-        ))}
-        {series.map((v, i) => (
-          <i
-            key={v.day}
-            data-in={inSpan(v.day, span)}
-            data-tone={tone}
-            data-empty={v.value == null}
-            style={{ height: v.value == null ? 2 : Math.max(3, (v.value - 34) * 0.45), "--i": i } as CSSProperties}
-          />
-        ))}
-      </div>
+    <div className={p.days}>
+      <DayCurve
+        days={n}
+        points={points}
+        band={band}
+        trips={trips.map((t) => ({ id: t.id, from: idx(t.start), to: idx(t.end) }))}
+        marks={marks}
+        tone={f?.direction ?? "neutral"}
+        reveal={reveal}
+        label={`${metricMeta(key).label}, day by day from ${fmtDay(d.start)} to ${fmtDay(d.end)}${
+          span ? `, using it ${span.ongoing ? `since ${fmtDay(span.start)}` : `${fmtDay(span.start)} to ${fmtDay(span.end)}`}` : ""
+        }${trips.length ? `, with your ${trips.map((t) => t.short).join(" and ")} trip marked` : ""}`}
+      />
       <div className={p.dayLabels} ref={labels} aria-hidden>
         {placed.map((l) => (
-          <span key={l.id} className={l.kind === "trip" ? p.tripTag : l.kind === "stop" ? p.stopTag : undefined} style={{ transform: `translateX(${l.x}px)` }}>
-            {l.kind === "trip" && <Icon name="plane" size={11} />}
-            {l.kind === "stop" && <Icon name="stop" size={11} />}
+          <span key={l.id} className={l.stop ? p.stopTag : undefined} style={{ transform: `translateX(${l.x}px)` }}>
+            {l.stop && <Icon name="stop" size={11} />}
             {l.text}
           </span>
         ))}
@@ -199,4 +183,3 @@ function DayBars({ d, product, reveal }: { d: Derived; product: Product; reveal:
     </div>
   );
 }
-

@@ -62,9 +62,8 @@
 }
 
 .metric {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex: none;
+  margin-top: -3px;
   font-size: 14px;
   font-weight: 500;
   color: var(--bark);
@@ -79,11 +78,6 @@
 
 .card[data-open="false"] .chevron {
   transform: none;
-}
-
-.rangeWrap {
-  margin-top: 12px;
-  padding: 0 2px;
 }
 
 .more {
@@ -106,56 +100,10 @@
   opacity: 0;
 }
 
-/* ------------------------------------------------ day bars */
+/* ------------------------------------------------ day curve */
 
 .days {
-  padding: 14px 2px 0;
-}
-
-.bars {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  height: 24px;
-}
-
-.bars i {
-  position: relative;
-  width: 3px;
-  border-radius: 1px;
-  background: var(--bark);
-  transform-origin: 50% 100%;
-}
-
-.bars i[data-in="true"][data-tone="helped"] {
-  background: var(--forest);
-}
-
-.bars i[data-in="true"][data-tone="held"] {
-  background: var(--clay);
-}
-
-.bars i[data-empty="true"] {
-  opacity: 0.35;
-}
-
-.trip {
-  position: absolute;
-  top: -4px;
-  bottom: -2px;
-  margin-left: -3px;
-  border-radius: 4px;
-  background: var(--clay-soft);
-}
-
-.days[data-reveal] .bars i {
-  transition: transform 420ms var(--ease-out);
-  transition-delay: calc(var(--i) * 12ms);
-}
-
-.days[data-reveal="out"] .bars i {
-  transform: scaleY(0.15);
+  padding: 0;
 }
 
 .dayLabels {
@@ -175,15 +123,6 @@
   align-items: center;
   gap: 3px;
   white-space: nowrap;
-}
-
-.tripTag {
-  justify-content: center;
-  width: 20px;
-  height: 16px;
-  border-radius: 4px;
-  background: var(--clay-soft);
-  color: var(--clay-ink);
 }
 
 .stopTag {
