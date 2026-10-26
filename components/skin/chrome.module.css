@@ -26,6 +26,9 @@
   transform: translateX(-50%);
   color: #000;
   pointer-events: none;
+  /* Its own layer in a tab-change view transition, so the header's morph never
+     paints over the clock and island (globals.css holds it still). */
+  view-transition-name: skin-status;
 }
 
 .time {
@@ -98,4 +101,5 @@
   background: #000;
   transform: translateX(-50%);
   pointer-events: none;
+  view-transition-name: skin-home;
 }

@@ -244,6 +244,20 @@ img {
   animation: none;
 }
 
+/* The phone's own chrome (status bar, home indicator) is not part of the page:
+   it stays exactly where it is, drawn live, above everything that morphs. */
+::view-transition-group(skin-status),
+::view-transition-group(skin-home),
+::view-transition-new(skin-status),
+::view-transition-new(skin-home) {
+  animation: none;
+}
+
+::view-transition-old(skin-status),
+::view-transition-old(skin-home) {
+  display: none;
+}
+
 ::view-transition-old(skin-score),
 ::view-transition-new(skin-score),
 ::view-transition-old(skin-photo),
