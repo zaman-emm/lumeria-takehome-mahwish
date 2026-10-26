@@ -1,17 +1,46 @@
+/* Error and empty sit on that same backdrop, so loading, failing and
+   retrying never change the ground, only what's written on it. */
 .state {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 675px;
+  padding: 40px 32px;
+  color: var(--evergreen);
+  text-align: center;
+}
+
+/* Loading: the home page's own backdrop with nothing on it, so the splash
+   opens on the same gold the hero will have. */
+.home {
+  position: relative;
   width: 100%;
   max-width: var(--phone);
   min-height: 100dvh;
   margin: 0 auto;
-  padding: 40px 32px;
+  background: var(--canvas);
+}
+
+.home::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 675px;
+  border-radius: 0 0 28px 28px;
   background:
-    radial-gradient(160px 120px at 50% 0, rgba(243, 230, 200, 0.6), transparent),
+    radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
     var(--sunrise);
-  color: var(--evergreen);
-  text-align: center;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .logo {
