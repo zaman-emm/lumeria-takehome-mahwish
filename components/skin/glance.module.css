@@ -211,7 +211,7 @@
 .badges li[data-earned="true"] {
   border-color: transparent;
   background: var(--gold);
-  color: var(--evergreen);
+  color: var(--bark);
 }
 
 /* The weeks light up one after another, then the earned badge lands. */

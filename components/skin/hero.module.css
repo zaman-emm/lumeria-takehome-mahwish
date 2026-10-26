@@ -11,7 +11,7 @@
   background:
     radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
     var(--sunrise-fade);
-  color: var(--evergreen);
+  color: var(--bark);
   view-transition-name: skin-head;
   overflow: hidden;
 }
@@ -19,7 +19,7 @@
 .logo {
   width: 184px;
   height: 34px;
-  color: var(--evergreen);
+  color: var(--bark);
 }
 
 /* The greeting opens the part of the page that's about her, under the gold. */
@@ -39,7 +39,7 @@
   line-height: 36px;
   font-weight: 600;
   letter-spacing: -0.8px;
-  color: var(--evergreen);
+  color: var(--bark);
 }
 
 .hi h2 span {
@@ -190,7 +190,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--evergreen);
+  color: var(--bark);
   font-size: 40px;
   line-height: 44px;
   font-weight: 500;
@@ -201,7 +201,7 @@
 .change {
   font-size: 14px;
   font-weight: 500;
-  color: var(--evergreen);
+  color: var(--bark);
 }
 
 .scan {
@@ -279,7 +279,7 @@
   box-shadow: var(--lg-rim);
   -webkit-backdrop-filter: var(--lg-blur);
   backdrop-filter: var(--lg-blur);
-  color: var(--evergreen);
+  color: var(--bark);
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
@@ -451,7 +451,7 @@
   backdrop-filter: var(--lg-blur);
   box-shadow: inset 0 -1px 0.5px rgba(255, 255, 255, 0.45);
   border-radius: 0 0 20px 20px;
-  color: var(--evergreen);
+  color: var(--bark);
   view-transition-name: skin-head;
 }
 
@@ -529,7 +529,7 @@
   -webkit-backdrop-filter: var(--lg-btn-blur);
   backdrop-filter: var(--lg-btn-blur);
   box-shadow: var(--lg-btn-rim);
-  color: var(--evergreen);
+  color: var(--bark);
   flex: none;
   transition: transform 160ms var(--ease-out);
 }
@@ -563,7 +563,7 @@
   -webkit-backdrop-filter: var(--lg-btn-blur);
   backdrop-filter: var(--lg-btn-blur);
   box-shadow: var(--lg-btn-rim);
-  color: var(--evergreen);
+  color: var(--bark);
   flex: none;
   transition: transform 160ms var(--ease-out);
 }

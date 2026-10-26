@@ -24,7 +24,7 @@
 }
 
 .stage[data-ink="dark"] {
-  --ink: var(--evergreen);
+  --ink: var(--bark);
   --ink-soft: rgba(20, 36, 26, 0.8);
   --accent: var(--bronze-deep);
   --glass: rgba(244, 239, 230, 0.4);
@@ -149,7 +149,7 @@
 }
 
 .stage[data-ink="dark"] .slide[data-kind="highs"] .title b {
-  color: var(--evergreen);
+  color: var(--bark);
 }
 
 .slide[data-kind="helped"] .title b {

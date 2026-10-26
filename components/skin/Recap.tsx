@@ -35,8 +35,9 @@ const THEMES: Record<Slide["kind"], Theme> = {
     glows: [glow(330, 110, 210, "rgba(255,250,240,.9)"), glow(20, 640, 220, "rgba(192,145,63,.2)")].join(","),
     ink: "dark",
   },
+  // Dark slides sit on evergreen, the guide's dark surface; bark is for text.
   scanTime: {
-    bg: "#2e2620",
+    bg: "#14241a",
     glows: [glow(210, 190, 170, "rgba(192,145,63,.35)"), glow(50, 730, 190, "rgba(184,83,58,.3)")].join(","),
     ink: "light",
   },
