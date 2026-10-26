@@ -6,6 +6,7 @@ import { Report } from "@/components/skin/Report";
 import { StateScreen } from "@/components/skin/StateScreen";
 import { useReport } from "@/lib/useReport";
 import { DeviceChrome } from "@/components/skin/DeviceChrome";
+import { PhoneFrame } from "@/components/skin/PhoneFrame";
 
 // /report/:id. Fetches the report like a real client would (forwarding
 // ?fail=1), then shows either a friendly state screen or the report itself.
@@ -13,10 +14,12 @@ import { DeviceChrome } from "@/components/skin/DeviceChrome";
 export default function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   return (
-    <Suspense fallback={<StateScreen state={{ status: "loading" }} />}>
-      <DeviceChrome />
-      <ReportRoute id={id} />
-    </Suspense>
+    <PhoneFrame>
+      <Suspense fallback={<StateScreen state={{ status: "loading" }} />}>
+        <DeviceChrome />
+        <ReportRoute id={id} />
+      </Suspense>
+    </PhoneFrame>
   );
 }
 
