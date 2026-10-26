@@ -411,6 +411,44 @@
   transform: rotateY(180deg);
 }
 
+/* The card's look, as tokens, so it can be tried in other finishes
+   (data-tone on .flip): charcoal, white, bronze or gold. */
+.flip {
+  --card-bg: radial-gradient(80% 70% at 50% 40%, rgba(215, 180, 111, 0.18), transparent 70%), #2a2522;
+  --card-ink: #e6cf9f;
+  --card-soft: rgba(244, 239, 230, 0.75);
+  --card-edge: rgba(244, 239, 230, 0.12);
+  --streak: #e6cf9f;
+  --streak-hot: #fff2cf;
+}
+
+.flip[data-tone="white"] {
+  --card-bg: radial-gradient(80% 70% at 50% 40%, rgba(215, 180, 111, 0.12), transparent 70%), #fffdf8;
+  --card-ink: var(--gold-deep);
+  --card-soft: var(--bark-2);
+  --card-edge: rgba(173, 130, 53, 0.18);
+  --streak: #d7b46f;
+  --streak-hot: #ad8235;
+}
+
+.flip[data-tone="bronze"] {
+  --card-bg: radial-gradient(80% 70% at 40% 25%, rgba(255, 246, 228, 0.25), transparent 70%), linear-gradient(160deg, #c99a4c, #8f6524);
+  --card-ink: #fff6e4;
+  --card-soft: rgba(255, 250, 240, 0.85);
+  --card-edge: rgba(255, 246, 228, 0.25);
+  --streak: #f3dfb2;
+  --streak-hot: #fffaf0;
+}
+
+.flip[data-tone="gold"] {
+  --card-bg: radial-gradient(80% 70% at 40% 25%, rgba(255, 250, 240, 0.45), transparent 70%), linear-gradient(160deg, #ead6a8, #d7b46f 55%, #c0913f);
+  --card-ink: #4a3510;
+  --card-soft: rgba(74, 53, 16, 0.75);
+  --card-edge: rgba(255, 250, 240, 0.4);
+  --streak: #fff2cf;
+  --streak-hot: #ffffff;
+}
+
 .cover,
 .face {
   position: absolute;
@@ -419,12 +457,53 @@
   border-radius: 30px;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  background:
-    radial-gradient(80% 70% at 50% 40%, rgba(215, 180, 111, 0.18), transparent 70%),
-    #2a2522;
+  background: var(--card-bg);
   box-shadow:
-    inset 0 0 0 1px rgba(244, 239, 230, 0.12),
-    0 18px 40px -20px rgba(0, 0, 0, 0.6);
+    inset 0 0 0 1px var(--card-edge),
+    0 18px 40px -20px rgba(46, 38, 32, 0.55);
+}
+
+/* Gold streaks that stay on the rim, as on Lapse's card: a long one down the
+   left side and one round the bottom-right corner, bright at their middles. */
+.cover::before,
+.face::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 95deg,
+    color-mix(in srgb, var(--streak) 60%, transparent) 115deg,
+    var(--streak-hot) 145deg,
+    color-mix(in srgb, var(--streak) 70%, transparent) 175deg,
+    transparent 205deg 222deg,
+    color-mix(in srgb, var(--streak) 70%, transparent) 240deg,
+    var(--streak-hot) 268deg,
+    var(--streak) 290deg,
+    transparent 335deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* The streaks glow a little into the card, like light catching an edge. */
+.cover::after,
+.face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 3px 0 6px -3px var(--streak-hot),
+    inset -3px -3px 8px -4px var(--streak-hot);
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 .face {
@@ -447,26 +526,16 @@
   transform: rotateY(180deg);
 }
 
-.coverPhoto {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.55;
-}
-
-/* The month's name in a serif, low on the cover, over a darkening. */
+/* The month's name in a serif, low on the cover. */
 .coverName {
   position: absolute;
   inset: auto 0 0;
-  padding: 40px 14px 14px;
-  background: linear-gradient(transparent, rgba(42, 37, 34, 0.88));
+  padding: 0 16px 16px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1;
   text-align: left;
-  color: var(--bone);
+  color: var(--card-ink);
 }
 
 /* A short arc of gold that runs once round the rim, from the left edge. */
@@ -486,7 +555,7 @@
     transparent 0deg,
     transparent 250deg,
     rgba(230, 207, 159, 0.5) 300deg,
-    #fff6e4 350deg,
+    var(--streak-hot) 350deg,
     transparent 360deg
   );
   -webkit-mask:
@@ -518,7 +587,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #e6cf9f;
+  color: var(--card-ink);
 }
 
 .streakNum b {
@@ -532,7 +601,7 @@
 .streakWord {
   font-size: 15px;
   font-weight: 500;
-  color: rgba(244, 239, 230, 0.75);
+  color: var(--card-soft);
 }
 
 .streakHead {

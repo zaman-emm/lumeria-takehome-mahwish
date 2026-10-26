@@ -344,7 +344,6 @@ function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
             </span>
           </span>
           <span className={s.cover} aria-hidden>
-            <Photo scan={slide.coverScan} alt="" className={s.coverPhoto} />
             <span className={s.coverName}>{slide.cover}</span>
           </span>
         </button>
