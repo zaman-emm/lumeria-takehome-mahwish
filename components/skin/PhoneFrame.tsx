@@ -3,14 +3,14 @@
 import { useEffect, useState, type ReactNode } from "react";
 import f from "./frame.module.css";
 
-// On a laptop the report sits in a Pixel-sized phone in the middle of the
+// On a laptop the report sits in an iPhone-sized phone in the middle of the
 // screen. The phone is an iframe of this same page, so inside it everything
 // (fixed sheets, the story, 100dvh, the status bar) sizes to a real phone's
-// 412 × 915 screen. On a phone, or inside the frame, it renders as is.
+// 393 × 852 screen. On a phone, or inside the frame, it renders as is.
 
-const W = 412;
-const H = 915;
-const BEZEL = 14;
+const W = 393;
+const H = 852;
+const BEZEL = 12;
 
 const desktop = () => window.self === window.top && matchMedia("(hover: hover) and (pointer: fine)").matches;
 

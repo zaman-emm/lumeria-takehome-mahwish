@@ -306,6 +306,6 @@ html[data-vt="back"]::view-transition-new(skin-panel) {
 
 @media (hover: hover) and (pointer: fine) {
   :root {
-    --chrome-top: 50px;
+    --chrome-top: 59px;
   }
 }
