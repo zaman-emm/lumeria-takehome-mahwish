@@ -14,51 +14,17 @@
 .head {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 12px;
-  width: 100%;
-  text-align: left;
-  transition: transform 160ms var(--ease-out);
-}
-
-.head:active {
-  transform: scale(0.98);
-}
-
-.icon {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--sand);
-  color: var(--bark);
-  flex: none;
-}
-
-.icon[data-tone="helped"] {
-  background: var(--forest-soft);
-  color: var(--forest);
-}
-
-.icon[data-tone="held"] {
-  background: var(--clay-soft);
-  color: var(--clay-ink);
-}
-
-.headText {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
 }
 
 .name {
-  padding-right: 8px;
+  margin: 0;
   font-size: 15px;
   line-height: 18px;
   font-weight: 600;
   color: var(--bark);
+  text-wrap: balance;
 }
 
 .metric {
@@ -67,37 +33,6 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--bark);
-}
-
-.chevron {
-  margin-top: 2px;
-  color: var(--bark-2);
-  transform: rotate(180deg);
-  transition: transform 240ms var(--ease-out);
-}
-
-.card[data-open="false"] .chevron {
-  transform: none;
-}
-
-.more {
-  display: grid;
-  grid-template-rows: 1fr;
-  transition: grid-template-rows 280ms var(--ease-out);
-}
-
-.card[data-open="false"] .more {
-  grid-template-rows: 0fr;
-}
-
-.moreInner {
-  min-height: 0;
-  overflow: hidden;
-  transition: opacity 200ms var(--ease-out);
-}
-
-.card[data-open="false"] .moreInner {
-  opacity: 0;
 }
 
 /* ------------------------------------------------ day curve */
@@ -123,6 +58,10 @@
   align-items: center;
   gap: 3px;
   white-space: nowrap;
+}
+
+.dayLabels[data-empty="true"] {
+  height: 0;
 }
 
 .stopTag {
@@ -195,9 +134,7 @@
 }
 
 .swaps {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--sand);
+  margin-top: 18px;
 }
 
 .swaps h3 {
@@ -291,8 +228,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .more,
-  .days[data-reveal] .bars i {
+  .trialBar[data-reveal] i {
     transition-duration: 0ms;
   }
 }

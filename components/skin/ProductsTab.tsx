@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { daysBetween, fmtDay, fmtRange, metricMeta, type Derived } from "@/lib/insights";
 import { BUDGET_TIER, dailySeries, factorFor, swapsFor, trial } from "@/lib/routine";
 import type { Product } from "@/lib/types";
@@ -11,10 +11,11 @@ import { Icon } from "./Icon";
 import { Chip, FromTo, ScheduleChip } from "./ui";
 import p from "./products.module.css";
 
-// The routine, one card per product: the score it lined up with (was › now),
-// that score as a curve across the period with the product's days on a band,
-// then what it is, when it's used, how a trial is going, and gentler swaps
-// when one was stopped for irritation.
+// The routine, one card per product, answering one question: is it working?
+// The score it lined up with (was › now) and that score as a curve with the
+// product's days on a band, then only what the name doesn't already say:
+// when it's used, other key ingredients, a trial's progress, and gentler
+// swaps when one was stopped for irritation.
 
 export function ProductsTab() {
   const { d } = useReportApi();
@@ -41,82 +42,71 @@ export function ProductsTab() {
 }
 
 function ProductCard({ d, product }: { d: Derived; product: Product }) {
-  const [open, setOpen] = useState(true);
   const [ref, reveal] = useReveal<HTMLElement>(`product-${product.id}`);
   const f = factorFor(d, product);
-  const tone = f ? f.direction : "neutral";
   const tr = trial(d, product);
   const swaps = swapsFor(product);
   const id = `product-${product.id}`;
+  // An ingredient the name already says ("Retinol" in "Retinol 0.3% Night Serum") isn't repeated.
+  const extra = product.keyIngredients.filter((k) => !product.name.toLowerCase().includes(k.toLowerCase()));
 
   return (
-    <article ref={ref} className={p.card} data-open={open} aria-labelledby={`${id}-name`}>
-      <button className={p.head} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls={`${id}-more`}>
-        <span className={p.icon} data-tone={tone}>
-          <Icon name="bottle" size={18} />
-        </span>
-        <span className={p.headText}>
-          <span className={p.name} id={`${id}-name`}>
-            {product.name}
-          </span>
-        </span>
+    <article ref={ref} className={p.card} aria-labelledby={`${id}-name`}>
+      <div className={p.head}>
+        <h2 className={p.name} id={`${id}-name`}>
+          {product.name}
+        </h2>
         {f && (
           <span className={p.metric} aria-label={`${metricMeta(f.change.key).label} ${f.change.from} to ${f.change.to}`}>
             <FromTo from={f.change.from} to={f.change.to} />
           </span>
         )}
-        <Icon name="chevronD" size={14} stroke={1.6} className={p.chevron} />
-      </button>
+      </div>
       <ProductCurve d={d} product={product} reveal={reveal} />
 
-      <div className={p.more} id={`${id}-more`} inert={!open}>
-        <div className={p.moreInner}>
-          <div className={p.chips}>
-            <Chip>{product.category}</Chip>
-            {product.keyIngredients.map((k) => (
-              <Chip key={k} kind="line" icon={<Icon name="drop" size={11} />}>
-                {k}
-              </Chip>
-            ))}
-            <ScheduleChip product={product} />
-          </div>
-          {tr && (
-            <div className={p.trial}>
-              <span className={p.trialHead}>
-                <span>2-week trial</span>
-                <b>
-                  {tr.day} of {tr.of}
-                </b>
-              </span>
-              <span className={p.trialBar} data-reveal={reveal} role="progressbar" aria-valuemin={0} aria-valuemax={tr.of} aria-valuenow={tr.day} aria-label="Trial progress">
-                {Array.from({ length: tr.of }, (_, i) => (
-                  <i key={i} data-on={i < tr.day} style={{ "--i": i } as CSSProperties} />
-                ))}
-              </span>
-            </div>
-          )}
-          {product.stoppedReason && (
-            <p className={p.stopped}>
-              <Icon name="stop" size={13} />
-              {product.stoppedReason}
-            </p>
-          )}
-          {swaps.length > 0 && (
-            <div className={p.swaps}>
-              <h3>Gentler swaps</h3>
-              <ul>
-                {swaps.map((s) => (
-                  <li key={s.tier} data-match={s.tier === BUDGET_TIER}>
-                    <b>{s.tier}</b>
-                    <span>{s.name}</span>
-                    {s.tier === BUDGET_TIER && <span className="sr-only">, in your price range</span>}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+      <div className={p.chips}>
+        <ScheduleChip product={product} />
+        {extra.map((k) => (
+          <Chip key={k} kind="line" icon={<Icon name="drop" size={11} />}>
+            {k}
+          </Chip>
+        ))}
       </div>
+      {tr && (
+        <div className={p.trial}>
+          <span className={p.trialHead}>
+            Trial
+            <b>
+              Day {tr.day} of {tr.of}
+            </b>
+          </span>
+          <span className={p.trialBar} data-reveal={reveal} role="progressbar" aria-valuemin={0} aria-valuemax={tr.of} aria-valuenow={tr.day} aria-label="Trial progress">
+            {Array.from({ length: tr.of }, (_, i) => (
+              <i key={i} data-on={i < tr.day} style={{ "--i": i } as CSSProperties} />
+            ))}
+          </span>
+        </div>
+      )}
+      {product.stoppedReason && (
+        <p className={p.stopped}>
+          <Icon name="stop" size={13} />
+          {product.stoppedReason}
+        </p>
+      )}
+      {swaps.length > 0 && (
+        <div className={p.swaps}>
+          <h3>Gentler swaps</h3>
+          <ul>
+            {swaps.map((s) => (
+              <li key={s.tier} data-match={s.tier === BUDGET_TIER}>
+                <b>{s.tier}</b>
+                <span>{s.name}</span>
+                {s.tier === BUDGET_TIER && <span className="sr-only">, in your price range</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </article>
   );
 }
@@ -145,7 +135,7 @@ function ProductCurve({ d, product, reveal }: { d: Derived; product: Product; re
   // Dates sit under their day, nudged right so they never overlap. Widths are
   // estimated from the text (12px Montserrat runs about 6.6px a character).
   const wanted = [
-    { id: "start", stop: false, text: fmtDay(start), at: idx(start) / Math.max(1, n - 1), width: fmtDay(start).length * 6.6, centre: start !== d.start },
+    ...(start !== d.start ? [{ id: "start", stop: false, text: fmtDay(start), at: idx(start) / Math.max(1, n - 1), width: fmtDay(start).length * 6.6, centre: true }] : []),
     ...(span && !span.ongoing ? [{ id: "stop", stop: true, text: fmtDay(span.end), at: idx(span.end) / Math.max(1, n - 1), width: 14 + fmtDay(span.end).length * 6.6, centre: true }] : []),
   ];
   const placed: { id: string; stop: boolean; text: string; x: number }[] = [];
@@ -175,7 +165,7 @@ function ProductCurve({ d, product, reveal }: { d: Derived; product: Product; re
           span ? `, using it ${span.ongoing ? `since ${fmtDay(span.start)}` : `${fmtDay(span.start)} to ${fmtDay(span.end)}`}` : ""
         }${trips.length ? `, with your ${trips.map((t) => t.short).join(" and ")} trip marked` : ""}`}
       />
-      <div className={p.dayLabels} ref={labels} aria-hidden>
+      <div className={p.dayLabels} ref={labels} data-empty={!placed.length} aria-hidden>
         {placed.map((l) => (
           <span key={l.id} className={l.stop ? p.stopTag : undefined} style={{ transform: `translateX(${l.x}px)` }}>
             {l.stop && <Icon name="stop" size={11} />}
