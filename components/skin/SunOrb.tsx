@@ -45,8 +45,11 @@ void main(){
   gl_FragColor=vec4(color,alpha);
 }`;
 
-export function SunOrb({ paused = false }: { paused?: boolean }) {
+/** `speed` scales the silk's flow, so Lumi can look busy while it thinks. */
+export function SunOrb({ paused = false, speed = 1 }: { paused?: boolean; speed?: number }) {
   const canvas = useRef<HTMLCanvasElement>(null);
+  const pace = useRef(speed);
+  pace.current = speed;
   useEffect(() => {
     const el = canvas.current;
     if (!el) return;
@@ -76,7 +79,7 @@ export function SunOrb({ paused = false }: { paused?: boolean }) {
     const reduced=window.matchMedia("(prefers-reduced-motion: reduce)");
     let raf=0, elapsed=0, last=performance.now();
     const draw=(now:number)=>{
-      elapsed+=Math.min((now-last)/1000,.05);last=now;
+      elapsed+=Math.min((now-last)/1000,.05)*pace.current;last=now;
       gl.uniform1f(clock,elapsed);gl.drawArrays(gl.TRIANGLES,0,6);
       if(!paused&&!reduced.matches&&!document.hidden)raf=requestAnimationFrame(draw);
     };

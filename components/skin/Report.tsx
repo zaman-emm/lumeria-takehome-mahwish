@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Drawer } from "@base-ui/react/drawer";
 import { AnimatePresence } from "motion/react";
-import { fmtDay, lumiQuestions, metricMeta, scanTz, type Derived, type ScoreKey } from "@/lib/insights";
+import { fmtDay, metricMeta, scanTz, type Derived, type ScoreKey } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { buildRecap } from "@/lib/recap";
 import { weekStreak } from "@/lib/weeks";
@@ -52,8 +52,6 @@ export function Report({ d }: { d: Derived }) {
   const [origin, setOrigin] = useState(0);
   const streak = useMemo(() => weekStreak(d), [d]);
   const slides = useMemo(() => buildRecap(d).length, [d]);
-  const questions = useMemo(() => lumiQuestions(d), [d]);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [recapFrom, setRecapFrom] = useState<{ x: number; y: number } | null>(null);
 
   // The photo the headers show: the newest real three-light photo of the
@@ -75,13 +73,8 @@ export function Report({ d }: { d: Derived }) {
       openScan: (scan: Scan) => open({ kind: "scan", scan }),
       openMetric: (key: ScoreKey, area?: string) => open({ kind: "metric", key, area: area ?? d.area }),
       openLumi: () => open({ kind: "lumi", tab }),
-      lumi: {
-        questions,
-        answers,
-        answer: (id: string, a: string) => setAnswers((s) => ({ ...s, [id]: a })),
-      },
     }),
-    [d, open, questions, answers, tab],
+    [d, open, tab],
   );
 
   const changeTab = (id: TabId) => {
@@ -178,7 +171,7 @@ export function Report({ d }: { d: Derived }) {
 
           <LumiButton
             hidden={Boolean(sheet) || recap}
-            count={questions.filter((q) => !answers[q.id]).length}
+            count={d.factors.length}
             month={d.isMonthly}
             onOpen={api.openLumi}
           />

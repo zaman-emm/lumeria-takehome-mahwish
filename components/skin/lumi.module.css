@@ -93,83 +93,180 @@
   color: var(--bark-2);
 }
 
-/* ------------------------------------------------ conversation */
+/* ------------------------------------------------ sheet */
 
 /* Tall from the start, so the sheet doesn't grow under your thumb as the
-   conversation does. */
-.chat {
+   conversation does. The composer stays pinned to the bottom. */
+.lumi {
   display: flex;
   flex-direction: column;
-  min-height: calc(85dvh - 64px);
+  min-height: calc(88dvh - 64px);
 }
 
-.chatHead {
+/* The start screen centres the orb and the question; once you ask, the same
+   orb glides up into a compact header beside Lumi's name. */
+.head {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding-right: 48px;
+  gap: 22px;
+  padding: 20px 8px 0;
+  text-align: center;
 }
 
-.chatHead h2 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 300;
+/* In conversation the header stays put while the thread scrolls under it. */
+.lumi[data-talking="true"] .head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  flex-direction: row;
+  gap: 12px;
+  margin: -36px -20px 0;
+  padding: 14px 68px 14px 20px;
+  background: linear-gradient(to bottom, var(--white) 78%, rgba(255, 255, 255, 0));
+  text-align: left;
 }
 
-.chatOrb {
+.orb {
   position: relative;
   display: block;
-  width: 64px;
-  height: 64px;
-  filter: drop-shadow(0 6px 6px rgba(192, 145, 63, 0.2));
+  flex: none;
+  width: 104px;
+  height: 104px;
+  filter: drop-shadow(0 10px 10px rgba(192, 145, 63, 0.22));
 }
 
-/* While Lumi reads or thinks, its glow swells a little. */
-.chatOrb::after {
+.lumi[data-talking="true"] .orb {
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 4px 5px rgba(192, 145, 63, 0.22));
+}
+
+/* While Lumi thinks, its glow swells a little. */
+.orb::after {
   content: "";
   position: absolute;
-  inset: -6px;
+  inset: -14%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(215, 180, 111, 0.35), transparent 70%);
+  background: radial-gradient(circle, rgba(215, 180, 111, 0.45), transparent 68%);
   opacity: 0;
   transform: scale(0.9);
   transition:
     opacity 400ms var(--ease-out),
     transform 400ms var(--ease-out);
   pointer-events: none;
+  z-index: -1;
 }
 
-.chatOrb[data-busy="true"]::after {
+.orb[data-busy="true"]::after {
   opacity: 1;
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
+
+.hello {
+  max-width: 320px;
+  margin: 0;
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 300;
+  letter-spacing: -0.3px;
+}
+
+.name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+/* ------------------------------------------------ start questions */
+
+.starters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.starters li {
+  display: flex;
+  animation: rise 420ms var(--ease-out) both;
+  animation-delay: calc(140ms + var(--i) * 60ms);
+}
+
+.starters button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  min-height: 118px;
+  padding: 16px 16px 14px;
+  border-radius: var(--radius-m);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--sand);
+  color: var(--bark);
+  font-size: 16px;
+  line-height: 21px;
+  font-weight: 500;
+  text-align: left;
+  transition:
+    transform 160ms var(--ease-out),
+    box-shadow 200ms ease;
+}
+
+.starters button svg {
+  align-self: flex-end;
+  color: var(--bronze-deep);
+}
+
+.starters button:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  .starters button:hover {
+    box-shadow: inset 0 0 0 1px var(--sand-deep);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* ------------------------------------------------ conversation */
 
 .thread {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 22px;
+  gap: 14px;
+  margin-top: 26px;
 }
 
 .line {
-  max-width: 88%;
+  max-width: 90%;
 }
 
 .line p {
   margin: 0;
-  font-size: 17px;
-  line-height: 24px;
 }
 
 .line[data-from="lumi"] p {
-  font-weight: 400;
+  font-size: 17px;
+  line-height: 25px;
   color: var(--bark);
 }
 
 .line[data-from="you"] {
   align-self: flex-end;
-  padding: 10px 14px;
-  border-radius: 18px 18px 6px 18px;
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 20px 20px 6px 20px;
   background: var(--forest);
   color: var(--bone);
 }
@@ -182,9 +279,9 @@
 
 .ai {
   display: block;
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: 12px;
-  color: var(--bark-2);
+  color: var(--bark-3);
 }
 
 /* Words arrive a few at a time, softly, like a reply being written. */
@@ -201,24 +298,20 @@
 }
 
 .status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin: 0;
   font-size: 15px;
   font-weight: 500;
-  color: var(--bark-2);
 }
 
 /* A light sweep across the words while Lumi works. */
 .shimmer {
   background: linear-gradient(
       100deg,
-      var(--bark-2) 0%,
-      var(--bark-2) 40%,
-      var(--bronze-deep) 50%,
-      var(--bark-2) 60%,
-      var(--bark-2) 100%
+      var(--bark-3) 0%,
+      var(--bark-3) 40%,
+      var(--bronze) 50%,
+      var(--bark-3) 60%,
+      var(--bark-3) 100%
     )
     0 0 / 250% 100%;
   -webkit-background-clip: text;
@@ -238,72 +331,103 @@
 
 .chips {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-top: 4px;
 }
 
 .chips button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 16px;
-  border-radius: 22px;
+  min-height: 40px;
+  padding: 0 15px;
+  border-radius: 20px;
   background: var(--paper);
   box-shadow: inset 0 0 0 1px var(--sand);
   color: var(--bark);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  text-align: left;
-  animation: chipIn 300ms var(--ease-out) both;
-  animation-delay: calc(120ms + var(--i) * 60ms);
+  animation: rise 300ms var(--ease-out) both;
+  animation-delay: calc(240ms + var(--i) * 60ms);
   transition: transform 160ms var(--ease-out);
-}
-
-.chips button svg {
-  color: var(--bronze-deep);
 }
 
 .chips button:active {
   transform: scale(0.97);
 }
 
-@keyframes chipIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+/* Room for the newest line to clear the pinned composer. */
+.end {
+  height: 1px;
+  scroll-margin-bottom: 120px;
 }
 
-.asks {
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid var(--sand);
-}
+/* ------------------------------------------------ composer */
 
-.asks h3 {
+.composer {
+  position: sticky;
+  bottom: calc(var(--bleed, 0px) + env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 12px;
-  font-size: 15px;
-  font-weight: 600;
+  margin-top: auto;
+  padding: 24px 0 4px;
+  background: linear-gradient(to bottom, transparent, var(--white) 24px);
 }
 
-.chat > :last-child {
-  margin-top: auto;
-  padding-top: 24px;
+.composer input {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 26px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--sand-deep);
+  color: var(--bark);
+  font: inherit;
+  font-size: 16px;
+  outline: 0;
+  transition: box-shadow 200ms ease;
+}
+
+.composer input::placeholder {
+  color: var(--bark-3);
+}
+
+.composer input:focus-visible {
+  box-shadow: inset 0 0 0 1.5px var(--bronze);
+}
+
+.composer button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--bone);
+  transition:
+    transform 160ms var(--ease-out),
+    opacity 200ms ease;
+}
+
+.composer button:disabled {
+  opacity: 0.35;
+}
+
+.composer button:not(:disabled):active {
+  transform: scale(0.94);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .written span[aria-hidden],
-  .chips button {
+  .chips button,
+  .starters li {
     animation-name: fadeOnly;
   }
   .shimmer {
     animation: none;
+    color: var(--bark-3);
+    background: none;
   }
 }
 

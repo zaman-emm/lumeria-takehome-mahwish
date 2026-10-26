@@ -1,8 +1,9 @@
 // Lumi's side of a conversation, written ahead from the report's own data.
-// There's no live model: each tab opens on a greeting about what's on it and
-// three questions, and each answer offers two more. Never diagnoses.
+// There's no live model: each tab offers four questions that fit it, each
+// answer offers two more, and anything typed is matched to the closest one.
+// Never diagnoses.
 
-import { band, fmtDay, metricMeta, rhythm, scanTz, signed, trendSentence, type Derived } from "./insights";
+import { band, fmtDay, metricMeta, rhythm, scanTz, signed, type Derived } from "./insights";
 import type { MetricKey, Scan } from "./types";
 
 export type LumiTab = "glance" | "products" | "trends" | "calendar" | "photos";
@@ -18,23 +19,40 @@ export interface LumiTopic {
 }
 
 export interface LumiScript {
-  greeting: string;
-  /** Up to three topic ids to start with. */
+  /** Up to four topic ids to start with. */
   start: string[];
   topics: Record<string, LumiTopic>;
+  /** Picks the topic closest to what someone typed, or a gentle "can't". */
+  reply: (text: string) => LumiTopic;
 }
 
 const OPENERS: Record<LumiTab, string[]> = {
-  glance: ["score", "biggest", "helped"],
-  products: ["helped", "held", "trip"],
-  trends: ["dip", "best", "helped"],
-  calendar: ["rhythm", "best", "next"],
-  photos: ["photo", "biggest", "next"],
+  glance: ["score", "biggest", "helped", "next"],
+  products: ["helped", "held", "trip", "biggest"],
+  trends: ["biggest", "dip", "best", "helped"],
+  calendar: ["rhythm", "best", "next", "dip"],
+  photos: ["photo", "biggest", "next", "best"],
 };
 /** Fills a tab's chips when one of its own topics has no data behind it. */
 const FALLBACK = ["score", "biggest", "rhythm", "next", "photo"];
 
 const nameOf = (title: string) => title.replace(/\s[\d.]+%.*$/, "");
+
+/** Words that point at each topic when someone types instead of tapping. */
+const KEYS: Record<string, RegExp> = {
+  score: /score|mean|number|overall|good|\d{2}/,
+  biggest: /chang|most|moved|improv|differen|progress/,
+  helped: /help|work|best product|routine|using/,
+  held: /hold|worse|sting|irritat|break ?out|bad/,
+  trip: /trip|travel|away|flight|holiday|vacation|weather|humid/,
+  dip: /dip|drop|fell|low|down/,
+  best: /best|highest|peak|top/,
+  rhythm: /often|streak|regular|consisten|habit|how am i doing/,
+  next: /next|when|again|schedule/,
+  photo: /photo|picture|camera|light|selfie|compar/,
+};
+/** Questions only a person should answer. */
+const MEDICAL = /cancer|melanoma|mole|diagnos|disease|infect|prescri|medic|doctor|derm|rash|allerg|pain|bleed/;
 
 export function lumiScript(d: Derived, tab: LumiTab): LumiScript {
   const at = (s: Scan) => fmtDay(s.takenAt, scanTz(s) ?? d.tz);
@@ -45,7 +63,6 @@ export function lumiScript(d: Derived, tab: LumiTab): LumiScript {
   const held = d.factors.find((f) => f.direction === "held" && f.kind === "product");
   const trip = d.factors.find((f) => f.kind === "travel");
   const r = rhythm(d);
-  const products = d.report.products?.length ?? 0;
   const topics: Record<string, LumiTopic> = {};
   const add = (t: LumiTopic) => (topics[t.id] = t);
 
@@ -141,24 +158,33 @@ export function lumiScript(d: Derived, tab: LumiTab): LumiScript {
     answer: `Same spot, same time, same light. Your ${d.area.toLowerCase()} is the spot you scan most, so stick with it, and face a window rather than a lamp.`,
     next: ["next", "rhythm"],
   });
-
-  const greetings: Record<LumiTab, string> = {
-    glance: `Hi ${d.firstName}. ${trendSentence(d)}`,
-    products: helped
-      ? `${nameOf(helped.title)} lines up with your biggest gain${d.isMonthly ? " this month" : ""}.`
-      : products
-        ? `I’m looking at the ${products} ${products === 1 ? "product" : "products"} in your routine.`
-        : "No products are logged yet, so I’m reading your scores on their own.",
-    trends: top ? `${metricMeta(top.key).label} moved the most: ${top.from} to ${top.to}.` : trendSentence(d),
-    calendar: `${r.scans} ${r.scans === 1 ? "scan" : "scans"} over ${r.scanDays} ${r.scanDays === 1 ? "day" : "days"}. ${r.title}.`,
-    photos: d.realPhotos.length
-      ? `${d.realPhotos.length} of your scans have photos in all three lights.`
-      : d.scans.length === 1
-        ? `Your first photo, of your ${d.area.toLowerCase()}.`
-        : `${d.scans.length} photos so far, most of them your ${d.area.toLowerCase()}.`,
-  };
-
-  const start = [...OPENERS[tab], ...FALLBACK].filter((id, i, all) => topics[id] && all.indexOf(id) === i).slice(0, 3);
+  const start = [...OPENERS[tab], ...FALLBACK].filter((id, i, all) => topics[id] && all.indexOf(id) === i).slice(0, 4);
   Object.values(topics).forEach((t) => (t.next = t.next.filter((id) => topics[id] && id !== t.id)));
-  return { greeting: greetings[tab], start, topics };
+
+  // Product and trip names count as keywords too.
+  const named: [string, string | undefined][] = [
+    ["helped", helped && nameOf(helped.title)],
+    ["held", held && nameOf(held.title)],
+    ["trip", trip?.title.replace(/ trip$/i, "")],
+  ];
+  const reply = (text: string): LumiTopic => {
+    const q = text.toLowerCase();
+    if (MEDICAL.test(q))
+      return {
+        id: "doctor",
+        ask: text,
+        answer: "That’s one for a dermatologist. I can read how your skin looks in your scans, not what’s going on underneath.",
+        next: start.slice(0, 2),
+      };
+    const byName = named.find(([id, name]) => topics[id] && name && q.includes(name.toLowerCase().split(" ")[0]));
+    const id = byName?.[0] ?? Object.keys(KEYS).find((k) => topics[k] && KEYS[k].test(q));
+    if (id) return { ...topics[id], ask: text };
+    return {
+      id: "unknown",
+      ask: text,
+      answer: "I can only speak to what your scans show, so I’m not sure about that one. These I can answer:",
+      next: start.slice(0, 2),
+    };
+  };
+  return { start, topics, reply };
 }

@@ -1,73 +1,57 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { metricMeta } from "@/lib/insights";
-import { lumiScript, type LumiTab } from "@/lib/lumi";
+import { lumiScript, type LumiTab, type LumiTopic } from "@/lib/lumi";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { SunOrb } from "./SunOrb";
 import l from "./lumi.module.css";
-import m from "./sheets.module.css";
 
-// Lumi as a short conversation about the tab you opened it from. The first
-// time, Lumi visibly reads your scans before it says anything. It greets
-// you with what's on that tab and offers three questions; tap one and the orb
-// thinks, then the answer writes itself in with two more to follow. Below,
-// Lumi's own questions for you. Everything is written ahead from the data:
-// no live model, and it never diagnoses.
+// Lumi opens on a quiet start screen: the orb, one line asking what you'd like
+// to know, and four questions that fit the tab you came from. Tap one (or type
+// your own) and the orb moves up into the header, thinks, and the answer
+// writes itself in with two more to follow. Everything is written ahead from
+// the report's data: no live model, and it never diagnoses.
 
-const READ_MS = 1300;
 /** Thinking time grows a little with the answer, so long ones feel considered. */
 const thinkMs = (text: string) => Math.min(1500, 700 + text.length * 4);
-let read = false;
+const EASE = [0.23, 1, 0.32, 1] as const;
 
-type Line = { id: string; from: "lumi" | "you"; text: string; ai?: boolean };
+type Line = { key: string; from: "lumi" | "you"; text: string };
 
 export function LumiSheet({ tab }: { tab: LumiTab }) {
-  const { d, lumi } = useReportApi();
-  const { questions: qs, answers } = lumi;
+  const { d } = useReportApi();
   const script = useMemo(() => lumiScript(d, tab), [d, tab]);
   const reduce = useReducedMotion();
 
-  const [reading, setReading] = useState(!read);
-  const [lines, setLines] = useState<Line[]>(() => (read ? [{ id: "hi", from: "lumi", text: script.greeting }] : []));
+  const [lines, setLines] = useState<Line[]>([]);
   const [thinking, setThinking] = useState(false);
   const [asked, setAsked] = useState<string[]>([]);
-  const [offer, setOffer] = useState(script.start);
+  const [offer, setOffer] = useState<string[]>([]);
+  const [draft, setDraft] = useState("");
   const timer = useRef(0);
   const end = useRef<HTMLDivElement>(null);
+  const talking = lines.length > 0;
 
-  useEffect(() => {
-    if (!reading) return;
-    timer.current = window.setTimeout(() => {
-      read = true;
-      setReading(false);
-      setLines([{ id: "hi", from: "lumi", text: script.greeting }]);
-    }, reduce ? 0 : READ_MS);
-    return () => window.clearTimeout(timer.current);
-    // Once per opening.
-  }, []);
   useEffect(() => () => window.clearTimeout(timer.current), []);
-
   // Keep the newest line in view as the conversation grows.
   useEffect(() => {
-    if (lines.length > 1 || thinking) end.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
-  }, [lines.length, thinking, reduce]);
+    if (talking) end.current?.scrollIntoView({ block: "end", behavior: reduce ? "auto" : "smooth" });
+  }, [lines.length, thinking, talking, reduce]);
 
-  const ask = (id: string) => {
-    const t = script.topics[id];
-    if (!t || thinking) return;
-    const done = [...asked, id];
+  const ask = (t: LumiTopic) => {
+    if (thinking) return;
+    const done = [...asked, t.id];
     setAsked(done);
     setOffer([]);
-    setLines((ls) => [...ls, { id: `q-${id}`, from: "you", text: t.ask }]);
+    setLines((ls) => [...ls, { key: `you-${ls.length}`, from: "you", text: t.ask }]);
     setThinking(true);
     timer.current = window.setTimeout(
       () => {
         setThinking(false);
-        setLines((ls) => [...ls, { id: `a-${id}`, from: "lumi", text: t.answer, ai: true }]);
-        const fresh = (ids: string[]) => ids.filter((x) => !done.includes(x));
+        setLines((ls) => [...ls, { key: `lumi-${ls.length}`, from: "lumi", text: t.answer }]);
+        const fresh = (ids: string[]) => ids.filter((x) => !done.includes(x) && script.topics[x]);
         const next = fresh(t.next);
         setOffer((next.length ? next : fresh([...script.start, ...Object.keys(script.topics)])).slice(0, 2));
       },
@@ -75,120 +59,113 @@ export function LumiSheet({ tab }: { tab: LumiTab }) {
     );
   };
 
-  const answer = (id: string, a: string) => lumi.answer(id, a);
+  const send = (e: FormEvent) => {
+    e.preventDefault();
+    const text = draft.trim();
+    if (!text || thinking) return;
+    setDraft("");
+    ask(script.reply(text));
+  };
 
   const rise = reduce
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
     : {
-        initial: { opacity: 0, filter: "blur(2px)", transform: "translateY(6px)" },
+        initial: { opacity: 0, filter: "blur(2px)", transform: "translateY(8px)" },
         animate: { opacity: 1, filter: "blur(0px)", transform: "translateY(0px)" },
         exit: { opacity: 0, filter: "blur(2px)" },
       };
-  const ease = [0.23, 1, 0.32, 1] as const;
+  const move = { layout: { duration: 0.45, ease: EASE } };
 
   return (
-    <div className={l.chat}>
-      <header className={l.chatHead}>
-        <span className={l.chatOrb} data-busy={reading || thinking}>
-          <SunOrb />
-        </span>
-        <h2>Lumi</h2>
-      </header>
-
-      <div className={l.thread} aria-live="polite">
-        {reading && (
-          <p className={l.status} role="status">
-            <span className={l.shimmer}>Reading your {d.scans.length} scans…</span>
-          </p>
-        )}
-        <AnimatePresence initial={false}>
-          {lines.map((line) => (
-            <motion.div
-              key={line.id}
-              className={l.line}
-              data-from={line.from}
-              {...rise}
-              transition={{ duration: 0.3, ease }}
-            >
-              {line.from === "lumi" ? <Written text={line.text} /> : <p>{line.text}</p>}
-              {line.ai && <small className={l.ai}>AI-generated · not medical advice</small>}
-            </motion.div>
-          ))}
-          {thinking && (
-            <motion.p key="thinking" className={l.status} role="status" {...rise} transition={{ duration: 0.2, ease }}>
-              <span className={l.shimmer}>Looking at your scans…</span>
-            </motion.p>
+    <div className={l.lumi} data-talking={talking}>
+      <motion.header layout={!reduce} className={l.head} transition={move}>
+        <motion.span layout={!reduce} className={l.orb} data-busy={thinking} transition={move}>
+          <SunOrb speed={thinking ? 3 : 1} />
+        </motion.span>
+        <AnimatePresence mode="popLayout" initial={false}>
+          {talking ? (
+            <motion.h2 key="name" className={l.name} {...rise} transition={{ duration: 0.3, ease: EASE, delay: 0.1 }}>
+              Lumi
+            </motion.h2>
+          ) : (
+            <motion.h2 key="hello" className={l.hello} {...rise} transition={{ duration: 0.3, ease: EASE }}>
+              Hi {d.firstName}, what would you like to know?
+            </motion.h2>
           )}
         </AnimatePresence>
+      </motion.header>
 
-        {!reading && offer.length > 0 && (
-          <div key={offer.join()} className={l.chips}>
-            {offer.map((id, i) => (
-              <button key={id} onClick={() => ask(id)} style={{ "--i": i } as CSSProperties}>
+      {!talking ? (
+        <ul className={l.starters} aria-label="Questions to ask Lumi">
+          {script.start.map((id, i) => (
+            <li key={id} style={{ "--i": i } as CSSProperties}>
+              <button onClick={() => ask(script.topics[id])}>
                 {script.topics[id].ask}
-                <Icon name="chevronR" size={10} stroke={2} />
+                <Icon name="arrowUR" size={16} stroke={1.6} />
               </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className={l.thread} aria-live="polite">
+          <AnimatePresence initial={false}>
+            {lines.map((line) => (
+              <motion.div key={line.key} className={l.line} data-from={line.from} {...rise} transition={{ duration: 0.3, ease: EASE }}>
+                {line.from === "lumi" ? (
+                  <>
+                    <Written text={line.text} />
+                    <small className={l.ai}>AI-generated · not medical advice</small>
+                  </>
+                ) : (
+                  <p>{line.text}</p>
+                )}
+              </motion.div>
             ))}
-          </div>
-        )}
-        <div ref={end} />
-      </div>
-
-      {!reading && qs.length > 0 && (
-        <section className={l.asks} aria-label="Lumi's questions for you">
-          <h3>Lumi’s questions</h3>
-          <ul className={m.questions}>
-            {qs.map((q) => {
-              const given = answers[q.id];
-              return (
-                <motion.li key={q.id} layout={!reduce} className={m.question} transition={{ layout: { duration: 0.28, ease } }}>
-                  <p className={m.seen}>
-                    <span>
-                      <Icon name={q.seen.key === "overall" ? "overall" : q.seen.key} size={13} />
-                      {metricMeta(q.seen.key).label} {q.seen.from}
-                      <Icon name="chevronR" size={9} />
-                      <b>{q.seen.to}</b>
-                    </span>
-                    <span>{q.seen.when}</span>
-                  </p>
-                  <AnimatePresence mode="popLayout" initial={false}>
-                    {given ? (
-                      <motion.p key="noted" className={m.noted} {...rise} transition={{ duration: 0.22, ease }} aria-live="polite">
-                        <Icon name="check" size={14} stroke={2} />
-                        Noted: {given}
-                      </motion.p>
-                    ) : (
-                      <motion.div key="ask" {...rise} transition={{ duration: 0.18, ease }}>
-                        <p className={m.ask}>{q.ask}</p>
-                        <div className={m.answers}>
-                          {q.answers.map((a, i) => (
-                            <button key={a} data-primary={i === 0} onClick={() => answer(q.id, a)}>
-                              {a}
-                            </button>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.li>
-              );
-            })}
-          </ul>
-        </section>
+            {thinking && (
+              <motion.p key="thinking" className={l.status} role="status" {...rise} transition={{ duration: 0.2, ease: EASE }}>
+                <span className={l.shimmer}>Looking at your scans…</span>
+              </motion.p>
+            )}
+          </AnimatePresence>
+          {offer.length > 0 && (
+            <div key={offer.join()} className={l.chips}>
+              {offer.map((id, i) => (
+                <button key={id} onClick={() => ask(script.topics[id])} style={{ "--i": i } as CSSProperties}>
+                  {script.topics[id].ask}
+                </button>
+              ))}
+            </div>
+          )}
+          <div ref={end} className={l.end} />
+        </div>
       )}
 
-      <p className={m.lumiFoot}>Lumi is an AI. It spots patterns in your scans; it can’t diagnose.</p>
+      <form className={l.composer} onSubmit={send}>
+        <label className="sr-only" htmlFor="lumi-ask">
+          Ask Lumi
+        </label>
+        <input
+          id="lumi-ask"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Ask Lumi"
+          autoComplete="off"
+          enterKeyHint="send"
+        />
+        <button type="submit" aria-label="Send" disabled={!draft.trim() || thinking}>
+          <Icon name="up" size={16} stroke={2} />
+        </button>
+      </form>
     </div>
   );
 }
 
 /** Lumi's words arrive a few at a time, the way a reply is written. */
 function Written({ text }: { text: string }) {
-  const words = text.split(" ");
   return (
     <p className={l.written}>
       <span className="sr-only">{text}</span>
-      {words.map((w, i) => (
+      {text.split(" ").map((w, i) => (
         <span key={i} style={{ "--w": i } as CSSProperties} aria-hidden>
           {w}{" "}
         </span>
