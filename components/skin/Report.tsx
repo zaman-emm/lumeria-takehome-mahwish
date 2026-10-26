@@ -12,7 +12,6 @@ import { ReportContext, type ReportApi, type SheetState } from "./context";
 import { Glance } from "./Glance";
 import { Hero, SlimHeader } from "./Hero";
 import { withViewTransition } from "./hooks";
-import { Icon } from "./Icon";
 import { LumiButton } from "./LumiButton";
 import { LumiSheet } from "./LumiSheet";
 import { MetricSheet } from "./MetricSheet";
@@ -172,18 +171,8 @@ export function Report({ d }: { d: Derived }) {
 
               {tab === "glance" && (
                 <footer className={r.foot}>
-                  <ul className={r.cues} aria-label="For scans you can compare">
-                    <li>
-                      <Icon name="target" size={20} />
-                      Same spot
-                    </li>
-                    <li>
-                      <Icon name="clock" size={20} />
-                      Same time
-                    </li>
-                  </ul>
                   <p className={r.disclaimer}>
-                    Lumeria reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the
+                    Lumeria’s AI reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the
                     right next step.
                   </p>
                 </footer>

@@ -51,7 +51,6 @@ export function Glance({ streak }: { streak: WeekStreak }) {
               {c && (
                 <span className={g.metricDelta}>
                   <Delta n={c.delta} />
-                  <Icon name="chevronR" size={9} />
                 </span>
               )}
             </button>
@@ -66,7 +65,6 @@ export function Glance({ streak }: { streak: WeekStreak }) {
           <Icon name="spark" size={14} />
           {latest.summary.tip}
         </p>
-        <p className={g.ai}>AI-generated · not medical advice</p>
         <button className={g.full} onClick={() => openScan(latest)}>
           This scan, in full
           <Icon name="chevronR" size={11} stroke={1.8} />
@@ -89,12 +87,6 @@ function Streak({ streak }: { streak: WeekStreak }) {
         <b ref={count}>{run}</b>
         <span>{streakLine(streak)}</span>
       </p>
-      <div className={g.weeks} aria-hidden>
-        {streak.weeks.map((on, i) => (
-          <i key={i} data-on={on} style={{ "--i": i } as CSSProperties} />
-        ))}
-        <i data-next style={{ "--i": streak.weeks.length } as CSSProperties} />
-      </div>
       <ul className={g.badges}>
         {streak.milestones.map((m, i) => (
           <li key={m.weeks} data-earned={m.earned} style={{ "--i": i } as CSSProperties}>
