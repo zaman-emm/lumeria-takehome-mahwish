@@ -107,6 +107,16 @@ body {
   padding: 0;
 }
 
+/* No scrollbar track, so the phone screen shows no bar. Scrolling still works. */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   background: var(--sand);
   color: var(--bark);
