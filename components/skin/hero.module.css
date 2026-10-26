@@ -90,7 +90,7 @@
 /* A white sun arc on the gold: warm white at the start, pure white at the tip. */
 .gauge {
   --arc-from: #fff6e4;
-  --arc-to: #ffffff;
+  --arc-to: var(--white);
   --track: rgba(255, 255, 255, 0.3);
   --ray: #fffaf0;
 }

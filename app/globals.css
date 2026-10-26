@@ -16,7 +16,6 @@
   --clay: #b8533a;
   --clay-soft: #f1ddd3;
   --paper: #fbf8f2;
-  --sand-2: #ece4d6;
   /* 2e: gold hero and forest accents on white. Gold is the logo's own. */
   --gold: #d7b46f;
   --gold-deep: #ad8235;
@@ -28,7 +27,6 @@
   --canvas: var(--bone);
   --canvas-rgb: 244, 239, 230;
   --card: var(--sand);
-  --sunrise: linear-gradient(180deg, #e6cf9f 0%, #d7b46f 45%, #c0913f 100%);
   --sunrise-x: linear-gradient(90deg, #e6cf9f 0%, #d7b46f 55%, #c0913f 100%);
   /* The At a glance ground: the sunrise, then easing back into the page's own
      canvas, so the gold has no hard edge. */
@@ -43,14 +41,12 @@
   );
 
   --glass: rgba(255, 252, 246, 0.62);
-  --glass-edge: rgba(255, 255, 255, 0.7);
   --glass-dark: rgba(255, 255, 255, 0.06);
   --glass-dark-edge: rgba(255, 255, 255, 0.1);
 
   /* Liquid glass. A thin fill lets the light field through, the blur and
      saturation bend it, a sheen and bright rim give the edge, and a soft lift
      sets it down. Used by what floats over content; cards stay flat (surface.module.css). */
-  --lg-fill: rgba(255, 253, 249, 0.42);
   --lg-fill-strong: rgba(255, 253, 249, 0.72);
   --lg-sheen: linear-gradient(
     160deg,
@@ -65,18 +61,6 @@
     inset 0 -1px 1px rgba(128, 96, 31, 0.06), 0 0 0 0.5px rgba(128, 96, 31, 0.1);
   --lg-lift: 0 10px 30px -14px rgba(46, 38, 32, 0.22), 0 1px 2px rgba(46, 38, 32, 0.04);
   --lg-well: rgba(217, 204, 180, 0.34);
-  /* Forest glass for the dark surfaces: tinted, not black. */
-  --lg-forest: rgba(47, 74, 53, 0.94);
-  --lg-sheen-dark: linear-gradient(
-    160deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.03) 34%,
-    rgba(255, 255, 255, 0) 60%,
-    rgba(255, 255, 255, 0.06) 100%
-  );
-  --lg-rim-dark:
-    inset 0 1px 0.5px rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.12);
 
   /* The small glass circle: back, play, the story's back and share. */
   --lg-btn: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 253, 249, 0.22));
@@ -112,13 +96,10 @@
 /* Reduce Transparency: the same surfaces, solid. */
 @media (prefers-reduced-transparency: reduce) {
   :root {
-    --lg-fill: var(--paper);
     --lg-fill-strong: var(--paper);
     --lg-sheen: linear-gradient(transparent, transparent);
-    --lg-sheen-dark: linear-gradient(transparent, transparent);
     --lg-blur: none;
     --lg-well: var(--sand);
-    --lg-forest: var(--forest);
   }
 }
 
