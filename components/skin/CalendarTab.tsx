@@ -77,9 +77,6 @@ export function CalendarTab() {
   const length = new Date(Date.UTC(y, mo, 0)).getUTCDate();
   const cells = [...Array.from({ length: lead }, () => null), ...Array.from({ length }, (_, i) => addDays(first, i))];
 
-  const scans = byDay.get(picked) ?? [];
-  const note = scans.find((s) => s.annotation?.note)?.annotation?.note;
-
   return (
     <div className={c.tab}>
       <section className={c.card} aria-label="Calendar">
@@ -162,27 +159,41 @@ export function CalendarTab() {
         </div>
       </section>
 
-      <section key={picked} className={c.dayCard} aria-live="polite">
-        <h2>
-          {weekday(picked)}, {fmtDay(picked)}
-        </h2>
-        {scans.map((s) => (
-          <DayRow key={s.id} d={d} scan={s} />
-        ))}
-        {note && <blockquote className={c.note}>“{note}”</blockquote>}
+      {/* Every scan day is laid out in the same cell and only the picked one shows, so the card
+          is always as tall as the tallest day and picking a day never resizes the page. */}
+      <section className={c.dayCard} aria-live="polite">
+        <div className={c.dayStack}>
+          {[...byDay.keys()].map((day) => {
+            const on = day === picked;
+            const ss = byDay.get(day)!;
+            const dayNote = ss.find((s) => s.annotation?.note)?.annotation?.note;
+            return (
+              <div key={day} className={c.dayPane} data-on={on} aria-hidden={!on} inert={!on}>
+                <h2>
+                  {weekday(day)}, {fmtDay(day)}
+                </h2>
+                {ss.map((s) => (
+                  <DayRow key={s.id} d={d} scan={s} ghost={!on} />
+                ))}
+                {dayNote && <blockquote className={c.note}>“{dayNote}”</blockquote>}
+              </div>
+            );
+          })}
+        </div>
       </section>
     </div>
   );
 }
 
-function DayRow({ d, scan }: { d: Derived; scan: Scan }) {
+/** `ghost`: a day that is only there to hold its size, so its photo is an empty circle, not an image to load. */
+function DayRow({ d, scan, ghost }: { d: Derived; scan: Scan; ghost?: boolean }) {
   const { openScan } = useReportApi();
   const tz = scanTz(scan) ?? d.tz;
   const prev = previousSameArea(d, scan);
   const delta = prev ? scan.scores.overall - prev.scores.overall : null;
   return (
     <button className={c.row} onClick={() => openScan(scan)} aria-label={`${scan.area} at ${fmtTime(scan.takenAt, tz)}, ${scan.scores.overall}. Open scan`}>
-      <Photo scan={scan} alt="" className={c.rowPhoto} />
+      {ghost ? <span className={c.rowPhoto} /> : <Photo scan={scan} alt="" className={c.rowPhoto} />}
       <span className={c.rowText}>
         <span>{scan.area}</span>
         <span>{fmtTime(scan.takenAt, tz)}</span>

@@ -241,6 +241,20 @@ button.stat:active {
   composes: card from "./surface.module.css";
   padding: 16px 12px 16px;
   border-radius: 20px;
+}
+
+.dayStack {
+  display: grid;
+}
+
+/* Every day shares the one cell; only the picked one is seen. */
+.dayPane {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.dayPane[data-on="true"] {
+  visibility: visible;
   animation: dayIn 240ms var(--ease-out) both;
 }
 
@@ -328,7 +342,7 @@ button.stat:active {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dayCard,
+  .dayPane[data-on="true"],
   .grid:not([data-dir="0"]) {
     animation-name: dayFade;
   }

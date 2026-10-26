@@ -113,11 +113,17 @@ export function TrendView({
 
       {scans.length > 1 ? (
         <Chart key={`${area}-${metric}`} d={d} scans={scans} metric={metric} picked={shown} onPick={setPicked} revealKey={revealKey} />
-      ) : scans.length ? null : (
-        <p className={t.emptyTrend}>No {metricMeta(metric).label.toLowerCase()} reads for this spot yet.</p>
+      ) : (
+        <div className={t.chartVoid}>
+          <p className={t.emptyTrend}>
+            {scans.length
+              ? `One ${metricMeta(metric).label.toLowerCase()} read so far. Your line starts with the next scan.`
+              : `No ${metricMeta(metric).label.toLowerCase()} reads for this spot yet.`}
+          </p>
+        </div>
       )}
       <Spans d={d} />
-      {shown && <ScanCard scan={shown} metric={metric} />}
+      {shown ? <ScanCard scan={shown} metric={metric} /> : <div className={t.cardVoid} aria-hidden />}
     </div>
   );
 }
