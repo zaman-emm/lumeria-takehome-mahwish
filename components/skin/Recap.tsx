@@ -320,26 +320,42 @@ const dotTone = (v: number) => {
  */
 function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
   const reduce = useReducedMotion();
-  // The card spins round from the month's cover; the streak counts up as it lands.
-  const count = useCountUp<HTMLElement>(slide.streak, !reduce, { delay: 2000, duration: 700 });
+  // As in Lapse: the card opens on the streak and counts up while a light runs
+  // round its rim, then turns over to the month's cover. Tap to turn it back.
+  const count = useCountUp<HTMLElement>(slide.streak, !reduce, { delay: 450, duration: 450, from: Math.min(1, slide.streak) });
+  const [side, setSide] = useState<"streak" | "cover">("streak");
+  useEffect(() => {
+    if (reduce) return;
+    const id = setTimeout(() => setSide("cover"), 1450);
+    return () => clearTimeout(id);
+  }, [reduce]);
   const tones = new Set(slide.weeks.flat().filter((c) => c && c.score != null).map((c) => dotTone(c!.score!)));
   let n = 0;
   return (
     <>
       <In i={0} className={s.streakCard}>
-        <span className={s.flip}>
-          <span className={s.cover} aria-hidden>
-            {slide.cover}
-          </span>
+        <button
+          type="button"
+          className={s.flip}
+          data-side={side}
+          onClick={() => setSide((v) => (v === "streak" ? "cover" : "streak"))}
+          aria-label={`${slide.streak} week streak. ${slide.cover}. Turn the card over`}
+        >
           <span className={s.face}>
             <span className={s.streakRim} aria-hidden />
-            <span className={s.streakNum}>
+            <span className={s.streakNum} aria-hidden>
               <Icon name="spark" size={30} />
               <b ref={count}>{slide.streak}</b>
             </span>
-            <span className={s.streakWord}>week streak</span>
+            <span className={s.streakWord} aria-hidden>
+              week streak
+            </span>
           </span>
-        </span>
+          <span className={s.cover} aria-hidden>
+            <Photo scan={slide.coverScan} alt="" className={s.coverPhoto} />
+            <span className={s.coverName}>{slide.cover}</span>
+          </span>
+        </button>
       </In>
       <In i={1} className={s.streakHead}>
         <Head t={slide.title} />

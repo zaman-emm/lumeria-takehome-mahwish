@@ -20,7 +20,12 @@ const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) *
 export function useCountUp<T extends HTMLElement>(
   value: number | null,
   play: boolean,
-  { delay = 0, duration = 1000, ease = "out" }: { delay?: number; duration?: number; ease?: "out" | "inOut" } = {},
+  {
+    delay = 0,
+    duration = 1000,
+    ease = "out",
+    from = 0,
+  }: { delay?: number; duration?: number; ease?: "out" | "inOut"; /** Where the count starts. */ from?: number } = {},
 ) {
   const ref = useRef<T>(null);
   useEffect(() => {
@@ -31,16 +36,16 @@ export function useCountUp<T extends HTMLElement>(
     let raf = 0;
     const tick = (now: number) => {
       const t = Math.min(1, Math.max(0, (now - start) / duration));
-      el.textContent = String(Math.round(curve(t) * value));
+      el.textContent = String(Math.round(from + curve(t) * (value - from)));
       if (t < 1) raf = requestAnimationFrame(tick);
     };
-    el.textContent = "0";
+    el.textContent = String(from);
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
       el.textContent = String(value);
     };
-  }, [play, value, delay, duration, ease]);
+  }, [play, value, delay, duration, ease, from]);
   return ref;
 }
 

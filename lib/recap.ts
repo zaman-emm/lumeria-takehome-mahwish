@@ -49,8 +49,10 @@ export type Slide =
       title: Title;
       /** Weeks in a row with a scan: the number on the streak card. */
       streak: number;
-      /** The month the card's cover names before it flips to the streak. */
+      /** The month the card turns over to, once the streak has counted up. */
       cover: string;
+      /** The photo on that cover: the month's newest real photo, else the latest scan. */
+      coverScan: Scan;
       stats: Stat[];
       /** Monday-first weeks; null pads the first and last week. */
       weeks: ({ day: string; date: number; score: number | null; latest: boolean } | null)[][];
@@ -189,6 +191,7 @@ export function buildRecap(d: Derived): Slide[] {
     // Said the way a big sister would: proud, plain, a little nudge.
     title: t("Look at you, ", "showing up", "."),
     streak: run,
+    coverScan: d.realPhotos[d.realPhotos.length - 1] ?? d.latest,
     cover: new Intl.DateTimeFormat("en-US", { month: "long", timeZone: "UTC" }).format(new Date(`${d.end}T12:00:00Z`)),
     stats: [
       { label: "Scan days", value: `${counts.size}/${days}` },

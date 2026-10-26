@@ -384,51 +384,38 @@
   border-radius: 20px;
 }
 
-/* The streak card: smoked glass with a rim of gold light that runs round it
-   once, the way Lapse's snaps develop. */
-@property --rim {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-/* Never squeezed by the slide's column; a little smaller on short screens. */
+/* The streak card, after Lapse: it opens on the streak, the number counts up
+   while a short run of gold light travels once round the rim, then the card
+   turns over to the month's cover. */
 .streakCard {
+  /* Never squeezed by the slide's column; a little smaller on short screens. */
   flex: none;
   align-self: center;
   height: clamp(132px, 21dvh, 180px);
   aspect-ratio: 5 / 6;
   margin-top: 2px;
-  perspective: 900px;
+  perspective: 800px;
 }
 
-/* Lapse's turn: the card rests on the month's cover a moment, then spins one
-   and a half times, decelerating, and lands on the streak. */
 .flip {
   position: relative;
   display: block;
   width: 100%;
   height: 100%;
+  padding: 0;
   transform-style: preserve-3d;
-  transform: rotateY(180deg);
-  animation: spin 2100ms linear 200ms both;
+  transition: transform 420ms cubic-bezier(0.55, 0, 0.25, 1);
 }
 
-@keyframes spin {
-  from,
-  28% {
-    transform: rotateY(0deg);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
-  }
-  to {
-    transform: rotateY(540deg);
-  }
+.flip[data-side="cover"] {
+  transform: rotateY(180deg);
 }
 
 .cover,
 .face {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   border-radius: 30px;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -440,53 +427,53 @@
     0 18px 40px -20px rgba(0, 0, 0, 0.6);
 }
 
-.cover {
-  display: flex;
-  align-items: flex-end;
-  padding: 0 16px 18px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 30px;
-  line-height: 1;
-  color: rgba(244, 239, 230, 0.85);
-}
-
 .face {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
+  animation: faceIn 500ms var(--ease-out) both;
+}
+
+/* The card surfaces dim and brightens, as Lapse's does. */
+@keyframes faceIn {
+  from {
+    filter: brightness(0.4);
+  }
+}
+
+.cover {
   transform: rotateY(180deg);
 }
 
-/* Light catches the long edges as the card turns side-on. */
-.cover::after,
-.face::after {
-  content: "";
+.coverPhoto {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  box-shadow:
-    inset 3px 0 0 -1px #e6cf9f,
-    inset -3px 0 0 -1px #e6cf9f;
-  opacity: 0;
-  animation: edge 1500ms ease-in-out 800ms both;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
 }
 
-@keyframes edge {
-  15%,
-  45%,
-  80% {
-    opacity: 0.9;
-  }
-  30%,
-  62% {
-    opacity: 0.2;
-  }
-  to {
-    opacity: 0;
-  }
+/* The month's name in a serif, low on the cover, over a darkening. */
+.coverName {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 40px 14px 14px;
+  background: linear-gradient(transparent, rgba(20, 36, 26, 0.85));
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  line-height: 1;
+  text-align: left;
+  color: var(--bone);
+}
+
+/* A short arc of gold that runs once round the rim, from the left edge. */
+@property --rim {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
 .streakRim {
@@ -496,27 +483,34 @@
   border-radius: inherit;
   background: conic-gradient(
     from var(--rim),
-    rgba(230, 207, 159, 0.15) 0deg,
-    rgba(230, 207, 159, 0.15) 200deg,
-    #e6cf9f 300deg,
-    #fff6e4 340deg,
-    rgba(230, 207, 159, 0.15) 360deg
+    transparent 0deg,
+    transparent 250deg,
+    rgba(230, 207, 159, 0.5) 300deg,
+    #fff6e4 350deg,
+    transparent 360deg
   );
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: rim 2400ms var(--ease-in-out) 2300ms both;
+  opacity: 0;
+  animation: rim 1100ms linear 300ms both;
   pointer-events: none;
 }
 
 @keyframes rim {
   from {
-    --rim: -60deg;
+    --rim: 200deg;
+    opacity: 0;
+  }
+  12%,
+  85% {
+    opacity: 1;
   }
   to {
-    --rim: 300deg;
+    --rim: 560deg;
+    opacity: 0;
   }
 }
 
@@ -617,7 +611,7 @@
   color: var(--evergreen);
   font-variant-numeric: tabular-nums;
   animation: develop 700ms var(--ease-out) both;
-  animation-delay: calc(2100ms + var(--k, 0) * 40ms);
+  animation-delay: calc(500ms + var(--k, 0) * 30ms);
 }
 
 /* Like a print in the tray: dark and soft first, then the colour comes up. */
@@ -1246,12 +1240,13 @@
   .hour {
     animation: none;
   }
-  /* The streak card is simply on its streak side; any opacity animation on
-     the flip would flatten it and show the cover through. */
-  .flip,
+  /* The streak card stays on its streak side and turns only when tapped,
+     without the light or the brightening. */
+  .flip {
+    transition: none;
+  }
   .streakRim,
-  .cover::after,
-  .face::after {
+  .face {
     animation: none;
   }
   .calDay {
