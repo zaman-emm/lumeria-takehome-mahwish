@@ -109,7 +109,7 @@ export function Hero({
           <span className={h.monthPlay}>
             <Icon name="play" size={14} />
           </span>
-          {d.isMonthly ? "Play your month" : "Play your story"}
+          {d.isMonthly ? "Relive your month" : "Relive your story"}
           <RecapPeek d={d} />
         </button>
       )}
@@ -148,7 +148,7 @@ export function SlimHeader({
         {streak}
       </span>
       {onPlay && (
-        <button className={h.play} onClick={(e) => onPlay(e.currentTarget)} aria-label={d.isMonthly ? "Play your month" : "Play your story"}>
+        <button className={h.play} onClick={(e) => onPlay(e.currentTarget)} aria-label={d.isMonthly ? "Relive your month" : "Relive your story"}>
           <Icon name="play" size={14} />
         </button>
       )}

@@ -18,6 +18,7 @@ export function StateScreen({
   if (state.status === "loading") {
     return (
       <div className={st.home} data-skin>
+        <div className={st.veil} aria-hidden />
         <p className={st.sr} role="status">
           Opening your report
         </p>
