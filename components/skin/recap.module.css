@@ -50,7 +50,7 @@
   align-items: center;
   justify-content: space-between;
   height: 44px;
-  margin-top: calc(12px + env(safe-area-inset-top, 0px));
+  margin-top: calc(4px + var(--top-inset));
   padding: 0 10px;
   font-size: 14px;
   font-weight: 600;
@@ -73,8 +73,8 @@
 .backZone {
   position: absolute;
   z-index: 3;
-  top: 56px;
-  bottom: 84px;
+  top: calc(56px + var(--top-inset));
+  bottom: calc(84px + var(--bottom-inset));
   left: 0;
   width: 22px;
   cursor: w-resize;
@@ -231,7 +231,7 @@
   align-items: center;
   justify-content: space-between;
   height: 56px;
-  margin-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  margin-bottom: calc(16px + var(--bottom-inset));
   padding: 0 24px;
 }
 

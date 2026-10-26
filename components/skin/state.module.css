@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   height: 675px;
-  padding: 40px 32px;
+  padding: calc(24px + var(--top-inset)) 32px 40px;
   color: var(--evergreen);
   text-align: center;
 }

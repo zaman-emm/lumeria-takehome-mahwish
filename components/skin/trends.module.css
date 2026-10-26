@@ -201,6 +201,10 @@
   fill: var(--evergreen);
 }
 
+.dot {
+  transition: r 160ms var(--ease-out);
+}
+
 .dot[data-on="true"] {
   fill: var(--evergreen);
   stroke: var(--white);
@@ -247,6 +251,8 @@
   font-variant-numeric: tabular-nums;
   pointer-events: none;
   animation: pillIn 140ms var(--ease-out);
+  /* Glides from scan to scan under a mouse instead of jumping. */
+  transition: left 140ms var(--ease-out);
 }
 
 .pill b {

@@ -15,8 +15,8 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
   const { id } = use(params);
   return (
     <PhoneFrame>
+      <DeviceChrome />
       <Suspense fallback={<StateScreen state={{ status: "loading" }} />}>
-        <DeviceChrome />
         <ReportRoute id={id} />
       </Suspense>
     </PhoneFrame>

@@ -80,6 +80,9 @@
      one (DeviceChrome) on a laptop. */
   --chrome-top: 0px;
   --top-inset: max(env(safe-area-inset-top, 0px), var(--chrome-top));
+  /* The same for the bottom: room for the home indicator. */
+  --chrome-bottom: 0px;
+  --bottom-inset: max(env(safe-area-inset-bottom, 0px), var(--chrome-bottom));
 }
 
 /* Reduce Transparency: the same surfaces, solid. */
@@ -307,5 +310,6 @@ html[data-vt="back"]::view-transition-new(skin-panel) {
 @media (hover: hover) and (pointer: fine) {
   :root {
     --chrome-top: 59px;
+    --chrome-bottom: 24px;
   }
 }

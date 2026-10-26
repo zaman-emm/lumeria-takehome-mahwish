@@ -38,9 +38,11 @@
   position: relative;
   width: 100%;
   max-width: var(--phone);
-  max-height: calc(100dvh - 40px + var(--bleed));
+  /* Stops below the status bar, like an iOS sheet, so the clock and the
+     island never sit over its content. */
+  max-height: calc(100dvh - var(--top-inset) - 6px + var(--bleed));
   margin-bottom: calc(-1 * var(--bleed));
-  padding-bottom: calc(var(--bleed) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--bleed) + var(--bottom-inset));
   border-radius: 28px 28px 0 0;
   background: var(--canvas);
   color: var(--bark);

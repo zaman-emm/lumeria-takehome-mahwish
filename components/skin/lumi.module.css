@@ -5,7 +5,7 @@
   position: fixed;
   z-index: 30;
   right: max(8px, calc((100vw - var(--phone)) / 2 + 8px));
-  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(28px + var(--bottom-inset));
   display: flex;
   align-items: center;
   gap: 10px;
@@ -329,7 +329,7 @@
 
 .composer {
   position: sticky;
-  bottom: calc(var(--bleed, 0px) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--bleed, 0px) + var(--bottom-inset));
   display: flex;
   align-items: center;
   gap: 8px;
@@ -339,7 +339,7 @@
 
 .composer::before {
   /* Reaches down through the sheet's bleed so there is no seam below. */
-  inset: -10px -20px calc(-4px - var(--bleed, 0px) - env(safe-area-inset-bottom, 0px));
+  inset: -10px -20px calc(-4px - var(--bleed, 0px) - var(--bottom-inset));
   background: linear-gradient(to top, rgba(var(--canvas-rgb), 0.96) 60%, rgba(var(--canvas-rgb), 0));
   -webkit-mask-image: linear-gradient(to top, #000 75%, transparent);
   mask-image: linear-gradient(to top, #000 75%, transparent);

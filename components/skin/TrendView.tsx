@@ -162,6 +162,9 @@ function Chart({
   // Only the first finger reads the chart; the pill shows while it's down.
   const finger = useRef<number | null>(null);
   const [touching, setTouching] = useState(false);
+  // A mouse reads the chart just by hovering, no press needed.
+  const [hovering, setHovering] = useState(false);
+  const reading = touching || hovering;
 
   const pick = (e: PointerEvent<HTMLDivElement>) => {
     if (!scans.length) return;
@@ -209,6 +212,13 @@ function Chart({
         }}
         onPointerMove={(e) => {
           if (finger.current === e.pointerId) pick(e);
+          else if (e.pointerType === "mouse" && finger.current == null) {
+            setHovering(true);
+            pick(e);
+          }
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType === "mouse") setHovering(false);
         }}
         onPointerUp={release}
         onPointerCancel={release}
@@ -236,7 +246,7 @@ function Chart({
                 </text>
               </g>
             ))}
-            {sel >= 0 && <line x1={pts[sel][0]} x2={pts[sel][0]} y1={PAD_T - 6} y2={H - PAD_B + 4} className={t.cursor} data-on={touching} />}
+            {sel >= 0 && <line x1={pts[sel][0]} x2={pts[sel][0]} y1={PAD_T - 6} y2={H - PAD_B + 4} className={t.cursor} data-on={reading} />}
             <path d={wash} className={t.wash} fill={`url(#${washId})`} />
             <path d={line} className={t.line} pathLength={1} />
             {pts.map(([px, py], i) => (
@@ -244,7 +254,7 @@ function Chart({
             ))}
           </svg>
         )}
-        {touching && sel >= 0 && (
+        {reading && sel >= 0 && (
           <span className={t.pill} style={{ left: pillAt } as CSSProperties} aria-hidden>
             {fmtDay(dayOf(d, scans[sel]))} · <b>{values[sel]}</b>
           </span>
