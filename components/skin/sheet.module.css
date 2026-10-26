@@ -35,6 +35,8 @@
 
 .popup {
   --bleed: 48px;
+  /* The card's top corners; the blur strips round themselves to match (edge.module.css). */
+  --sheet-radius: 28px;
   position: relative;
   width: 100%;
   max-width: var(--phone);
@@ -42,7 +44,7 @@
      island never sit over its content. */
   max-height: calc(100dvh - var(--top-inset) - 6px + var(--bleed));
   margin-bottom: calc(-1 * var(--bleed));
-  border-radius: 28px 28px 0 0;
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
   background: var(--canvas);
   color: var(--bark);
   box-shadow: 0 -8px 40px rgba(20, 36, 26, 0.16);
@@ -87,6 +89,7 @@
   right: 0;
   left: 0;
   height: 88px;
+  --edge-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
 }
 
 .grabber {

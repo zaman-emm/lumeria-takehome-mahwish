@@ -88,6 +88,8 @@
   bottom: -18px;
   left: 0;
   z-index: -1;
+  /* The header meets the card's rounded top corners, so the blur rounds to them. */
+  --edge-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
 }
 
 .orb {
