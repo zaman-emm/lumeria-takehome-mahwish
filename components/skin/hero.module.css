@@ -279,30 +279,6 @@
   transform: scale(0.96);
 }
 
-/* One segment per slide, like the recap's own progress bar. */
-.segs {
-  display: flex;
-  gap: 3px;
-  margin-left: auto;
-}
-
-.segs i {
-  position: relative;
-  width: 8px;
-  height: 3px;
-  border-radius: 2px;
-  background: rgba(244, 239, 230, 0.28);
-  overflow: hidden;
-}
-
-.segs i::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--gold);
-  opacity: 0;
-}
-
 /* ------------------------------------------------ first-load sequence */
 
 /* The rays fade in dim; each lit one swells as the arc's tip passes it. */
@@ -340,18 +316,14 @@
   animation: rise 500ms var(--ease-out) 1000ms both;
 }
 
-/* Once the button lands, a light runs along the segments: there's a story. */
-.hero[data-play="true"] .segs i::after {
-  animation: segRun 520ms var(--ease-out) both;
-  animation-delay: calc(1500ms + var(--i) * 70ms);
+/* Once the button lands, the two story pages open into their V. */
+.hero[data-play="true"] .month [data-peek-card] {
+  animation: peekOpen 520ms var(--ease-out) 1300ms both;
 }
 
-@keyframes segRun {
-  40% {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
+@keyframes peekOpen {
+  from {
+    transform: rotate(0deg);
   }
 }
 
@@ -405,7 +377,7 @@
 @media (prefers-reduced-motion: reduce) {
   .gauge[data-play="true"] .ray,
   .gauge[data-play="true"] .arc,
-  .hero[data-play="true"] .segs i::after {
+  .hero[data-play="true"] .month [data-peek-card] {
     animation: none;
   }
 }
@@ -457,13 +429,12 @@
   animation: reveal 620ms var(--ease-out) 760ms both;
 }
 
-.hero[data-splash="go"] .segs i::after {
-  animation: segRun 520ms var(--ease-out) both;
-  animation-delay: calc(980ms + var(--i) * 70ms);
+.hero[data-splash="go"] .month [data-peek-card] {
+  animation: peekOpen 520ms var(--ease-out) 800ms both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero[data-splash] :is(.logo, .hi, .title, .card, .month, .pairItem) {
+  .hero[data-splash] :is(.logo, .hi, .title, .card, .month, .pairItem, .month [data-peek-card]) {
     animation: none;
   }
 }

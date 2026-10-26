@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import NumberFlow from "@number-flow/react";
 import { motion, useReducedMotion } from "motion/react";
-import { band, fmtDay, scanTz } from "@/lib/insights";
+import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import { buildRecap, type Slide, type Stat, type Title } from "@/lib/recap";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
@@ -247,6 +247,25 @@ export function Recap({
         )}
       </footer>
     </motion.div>
+  );
+}
+
+/** The story's first two pages in miniature, leaning apart in a V: the play button's preview. */
+export function RecapPeek({ d }: { d: Derived }) {
+  const pages = useMemo(() => buildRecap(d).slice(0, 2), [d]);
+  return (
+    <span className={s.peek} aria-hidden>
+      {pages.map((sl, n) => (
+        <span key={n} className={s.peekCard} data-peek-card style={{ "--n": n } as CSSProperties}>
+          <span className={`${s.stage} ${s.peekPage}`} data-ink={THEMES[sl.kind].ink}>
+            <span className={s.bg} data-on style={{ backgroundColor: THEMES[sl.kind].bg, backgroundImage: THEMES[sl.kind].glows }} />
+            <section className={s.slide} data-kind={sl.kind}>
+              <SlideBody slide={sl} />
+            </section>
+          </span>
+        </span>
+      ))}
+    </span>
   );
 }
 

@@ -10,6 +10,7 @@ import { Flame, Icon } from "./Icon";
 import { headline, sinceStart } from "@/lib/voice";
 import { Logo } from "./Logo";
 import { Photo } from "./ui";
+import { RecapPeek } from "./Recap";
 import h from "./hero.module.css";
 
 // The At a glance hero: the score as a sunrise gauge on gold. On a first load
@@ -32,7 +33,6 @@ export function Hero({
   d,
   lens,
   onScan,
-  slides,
   onPlay,
   splash,
 }: {
@@ -41,8 +41,6 @@ export function Hero({
   onScan: () => void;
   /** Where the splash is: held back until it flies in, then rising around the gauge. */
   splash?: "wait" | "go" | "done";
-  /** How many slides the month has; the button previews them as segments. */
-  slides: number;
   onPlay?: (from: HTMLElement) => void;
 }) {
   const value = d.latest.scores.overall;
@@ -107,11 +105,7 @@ export function Hero({
             <Icon name="play" size={14} />
           </span>
           {d.isMonthly ? "Play your month" : "Play your story"}
-          <span className={h.segs} aria-hidden>
-            {Array.from({ length: slides }, (_, i) => (
-              <i key={i} style={{ "--i": i } as CSSProperties} />
-            ))}
-          </span>
+          <RecapPeek d={d} />
         </button>
       )}
     </header>
