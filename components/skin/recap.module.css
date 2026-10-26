@@ -525,20 +525,24 @@
 }
 
 .cover {
-  /* Sized from the card, so the photos and the name shrink with it. */
+  /* Sized from the card, so the photos and the name shrink with it. The two
+     sit together in the middle of the card. */
   container-type: size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqw;
   transform: rotateY(180deg);
 }
 
-/* The month's name in a serif, low on the cover. */
+/* The month's name in a serif, under the photos. */
 .coverName {
-  position: absolute;
-  inset: auto 0 0;
-  padding: 0 16px 16px;
+  position: relative;
   font-family: Georgia, "Times New Roman", serif;
   font-size: min(30px, 21cqw);
   line-height: 1;
-  text-align: left;
+  text-align: center;
   color: var(--card-ink);
   text-shadow: var(--card-shadow, none);
 }
@@ -546,9 +550,11 @@
 /* Three scans as polaroids, fanned a little and stacked, latest on top. They
    deal out when the card turns over to the cover. */
 .snaps {
-  position: absolute;
-  /* Sits just above the month's name: its padding, its size and a small gap. */
-  inset: 0 0 calc(16px + min(30px, 21cqw) + 8cqw);
+  position: relative;
+  flex: none;
+  width: 100%;
+  /* One polaroid's height: the square photo and its frame. */
+  height: 52cqw;
 }
 
 .snap {
