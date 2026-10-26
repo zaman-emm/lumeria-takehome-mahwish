@@ -7,6 +7,8 @@
   --tint-calm: #f1ddd3;
   --tint-clarity: #e8dfce;
   --tint-oil: #e6cf9f;
+  --tint-radiance: #f3e3bf;
+  --tint-pores: #e4e1d6;
   /* Bleeds past the panel's 16px gutter so the side cards reach the edges. */
   margin: 0 -16px;
 }
@@ -70,6 +72,23 @@
 .card:active {
   scale: 0.97;
   transition: scale 160ms var(--ease-out);
+}
+
+/* The two preview cards don't open, so they don't press either. */
+.card[data-preview]:active {
+  scale: 1;
+}
+
+.preview {
+  position: absolute;
+  top: 16px;
+  right: 14px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(46, 38, 32, 0.18);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bark-2);
 }
 
 .label {

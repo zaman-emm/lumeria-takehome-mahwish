@@ -88,18 +88,20 @@ function MoreMetrics() {
   const latest = d.latest;
   const skinType = skinTypeOf(d);
   const underEye = d.areas.some((a) => /eye/i.test(a.area));
+  // Radiance and pores sit in the scores carousel now, as previews.
+  const extras = EXTRAS.filter((m) => m.key !== "radiance" && m.key !== "pores");
   return (
     <section className={g.more} data-open={open} style={{ "--n": 3 } as CSSProperties}>
       <button className={g.moreHead} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="more-metrics">
         <span>
-          More metrics <span className={g.count}>· {EXTRAS.length}</span>
+          More metrics <span className={g.count}>· {extras.length}</span>
         </span>
         <Icon name="chevronR" size={12} stroke={1.8} className={g.moreChevron} />
       </button>
       <div className={g.moreBody} id="more-metrics" inert={!open}>
         <div className={g.moreInner}>
           <div className={g.extras}>
-            {EXTRAS.map((m) => {
+            {extras.map((m) => {
               const v = score(latest, m.key);
               return (
                 <div key={m.key} className={g.extra}>

@@ -6,7 +6,7 @@ import { useReportApi } from "./context";
 import { Delta, Ticks } from "./ui";
 import c from "./carousel.module.css";
 
-// The five scores as a swipeable row of cards on an inverted arc: the card in
+// The five scores (and two previews) as a swipeable row of cards on an inverted arc: the card in
 // the middle sits level and full size, and its neighbours tip away and drop as
 // they slide out to the sides. Each card is one score: its name, the number,
 // how far it moved since the first scan, and its ticks. Tapping any card opens
@@ -19,7 +19,19 @@ const TINT: Record<string, string> = {
   redness: "var(--tint-calm)",
   pigmentation: "var(--tint-clarity)",
   oiliness: "var(--tint-oil)",
+  radiance: "var(--tint-radiance)",
+  pores: "var(--tint-pores)",
 };
+
+/**
+ * Two scores the scope doesn't measure yet, shown to sketch where the report
+ * could go. The numbers are made up, so the cards don't open and say they're
+ * a preview.
+ */
+const PREVIEWS: { key: string; label: string; value: number; delta: number }[] = [
+  { key: "radiance", label: "Radiance", value: 71, delta: 6 },
+  { key: "pores", label: "Pores", value: 63, delta: 3 },
+];
 
 export function MetricCarousel({ onOpen }: { onOpen: (key: ScoreKey) => void }) {
   const { d } = useReportApi();
@@ -104,9 +116,33 @@ export function MetricCarousel({ onOpen }: { onOpen: (key: ScoreKey) => void }) 
             </button>
           );
         })}
+        {PREVIEWS.map((m, i) => (
+          <div
+            key={m.key}
+            className={c.card}
+            data-preview
+            data-on={METRICS.length + i === active}
+            style={{ "--tint": TINT[m.key] } as CSSProperties}
+            role="group"
+            aria-label={`${m.label} ${m.value}, up ${m.delta}. A preview with sample numbers`}
+          >
+            <span className={c.label}>{m.label}</span>
+            <span className={c.preview} aria-hidden>
+              Preview
+            </span>
+            <b className={c.value}>{m.value}</b>
+            <span className={c.change}>
+              <Delta n={m.delta} className={c.delta} />
+              {since ? ` since ${since}` : " changed"}
+            </span>
+            <span className={c.ticks}>
+              <Ticks value={m.value} />
+            </span>
+          </div>
+        ))}
       </div>
       <div className={c.dots} role="tablist" aria-label="Score">
-        {METRICS.map((m, i) => (
+        {[...METRICS, ...PREVIEWS].map((m, i) => (
           <button key={m.key} role="tab" aria-selected={i === active} aria-label={m.label} onClick={() => goTo(i)}>
             <i />
           </button>
