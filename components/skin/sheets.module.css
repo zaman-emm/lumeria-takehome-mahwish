@@ -310,9 +310,28 @@
   font-weight: 600;
 }
 
-.stress[data-high="true"] {
-  background: var(--clay-soft);
+/* How the app reads the stress number: a caution in clay when it's high. */
+.stressRead {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  /* Out into the pencil's column, so its right edge lines up with the pencil. */
+  margin: 0 -26px 0 auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bark-2);
+}
+
+.stressRead[data-high="true"] {
   color: var(--clay-ink);
+}
+
+.stressRead[data-high="true"]::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--clay);
 }
 
 .tiles,

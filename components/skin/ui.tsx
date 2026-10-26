@@ -202,13 +202,17 @@ export function Chip({ children, kind = "plain", icon }: { children?: ReactNode;
   );
 }
 
-/** When a product is used: sun, moon or both. How often is told to screen readers. */
+/**
+ * When a product is used: a sun pill for morning and a moon pill for night,
+ * each in its own column so they line up down a list. How often is told to
+ * screen readers.
+ */
 export function ScheduleChip({ product }: { product: Product }) {
   const sc = schedule(product);
   return (
-    <span className={u.chip} data-kind="schedule" aria-label={sc.spoken} role="img">
-      {sc.am && <Icon name="sun" size={12} />}
-      {sc.pm && <Icon name="moon" size={12} />}
+    <span className={u.when} aria-label={sc.spoken} role="img">
+      <span data-on={sc.am}>{sc.am && <Icon name="sun" size={12} />}</span>
+      <span data-on={sc.pm}>{sc.pm && <Icon name="moon" size={12} />}</span>
     </span>
   );
 }

@@ -274,10 +274,24 @@
   color: var(--bark-2);
 }
 
-.chip[data-kind="schedule"] {
+/* Morning and night as two separate pills; an unused slot keeps its space. */
+.when {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.when > span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 24px;
+  border-radius: 6px;
   background: var(--forest-soft);
   color: var(--forest);
-  font-weight: 600;
+}
+
+.when > span[data-on="false"] {
+  visibility: hidden;
 }
 
 .chip[data-kind="alert"] {

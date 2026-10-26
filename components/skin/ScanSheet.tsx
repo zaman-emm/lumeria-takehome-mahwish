@@ -147,10 +147,13 @@ export function ScanSheet({ scan }: { scan: Scan }) {
                 <div>
                   <dt>Stress</dt>
                   <dd>
-                    <span className={m.stress} data-high={stress >= 4}>
-                      {stressWord(stress)} · {stress} of 5
-                    </span>
+                    {/* What she entered, as she entered it. */}
+                    <span className={m.stress}>{stress} of 5</span>
                   </dd>
+                  {/* The app's reading of it, kept apart on the right. */}
+                  <span className={m.stressRead} data-high={stress >= 4}>
+                    {stressWord(stress)}
+                  </span>
                 </div>
               )}
             </dl>
