@@ -2,15 +2,14 @@
 
 import { useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { dayOf, fmtDay, fmtTime, scanTz, type Derived } from "@/lib/insights";
+import { dayOf, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
-import { Icon } from "./Icon";
 import { LIGHTS, Photo, photoFor, type Light } from "./ui";
 import ph from "./photos.module.css";
 
 // Photos: first against latest under a drag-to-compare slider, then every
-// scan as a polaroid wall (or a list), filtered by spot.
+// scan as a photo wall, filtered by spot.
 
 const ALL = "All";
 
@@ -18,7 +17,6 @@ export function PhotosTab() {
   const { d } = useReportApi();
   const [light, setLight] = useState<Light>("ambient");
   const [area, setArea] = useState(ALL);
-  const [view, setView] = useState<"grid" | "rows">("grid");
   const reduce = useReducedMotion();
   const anyReal = d.realPhotos.length > 0;
   const shown = [...d.scans].reverse().filter((s) => area === ALL || s.area === area);
@@ -52,18 +50,9 @@ export function PhotosTab() {
         ) : (
           <span />
         )}
-        <div className={ph.view} role="radiogroup" aria-label="Layout" data-view={view}>
-          <i className={ph.viewKnob} aria-hidden />
-          <button role="radio" aria-checked={view === "grid"} onClick={() => setView("grid")} aria-label="Grid">
-            <Icon name="grid" size={16} />
-          </button>
-          <button role="radio" aria-checked={view === "rows"} onClick={() => setView("rows")} aria-label="List">
-            <Icon name="rows" size={16} />
-          </button>
-        </div>
       </div>
 
-      <ul className={ph.wall} data-view={view} aria-label={`${shown.length} scans`}>
+      <ul className={ph.wall} data-view="grid" aria-label={`${shown.length} scans`}>
         <AnimatePresence mode="popLayout" initial={false}>
           {shown.map((s) => (
             <motion.li
@@ -74,7 +63,7 @@ export function PhotosTab() {
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}
             >
-              {view === "grid" ? <Polaroid d={d} scan={s} light={light} /> : <PhotoRow d={d} scan={s} light={light} />}
+              <Polaroid d={d} scan={s} light={light} showArea={area === ALL} />
             </motion.li>
           ))}
         </AnimatePresence>
@@ -87,36 +76,17 @@ const lightFor = (s: Scan, light: Light): Light => (photoFor(s, light) ? light :
 
 const tone = (v: number) => (v >= 70 ? "good" : v < 60 ? "low" : "fair");
 
-function Polaroid({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) {
+function Polaroid({ d, scan, light, showArea }: { d: Derived; scan: Scan; light: Light; showArea: boolean }) {
   const { openScan } = useReportApi();
   const tz = scanTz(scan) ?? d.tz;
   return (
     <button className={ph.polaroid} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}`}>
-      <i className={ph.tape} aria-hidden />
       <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.thumb} />
       <span className={ph.pMeta}>
         <span>{fmtDay(scan.takenAt, tz)}</span>
         <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>
       </span>
-      <span className={ph.pArea}>{scan.area}</span>
-    </button>
-  );
-}
-
-function PhotoRow({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) {
-  const { openScan } = useReportApi();
-  const tz = scanTz(scan) ?? d.tz;
-  return (
-    <button className={ph.row} onClick={() => openScan(scan)}>
-      <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.rowPhoto} />
-      <span className={ph.rowText}>
-        <span>
-          {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}
-        </span>
-        <span>{scan.area}</span>
-        {scan.annotation?.note && <span className={ph.rowNote}>“{scan.annotation.note}”</span>}
-      </span>
-      <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>
+      {showArea && <span className={ph.pArea}>{scan.area}</span>}
     </button>
   );
 }
