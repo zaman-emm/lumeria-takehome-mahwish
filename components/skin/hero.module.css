@@ -148,8 +148,8 @@
   line-height: 0.9;
   font-weight: 500;
   letter-spacing: -3px;
-  color: var(--white);
-  text-shadow: 0 2px 18px rgba(128, 96, 31, 0.45), 0 1px 2px rgba(128, 96, 31, 0.3);
+  /* Bark on the gold: about 7:1, where white was 2.5:1. */
+  color: var(--bark);
   font-variant-numeric: tabular-nums;
   /* A touch of left room so the negative tracking stays centred. */
   padding-left: 3px;
