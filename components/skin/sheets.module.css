@@ -407,7 +407,7 @@
 
 .answers button {
   min-height: 44px;
-  padding: 0 8px;
+  padding: 0 4px;
   border-radius: 12px;
   background: var(--sand);
   color: var(--bark);

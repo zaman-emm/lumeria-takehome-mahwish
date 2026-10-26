@@ -35,7 +35,7 @@ export function LumiDock({ hidden, open, onOpen }: { hidden: boolean; open: numb
     if (dock.current) dock.current.style.transform = `translate3d(0, ${y.current}px, 0)`;
   };
   useLayoutEffect(() => {
-    let frac = 0.7;
+    let frac = 0.78;
     try {
       const saved = Number(localStorage.getItem(KEY));
       if (saved > 0 && saved < 1) frac = saved;

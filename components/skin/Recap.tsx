@@ -385,7 +385,7 @@ function ScanTime({ slide }: { slide: Extract<Slide, { kind: "scanTime" }> }) {
         <svg viewBox="0 0 256 256" aria-hidden>
           <circle cx="128" cy="128" r="127" className={s.dial} />
           {Array.from({ length: 12 }, (_, k) => (
-            <line key={k} x1="128" y1="2" x2="128" y2={k % 3 ? 7 : 14} className={s.tick} transform={`rotate(${k * 30} 128 128)`} />
+            <line key={k} x1="128" y1={k % 3 ? -4 : -8} x2="128" y2={k % 3 ? 6 : 10} className={s.tick} transform={`rotate(${k * 30} 128 128)`} />
           ))}
           {[
             ["12", 128, 28],

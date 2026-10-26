@@ -128,15 +128,16 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
 
 /**
  * The product's score for every day of the period: one bar a day, a stub on
- * days without a scan. The product's own days carry its colour; a trip shows
- * as a band behind.
+ * days without a scan. The product's own days carry its colour; on a product
+ * that got worse, a trip shows as a band behind.
  */
 function DayBars({ d, product, reveal }: { d: Derived; product: Product; reveal: string }) {
   const f = factorFor(d, product);
   const key = f?.change.key ?? "overall";
   const series = dailySeries(d, key);
   const span = d.spans.find((s) => s.id === product.id);
-  const trips = d.spans.filter((s) => s.kind === "travel");
+  // A trip only shows on a product that got worse, where it may share the blame.
+  const trips = f?.direction === "held" ? d.spans.filter((s) => s.kind === "travel") : [];
   const n = series.length;
   const xOf = (day: string) => `${(Math.max(0, Math.min(n - 1, daysBetween(d.start, day))) / Math.max(1, n - 1)) * 100}%`;
   const inSpan = (day: string, s?: Span) => Boolean(s && day >= s.start && day <= s.end);
