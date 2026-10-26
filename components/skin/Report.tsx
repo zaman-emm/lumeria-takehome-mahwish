@@ -150,22 +150,24 @@ export function Report({ d }: { d: Derived }) {
                 {tab === "photos" && <PhotosTab />}
               </main>
 
-              <footer className={r.foot}>
-                <ul className={r.cues} aria-label="For scans you can compare">
-                  <li>
-                    <Icon name="target" size={20} />
-                    Same spot
-                  </li>
-                  <li>
-                    <Icon name="clock" size={20} />
-                    Same time
-                  </li>
-                </ul>
-                <p className={r.disclaimer}>
-                  Lumeria reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the
-                  right next step.
-                </p>
-              </footer>
+              {tab === "glance" && (
+                <footer className={r.foot}>
+                  <ul className={r.cues} aria-label="For scans you can compare">
+                    <li>
+                      <Icon name="target" size={20} />
+                      Same spot
+                    </li>
+                    <li>
+                      <Icon name="clock" size={20} />
+                      Same time
+                    </li>
+                  </ul>
+                  <p className={r.disclaimer}>
+                    Lumeria reads how your skin looks, not what’s going on underneath. If something worries you, a dermatologist is the
+                    right next step.
+                  </p>
+                </footer>
+              )}
             </div>
           </Drawer.Indent>
 

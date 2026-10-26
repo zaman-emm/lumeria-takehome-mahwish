@@ -42,9 +42,9 @@
   display: grid;
   place-items: center;
   flex: none;
-  height: 40px;
+  height: 44px;
   padding: 0 16px;
-  border-radius: 20px;
+  border-radius: 22px;
   background: var(--card);
   color: var(--bark);
   font-size: 14px;

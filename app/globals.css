@@ -192,9 +192,14 @@ img {
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-::view-transition-old(root),
+/* Only the named parts move. The rest of the page swaps in one frame, so
+   the old and new tab never show through each other. */
+::view-transition-old(root) {
+  display: none;
+}
+
 ::view-transition-new(root) {
-  animation-duration: 200ms;
+  animation: none;
 }
 
 ::view-transition-old(skin-tabs) {
