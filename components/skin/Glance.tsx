@@ -2,7 +2,6 @@
 
 import { useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
-import { EXTRAS, score } from "@/lib/insights";
 import { skinTypeOf } from "@/lib/extended";
 import { noteEcho, streakLine } from "@/lib/voice";
 import type { WeekStreak } from "@/lib/weeks";
@@ -82,44 +81,40 @@ function Streak({ streak }: { streak: WeekStreak }) {
   );
 }
 
+/** Measures the scope doesn't take yet. Each shows as an empty ring until it does. */
+const COMING: { key: string; label: string }[] = [
+  { key: "spots", label: "Spots" },
+  { key: "pigment", label: "Under-surface pigmentation" },
+  { key: "eyes", label: "Under eyes" },
+];
+
 function MoreMetrics() {
   const { d } = useReportApi();
   const [open, setOpen] = useState(false);
-  const latest = d.latest;
   const skinType = skinTypeOf(d);
-  const underEye = d.areas.some((a) => /eye/i.test(a.area));
-  // Radiance and pores sit in the scores carousel now, as previews.
-  const extras = EXTRAS.filter((m) => m.key !== "radiance" && m.key !== "pores");
   return (
     <section className={g.more} data-open={open} style={{ "--n": 3 } as CSSProperties}>
       <button className={g.moreHead} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="more-metrics">
         <span>
-          More metrics <span className={g.count}>· {extras.length}</span>
+          More metrics <span className={g.count}>· {COMING.length}</span>
         </span>
         <Icon name="chevronR" size={12} stroke={1.8} className={g.moreChevron} />
       </button>
       <div className={g.moreBody} id="more-metrics" inert={!open}>
         <div className={g.moreInner}>
           <div className={g.extras}>
-            {extras.map((m) => {
-              const v = score(latest, m.key);
-              return (
-                <div key={m.key} className={g.extra}>
-                  <Ring value={v} dashed={v == null} draw={open} />
-                  <span className={g.metricLabel}>{m.label}</span>
-                  {m.source === "derived" && v != null && <span className={g.derived}>Derived</span>}
-                </div>
-              );
-            })}
+            {COMING.map((m) => (
+              <div key={m.key} className={g.extra}>
+                <Ring value={null} dashed />
+                <span className={g.extraLabel}>{m.label}</span>
+                <span className={g.soon}>Coming soon</span>
+              </div>
+            ))}
           </div>
           <dl className={g.profile}>
             <div>
               <dt>Skin type</dt>
               <dd>{skinType ?? "Not set"}</dd>
-            </div>
-            <div>
-              <dt>Under eyes</dt>
-              <dd className={underEye ? undefined : g.muted}>{underEye ? "Scanned" : "Needs the under-eye scan"}</dd>
             </div>
           </dl>
         </div>
