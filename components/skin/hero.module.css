@@ -264,11 +264,19 @@
   border-radius: 20px;
   font-size: 16px;
   white-space: nowrap;
+  /* The same glass as the card above it. */
+  background: var(--lg-sheen), rgba(251, 246, 236, 0.32);
+  box-shadow: var(--lg-rim);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  color: var(--evergreen);
 }
 
 .month[data-size="card"] .monthPlay {
   width: 44px;
   height: 44px;
+  background: var(--evergreen);
+  color: var(--gold);
 }
 
 /* Only the top half of each page shows, rising out of the bottom edge. */
