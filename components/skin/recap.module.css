@@ -758,7 +758,7 @@
   height: 4px;
   margin-left: -2px;
   border-radius: 50%;
-  background: var(--bronze);
+  background: var(--bronze-deep);
   animation: dot 300ms var(--ease-out) both;
   animation-delay: calc(500ms + var(--k, 0) * 25ms);
 }
