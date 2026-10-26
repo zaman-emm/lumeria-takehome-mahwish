@@ -10,6 +10,11 @@
   :global(html[data-embedded]) .pending {
     visibility: visible;
   }
+
+  /* While the page is held back, the desk's own grey, not the page's sand. */
+  :global(body):has(.pending) {
+    background: #eeeeec;
+  }
 }
 
 .desk {
@@ -63,13 +68,40 @@
 }
 
 .screen {
+  position: relative;
+  z-index: 1;
   display: block;
   border: 0;
   border-radius: 51px;
-  /* What the loading screen looks like, behind the page while it loads, so the
-     screen never goes white first. */
+}
+
+/* Behind the iframe: the loading screen, drawn here too (gold at the hero's
+   height with the splash glass's soft edge, and the phone's status bar), so the
+   screen is never white or bare in the instant before the iframe's own page
+   paints. contain makes the status bar's fixed positioning relative to this box. */
+.under {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  overflow: hidden;
+  border-radius: 51px;
+  background: var(--canvas);
+  contain: layout paint;
+}
+
+.ring {
+  position: absolute;
+}
+
+.gold {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  left: -30px;
+  height: calc(var(--hero-h) + 30px);
+  border-radius: 0 0 58px 58px;
   background:
-    radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%) top / 100% 675px no-repeat,
-    var(--sunrise) top / 100% 675px no-repeat,
-    var(--canvas);
+    radial-gradient(130px 80px at 50% 30px, rgba(243, 230, 200, 0.6), transparent 100%),
+    var(--sunrise);
+  filter: blur(20px);
 }

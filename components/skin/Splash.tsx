@@ -22,30 +22,19 @@ const DRAWER = "cubic-bezier(0.32, 0.72, 0, 1)";
 
 type Geo = { left: number; top: number; width: number; height: number; scale: number; cy: number };
 
-/** The hero's gauge box (hero.module.css .gaugeBox): 342 : 240, at most 326 wide, inside the hero's 24px sides. */
-const BOX_MAX = 326;
-const BOX_RATIO = 240 / 342;
-
-/** Where the splash holds the ring: centred, a little above the middle of the screen. */
-function held(vw: number, vh: number) {
-  const width = Math.min(BOX_MAX, Math.min(vw, 430) - 48);
-  const height = width * BOX_RATIO;
-  const scale = Math.min(1.25, (Math.min(vw, 430) - 24) / width);
-  return { width: width * scale, height: height * scale, left: (vw - width * scale) / 2, top: vh * 0.5 - height * scale * 0.48 };
-}
-
 /**
  * The ring's empty track, set down where the splash will draw it. The loading
  * screen shows this while the report is on its way, so the gold is never bare
- * and the splash simply carries on from it.
+ * and the splash simply carries on from it. Its place is pure CSS
+ * (state.module.css .shell), so it is in the first paint, server HTML included.
  */
 export function SplashShell({ className }: { className?: string }) {
-  const [at, setAt] = useState<ReturnType<typeof held> | null>(null);
-  // Only when the splash is actually coming; otherwise the ring would have nowhere to go.
-  useLayoutEffect(() => setAt(willSplash() ? held(window.innerWidth, window.innerHeight) : null), []);
-  if (!at) return null;
+  const [coming, setComing] = useState(true);
+  // Not when the splash won't play (played already this page load); reduced motion is in the CSS.
+  useLayoutEffect(() => setComing(willSplash()), []);
+  if (!coming) return null;
   return (
-    <div className={className} style={{ left: at.left, top: at.top, width: at.width, height: at.height }} aria-hidden>
+    <div className={className} aria-hidden>
       <Gauge value={0} play={false} idle decorative />
     </div>
   );
