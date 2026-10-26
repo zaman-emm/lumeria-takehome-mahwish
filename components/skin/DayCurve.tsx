@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { area, curveMonotoneX, line } from "d3-shape";
 import type { RevealState } from "./hooks";
 import { useWidth } from "./hooks";
@@ -30,6 +30,14 @@ export interface CurveBand {
 }
 
 type Tone = "helped" | "held" | "neutral";
+
+// A light tap of the motor as the reading moves to a new scan, where the
+// phone supports it.
+export function tick() {
+  try {
+    navigator.vibrate?.(4);
+  } catch {}
+}
 
 const PAD_X = 6;
 const PAD_TOP = 10;
@@ -70,6 +78,7 @@ export function DayCurve({
   const [box, w] = useWidth<HTMLDivElement>();
   const [at, setAt] = useState<CurvePoint | null>(null);
   const [pinned, setPinned] = useState<CurveBand | null>(null);
+  const finger = useRef<number | null>(null);
 
   const { x, y, path, fill } = useMemo(() => {
     const vs = points.map((p) => p.value);
@@ -105,7 +114,20 @@ export function DayCurve({
     let best = points[0];
     for (const p of points) if (Math.abs(x(p.i) - px) < Math.abs(x(best.i) - px)) best = p;
     setPinned(null);
-    setAt(best);
+    if (best !== at) {
+      setAt(best);
+      if (e.pointerType !== "mouse") tick();
+    }
+  };
+  const lift = (e: PointerEvent<HTMLDivElement>) => {
+    if (finger.current === e.pointerId) finger.current = null;
+    if (e.pointerType !== "mouse") setAt(null);
+  };
+  const step = (by: number) => {
+    const k = at ? points.indexOf(at) : by > 0 ? -1 : points.length;
+    const next = points[Math.max(0, Math.min(points.length - 1, k + by))];
+    setPinned(null);
+    setAt(next);
   };
   // The pill centres on its day or band, kept inside the chart by half its width.
   const pillText = at ? `${at.label} · ${at.value}` : (pinned?.label ?? "");
@@ -120,13 +142,29 @@ export function DayCurve({
       data-focus={Boolean(lit)}
       data-reveal={reveal}
       style={{ height: H } as CSSProperties}
-      role="img"
+      role="slider"
+      tabIndex={0}
       aria-label={label}
-      onPointerDown={read}
-      onPointerMove={(e) => (e.pointerType === "mouse" || e.buttons ? read(e) : undefined)}
-      onPointerLeave={() => setAt(null)}
-      onPointerUp={(e) => e.pointerType !== "mouse" && setAt(null)}
-      onPointerCancel={() => setAt(null)}
+      aria-valuemin={0}
+      aria-valuemax={Math.max(0, points.length - 1)}
+      aria-valuenow={at ? points.indexOf(at) : points.length - 1}
+      aria-valuetext={at ? `${at.label}: ${at.value}` : undefined}
+      onPointerDown={(e) => {
+        if (finger.current != null) return;
+        finger.current = e.pointerId;
+        e.currentTarget.setPointerCapture(e.pointerId);
+        read(e);
+      }}
+      onPointerMove={(e) => (e.pointerType === "mouse" || finger.current === e.pointerId ? read(e) : undefined)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && setAt(null)}
+      onPointerUp={lift}
+      onPointerCancel={lift}
+      onKeyDown={(e) => {
+        if (e.key === "ArrowLeft") step(-1);
+        if (e.key === "ArrowRight") step(1);
+        if (e.key === "Escape") setAt(null);
+      }}
+      onBlur={() => setAt(null)}
     >
       {w > 0 && points.length > 1 && (
         <>

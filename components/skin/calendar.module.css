@@ -34,7 +34,7 @@
 }
 
 .month button:active:not(:disabled) {
-  transform: scale(0.92);
+  transform: scale(0.96);
 }
 
 .month button:disabled {
@@ -106,7 +106,7 @@
 }
 
 .day[data-scan]:active::before {
-  transform: scale(0.92);
+  transform: scale(0.96);
 }
 
 .ring {
@@ -215,7 +215,7 @@
 }
 
 button.stat:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 .stat[data-on="true"] {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { area as d3area, curveMonotoneX, line as d3line } from "d3-shape";
 import NumberFlow from "@number-flow/react";
 import { motion, useReducedMotion } from "motion/react";
 import {
@@ -22,6 +23,7 @@ import { useReportApi } from "./context";
 import { useReveal, useWidth } from "./hooks";
 import { Icon } from "./Icon";
 import { Photo, Ring } from "./ui";
+import { tick } from "./DayCurve";
 import t from "./trends.module.css";
 
 // One score over time for one spot. Pick the spot, pick the score, then drag
@@ -152,9 +154,14 @@ function Chart({
   const x = (s: Scan | string) => 30 + (daysBetween(d.start, typeof s === "string" ? s : dayOf(d, s)) / days) * (W - 8);
   const y = (v: number) => PAD_T + (1 - (v - lo) / (hi - lo || 1)) * (H - PAD_T - PAD_B);
   const pts = scans.map((s, i) => [x(s), y(values[i])] as const);
-  const line = pts.map(([px, py], i) => `${i ? "L" : "M"}${px.toFixed(1)} ${py.toFixed(1)}`).join("");
+  const line = d3line().curve(curveMonotoneX)(pts as [number, number][]) ?? "";
+  const wash = d3area().curve(curveMonotoneX).y0(H - PAD_B).y1((p) => p[1])(pts as [number, number][]) ?? "";
+  const washId = `${useId().replace(/:/g, "")}-wash`;
   const trips = d.spans.filter((s) => s.kind === "travel");
   const sel = picked ? scans.indexOf(picked) : -1;
+  // Only the first finger reads the chart; the pill shows while it's down.
+  const finger = useRef<number | null>(null);
+  const [touching, setTouching] = useState(false);
 
   const pick = (e: PointerEvent<HTMLDivElement>) => {
     if (!scans.length) return;
@@ -164,8 +171,19 @@ function Chart({
     pts.forEach(([qx], i) => {
       if (Math.abs(qx - px) < Math.abs(pts[best][0] - px)) best = i;
     });
-    if (scans[best] !== picked) onPick(scans[best]);
+    if (scans[best] !== picked) {
+      onPick(scans[best]);
+      tick();
+    }
   };
+  const release = (e: PointerEvent<HTMLDivElement>) => {
+    if (finger.current !== e.pointerId) return;
+    finger.current = null;
+    setTouching(false);
+  };
+  const pillText = sel >= 0 ? `${fmtDay(dayOf(d, scans[sel]))} · ${values[sel]}` : "";
+  const half = pillText.length * 3.4 + 12;
+  const pillAt = sel >= 0 ? Math.max(half, Math.min(w - half, pts[sel][0])) : 0;
 
   const label = `${metricMeta(metric).label}, ${scans.length} scans from ${values[0]} to ${values[values.length - 1]}`;
 
@@ -183,12 +201,17 @@ function Chart({
         aria-valuenow={Math.max(0, sel)}
         aria-valuetext={picked ? `${fmtDay(dayOf(d, picked))}: ${score(picked, metric)}` : undefined}
         onPointerDown={(e) => {
+          if (finger.current != null) return;
+          finger.current = e.pointerId;
           e.currentTarget.setPointerCapture(e.pointerId);
+          setTouching(true);
           pick(e);
         }}
         onPointerMove={(e) => {
-          if (e.buttons || e.pointerType === "touch") pick(e);
+          if (finger.current === e.pointerId) pick(e);
         }}
+        onPointerUp={release}
+        onPointerCancel={release}
         onKeyDown={(e) => {
           if (e.key === "ArrowLeft" && sel > 0) onPick(scans[sel - 1]);
           if (e.key === "ArrowRight" && sel < scans.length - 1) onPick(scans[sel + 1]);
@@ -196,6 +219,12 @@ function Chart({
       >
         {w > 0 && scans.length > 0 && (
           <svg width={w} height={H} aria-hidden className={t.svg}>
+            <defs>
+              <linearGradient id={washId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" className={t.washTop} />
+                <stop offset="1" className={t.washEnd} />
+              </linearGradient>
+            </defs>
             {trips.map((tr) => (
               <rect key={tr.id} x={x(tr.start) - 5} y={PAD_T - 4} width={x(tr.end) - x(tr.start) + 10} height={H - PAD_T - PAD_B + 8} rx={3} className={t.trip} />
             ))}
@@ -207,12 +236,18 @@ function Chart({
                 </text>
               </g>
             ))}
-            {sel >= 0 && <line x1={pts[sel][0]} x2={pts[sel][0]} y1={PAD_T - 6} y2={H - PAD_B + 4} className={t.cursor} />}
+            {sel >= 0 && <line x1={pts[sel][0]} x2={pts[sel][0]} y1={PAD_T - 6} y2={H - PAD_B + 4} className={t.cursor} data-on={touching} />}
+            <path d={wash} className={t.wash} fill={`url(#${washId})`} />
             <path d={line} className={t.line} pathLength={1} />
             {pts.map(([px, py], i) => (
               <circle key={i} cx={px} cy={py} r={i === sel ? 4.5 : 2} className={t.dot} data-on={i === sel} style={{ "--i": i } as CSSProperties} />
             ))}
           </svg>
+        )}
+        {touching && sel >= 0 && (
+          <span className={t.pill} style={{ left: pillAt } as CSSProperties} aria-hidden>
+            {fmtDay(dayOf(d, scans[sel]))} · <b>{values[sel]}</b>
+          </span>
         )}
       </div>
       <div className={t.axis} aria-hidden>

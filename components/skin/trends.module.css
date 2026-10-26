@@ -155,7 +155,7 @@
 /* ------------------------------------------------ chart */
 
 .chartWrap {
-  margin-top: 14px;
+  margin-top: 36px;
 }
 
 .chart {
@@ -164,6 +164,8 @@
   touch-action: pan-y;
   cursor: crosshair;
   border-radius: 8px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .svg {
@@ -209,6 +211,54 @@
   stroke: var(--bark);
   stroke-width: 1;
   opacity: 0.25;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.cursor[data-on="true"] {
+  opacity: 0.45;
+}
+
+.washTop {
+  stop-color: var(--gold-deep);
+  stop-opacity: 0.2;
+}
+
+.washEnd {
+  stop-color: var(--gold-deep);
+  stop-opacity: 0;
+}
+
+/* The reading follows the finger, iOS style, and leaves when it lifts. */
+.pill {
+  position: absolute;
+  top: -32px;
+  translate: -50% 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), 0 6px 14px -6px rgba(46, 38, 32, 0.3);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  animation: pillIn 140ms var(--ease-out);
+}
+
+.pill b {
+  font-weight: 600;
+  color: var(--bark);
+}
+
+@keyframes pillIn {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
 }
 
 .axis {
@@ -228,8 +278,13 @@
   transition: stroke-dashoffset 900ms var(--ease-out);
 }
 
-.chartWrap[data-reveal="out"] .dot {
+.chartWrap[data-reveal="out"] .dot,
+.chartWrap[data-reveal="out"] .wash {
   opacity: 0;
+}
+
+.chartWrap[data-reveal="in"] .wash {
+  transition: opacity 500ms ease 150ms;
 }
 
 .chartWrap[data-reveal="in"] .dot {

@@ -1,6 +1,12 @@
 /* Shared visual pieces. Motion: transform and opacity only, ease-out for
    anything arriving, and every set piece has a reduced-motion fallback. */
 
+/* A hairline of pure black keeps every photo's edge crisp on bone and white. */
+.photo {
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+  outline-offset: -1px;
+}
+
 .noPhoto {
   display: grid;
   place-items: center;

@@ -198,7 +198,7 @@
 }
 
 .scan:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 .scanPhoto {
@@ -219,7 +219,7 @@
 }
 
 .pair:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 .pairItem {
@@ -266,7 +266,7 @@
 }
 
 .month:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 .monthPlay {
@@ -286,7 +286,7 @@
 }
 
 .month:active .monthPlay {
-  transform: scale(0.92);
+  transform: scale(0.96);
 }
 
 /* One segment per slide, like the recap's own progress bar. */
@@ -538,7 +538,7 @@
 }
 
 .play:active {
-  transform: scale(0.94);
+  transform: scale(0.96);
 }
 
 @media (prefers-reduced-transparency: reduce) {

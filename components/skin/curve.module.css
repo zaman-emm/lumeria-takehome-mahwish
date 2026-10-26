@@ -128,7 +128,7 @@
 }
 
 .pin:active {
-  transform: scale(0.92);
+  transform: scale(0.96);
 }
 
 .pin[data-tone="trip"] {

@@ -59,7 +59,7 @@ export function Photo({
     <img
       src={src}
       alt={alt ?? `${scan.area} close-up`}
-      className={className}
+      className={`${u.photo} ${className ?? ""}`}
       style={style}
       data-on={on}
       loading={priority ? "eager" : "lazy"}
