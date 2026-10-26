@@ -1,6 +1,12 @@
 .view {
   display: flex;
   flex-direction: column;
+  /* Product range colours, a fixed categorical order (never cycled), checked
+     for colour-blind separation on this card: teal, blue, terracotta. They
+     stay clear of the trip's clay band and the period's gold hatch. */
+  --range-1: #2b9670;
+  --range-2: #3b74c0;
+  --range-3: #d0683a;
 }
 
 .delta {
@@ -163,6 +169,11 @@
 
 .chartWrap {
   margin-top: 36px;
+}
+
+/* Under its legend the chart sits closer. */
+.legend + .chartWrap {
+  margin-top: 14px;
 }
 
 .chart {
@@ -335,68 +346,105 @@
   }
 }
 
-/* ------------------------------------------------ spans */
+/* ------------------------------------------------ legend and ranges */
 
-.spans {
+/* The legend row above the chart (Legend in TrendView.tsx): swatch and name,
+   left-aligned, wrapping. Each item is a button that picks its range out. */
+.legend {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 10px 0 0 30px;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin: 20px 0 0;
   padding: 0;
   list-style: none;
 }
 
-.spans li {
+.legendItem {
   position: relative;
-  height: 20px;
-}
-
-.span {
-  position: absolute;
-  top: 0;
-  height: 20px;
-  border-radius: 6px;
-  background: var(--sand);
-  overflow: hidden;
-}
-
-.span[data-tone="helped"] {
-  background: var(--forest-soft);
-}
-
-.span[data-tone="travel"] {
-  background: var(--clay-soft);
-}
-
-/* The period runs from its first day to its last, hatched in gold so it never
-   reads as one of the products. */
-.span[data-tone="period"] {
-  background: repeating-linear-gradient(-45deg, rgba(215, 180, 111, 0.55) 0 2px, rgba(215, 180, 111, 0.22) 2px 6px);
-  box-shadow: inset 0 0 0 1px rgba(173, 130, 53, 0.35);
-}
-
-.spanLabel {
-  display: block;
-  padding: 0 6px;
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 600;
-  color: var(--bark-2);
-  white-space: nowrap;
-}
-
-.span[data-tone="helped"] .spanLabel {
-  color: var(--forest);
-}
-
-.spanOutside {
-  position: absolute;
-  top: 0;
-  font-size: 12px;
-  line-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  font-size: 12.5px;
   font-weight: 500;
   color: var(--bark);
   white-space: nowrap;
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 140ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A taller target than the text. */
+.legendItem::before {
+  content: "";
+  position: absolute;
+  inset: -8px -6px;
+}
+
+.legendItem:active {
+  transform: scale(0.96);
+}
+
+.legendItem[aria-pressed="true"] {
+  font-weight: 600;
+}
+
+.legendItem[data-dim="true"] {
+  opacity: 0.4;
+}
+
+.legendItem:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Swatches match the marks: a product's lane bar, the trip's band, the
+   period's hatch. */
+.swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.swatch[data-kind="product"] {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--c);
+}
+
+.swatch[data-kind="travel"] {
+  background: var(--clay-soft);
+  box-shadow: inset 0 0 0 1px rgba(184, 83, 58, 0.25);
+}
+
+.swatch[data-kind="period"] {
+  background: repeating-linear-gradient(-45deg, rgba(215, 180, 111, 0.6) 0 1.5px, rgba(215, 180, 111, 0.2) 1.5px 4px);
+  box-shadow: inset 0 0 0 1px rgba(173, 130, 53, 0.4);
+}
+
+/* In the chart: product lanes under the plot; a picked range stays, the rest fade. */
+.lane,
+.trip,
+.period {
+  transition: opacity 200ms var(--ease-out);
+}
+
+.lane[data-dim="true"] {
+  opacity: 0.22;
+}
+
+.trip[data-dim="true"],
+.period[data-dim="true"] {
+  opacity: 0.18;
+}
+
+.focusBand {
+  opacity: 0.1;
+  pointer-events: none;
+  animation: fadeIn 200ms var(--ease-out);
 }
 
 /* ------------------------------------------------ scan card */

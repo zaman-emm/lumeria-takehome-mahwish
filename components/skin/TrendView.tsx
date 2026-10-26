@@ -64,6 +64,8 @@ export function TrendView({
   const [picked, setPicked] = useState<Scan | null>(null);
   const shown = picked && scans.includes(picked) ? picked : scans[scans.length - 1];
   useEffect(() => setPicked(null), [area, metric]);
+  // The range a tapped legend item picks out on the chart.
+  const [focus, setFocus] = useState<string | null>(null);
   const reduce = useReducedMotion();
 
   return (
@@ -114,7 +116,10 @@ export function TrendView({
       </div>
 
       {scans.length > 1 ? (
-        <Chart key={`${area}-${metric}`} d={d} scans={scans} metric={metric} picked={shown} onPick={setPicked} revealKey={revealKey} />
+        <>
+          <Legend d={d} focus={focus} onFocus={setFocus} />
+          <Chart key={`${area}-${metric}`} d={d} scans={scans} metric={metric} picked={shown} onPick={setPicked} revealKey={revealKey} focus={focus} />
+        </>
       ) : (
         <div className={t.chartVoid}>
           <p className={t.emptyTrend}>
@@ -124,7 +129,6 @@ export function TrendView({
           </p>
         </div>
       )}
-      <Spans d={d} />
       {shown ? <ScanCard scan={shown} metric={metric} /> : <div className={t.cardVoid} aria-hidden />}
     </div>
   );
@@ -135,6 +139,15 @@ export function TrendView({
 const H = 150;
 const PAD_T = 12;
 const PAD_B = 10;
+/** Product lanes under the plot: the gap above them, each lane's height, and its bar. */
+const LANE_GAP = 6;
+const LANE = 9;
+const LANE_BAR = 4;
+
+/** The products, in the order they started; each keeps its colour slot wherever it shows. */
+const productSpans = (d: Derived) => d.spans.filter((s) => s.kind === "product");
+/** Fixed categorical slots (trends.module.css, CVD-checked), never cycled: a fourth product and on are plain. */
+const rangeColor = (i: number) => `var(--range-${i + 1}, var(--bark-3))`;
 
 function Chart({
   d,
@@ -143,6 +156,7 @@ function Chart({
   picked,
   onPick,
   revealKey,
+  focus,
 }: {
   d: Derived;
   scans: Scan[];
@@ -150,6 +164,8 @@ function Chart({
   picked: Scan | undefined;
   onPick: (s: Scan) => void;
   revealKey: string;
+  /** A range picked out from the legend: it stays, the others fade. */
+  focus: string | null;
 }) {
   const [box, w] = useWidth<HTMLDivElement>();
   const [revealRef, reveal] = useReveal<HTMLDivElement>(`${revealKey}-chart`);
@@ -167,6 +183,11 @@ function Chart({
   const washId = `${useId().replace(/:/g, "")}-wash`;
   const trips = d.spans.filter((s) => s.kind === "travel");
   const hatchId = `${washId}-period`;
+  // Products run in thin lanes under the plot, one each, on the same x scale.
+  const products = productSpans(d);
+  const lanesH = products.length ? LANE_GAP + products.length * LANE : 0;
+  const focused = products.find((p) => p.id === focus);
+  const dim = (id: string) => (focus ? focus !== id : undefined);
   const sel = picked ? scans.indexOf(picked) : -1;
   // Only the first finger reads the chart; the pill shows while it's down.
   const finger = useRef<number | null>(null);
@@ -204,6 +225,7 @@ function Chart({
       <div
         ref={box}
         className={t.chart}
+        style={{ height: H + lanesH }}
         data-base-ui-swipe-ignore="x"
         role="slider"
         tabIndex={0}
@@ -237,7 +259,7 @@ function Chart({
         }}
       >
         {w > 0 && scans.length > 0 && (
-          <svg width={w} height={H} aria-hidden className={t.svg}>
+          <svg width={w} height={H + lanesH} aria-hidden className={t.svg}>
             <defs>
               <linearGradient id={washId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" className={t.washTop} />
@@ -249,7 +271,16 @@ function Chart({
               </pattern>
             </defs>
             {trips.map((tr) => (
-              <rect key={tr.id} x={x(tr.start) - 5} y={PAD_T - 4} width={x(tr.end) - x(tr.start) + 10} height={H - PAD_T - PAD_B + 8} rx={3} className={t.trip} />
+              <rect
+                key={tr.id}
+                x={x(tr.start) - 5}
+                y={PAD_T - 4}
+                width={x(tr.end) - x(tr.start) + 10}
+                height={H - PAD_T - PAD_B + 8}
+                rx={3}
+                className={t.trip}
+                data-dim={dim(tr.id)}
+              />
             ))}
             {d.moments.map((m) => (
               <rect
@@ -261,6 +292,32 @@ function Chart({
                 rx={3}
                 fill={`url(#${hatchId})`}
                 className={t.period}
+                data-dim={dim(m.id)}
+              />
+            ))}
+            {/* A product picked in the legend washes its stretch of the plot in its own colour. */}
+            {focused && (
+              <rect
+                x={x(focused.start)}
+                y={PAD_T - 4}
+                width={Math.max(4, x(focused.end) - x(focused.start))}
+                height={H - PAD_T + lanesH}
+                rx={3}
+                className={t.focusBand}
+                style={{ fill: rangeColor(products.indexOf(focused)) }}
+              />
+            )}
+            {products.map((p, i) => (
+              <rect
+                key={p.id}
+                x={x(p.start)}
+                y={H + LANE_GAP + i * LANE + (LANE - LANE_BAR) / 2}
+                width={Math.max(LANE_BAR, x(p.end) - x(p.start))}
+                height={LANE_BAR}
+                rx={LANE_BAR / 2}
+                className={t.lane}
+                style={{ fill: rangeColor(i) }}
+                data-dim={dim(p.id)}
               />
             ))}
             {[hi, mid, lo].map((g) => (
@@ -293,50 +350,59 @@ function Chart({
   );
 }
 
-// ---------------------------------------------------------------- spans
+// ---------------------------------------------------------------- legend
 
-function Spans({ d }: { d: Derived }) {
-  if (!d.spans.length && !d.moments.length) return null;
-  const days = daysBetween(d.start, d.end) || 1;
-  const pct = (day: string) => `${(Math.max(0, daysBetween(d.start, day)) / days) * 100}%`;
-  const helped = new Set(d.factors.filter((f) => f.direction === "helped").map((f) => f.spanId));
+/**
+ * What was going on, as one tidy row above the chart, the way Health labels
+ * its series: a swatch and a name, left-aligned and wrapping. The ranges
+ * themselves live in the chart (product lanes under the plot, trips and the
+ * period as bands across it). Tapping an item picks its range out; tapping it
+ * again lets go.
+ */
+function Legend({ d, focus, onFocus }: { d: Derived; focus: string | null; onFocus: (id: string | null) => void }) {
+  const items = [
+    ...productSpans(d).map((sp, i) => ({
+      id: sp.id,
+      kind: "product",
+      label: sp.short,
+      color: rangeColor(i),
+      spoken: `${sp.label}, ${fmtDay(sp.start)} to ${sp.ongoing ? "now" : fmtDay(sp.end)}`,
+    })),
+    ...d.spans
+      .filter((sp) => sp.kind === "travel")
+      .map((sp) => ({
+        id: sp.id,
+        kind: "travel",
+        label: `${sp.short} · ${fmtRange(sp.start, sp.end)}`,
+        color: undefined,
+        spoken: `${sp.label}, ${fmtDay(sp.start)} to ${fmtDay(sp.end)}`,
+      })),
+    ...d.moments.map((m) => ({
+      id: m.id,
+      kind: "period",
+      label: `${m.label} · ${fmtRange(m.day, m.end)}`,
+      color: undefined,
+      spoken: `${m.label}, ${fmtDay(m.day)} to ${fmtDay(m.end)}`,
+    })),
+  ];
+  if (!items.length) return null;
   return (
-    <ul className={t.spans} aria-label="What was going on">
-      {d.spans.map((sp) => (
-        <li key={sp.id}>
-          <span
-            className={t.span}
-            data-kind={sp.kind}
-            data-tone={sp.kind === "travel" ? "travel" : helped.has(sp.id) ? "helped" : "plain"}
-            style={{ left: pct(sp.start), width: `max(calc(${pct(sp.end)} - ${pct(sp.start)}), 8px)` } as CSSProperties}
+    <ul className={t.legend} aria-label="What was going on">
+      {items.map((it) => (
+        <li key={it.id}>
+          <button
+            type="button"
+            className={t.legendItem}
+            aria-pressed={focus === it.id}
+            data-dim={focus ? focus !== it.id : undefined}
+            onClick={() => onFocus(focus === it.id ? null : it.id)}
           >
-            {sp.kind === "product" && <span className={t.spanLabel}>{sp.short}</span>}
-          </span>
-          {sp.kind === "travel" && (
-            <span className={t.spanOutside} style={{ left: `calc(${pct(sp.end)} + 8px)` }}>
-              {sp.short}
-            </span>
-          )}
-          <span className="sr-only">
-            {sp.label}, {fmtDay(sp.start)} to {sp.ongoing ? "now" : fmtDay(sp.end)}
-          </span>
+            <i className={t.swatch} data-kind={it.kind} style={it.color ? ({ "--c": it.color } as CSSProperties) : undefined} aria-hidden />
+            <span aria-hidden>{it.label}</span>
+            <span className="sr-only">{it.spoken}</span>
+          </button>
         </li>
       ))}
-      {d.moments.map((m) => {
-        const late = daysBetween(d.start, m.day) / days > 0.6;
-        return (
-          <li key={m.id}>
-            <span className={t.span} data-tone="period" style={{ left: pct(m.day), width: `max(calc(${pct(m.end)} - ${pct(m.day)}), 8px)` } as CSSProperties} />
-            {/* The dates sit beside the bar, on whichever side has room. */}
-            <span
-              className={t.spanOutside}
-              style={(late ? { right: `calc(100% - ${pct(m.day)} + 8px)` } : { left: `calc(${pct(m.end)} + 8px)` }) as CSSProperties}
-            >
-              {m.label} · {fmtRange(m.day, m.end)}
-            </span>
-          </li>
-        );
-      })}
     </ul>
   );
 }
