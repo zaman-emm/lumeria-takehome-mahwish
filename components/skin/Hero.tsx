@@ -6,6 +6,7 @@ import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useFirstTime } from "./hooks";
 import { Flame, Icon } from "./Icon";
+import { headline, sinceStart } from "@/lib/voice";
 import { Logo } from "./Logo";
 import { Photo } from "./ui";
 import h from "./hero.module.css";
@@ -105,7 +106,7 @@ export function Hero({
     <header className={h.hero} data-play={play} data-reduce={first && reduce}>
       <Logo className={h.logo} />
       <p className={h.hi}>Hi {d.firstName},</p>
-      <h1 className={h.title}>Your skin, at a glance</h1>
+      <h1 className={h.title}>{headline(d)}</h1>
 
       <div className={h.gauge} role="img" aria-label={`Overall score ${value} out of 100, ${word.toLowerCase()}`}>
         <svg viewBox="0 0 342 240" aria-hidden>
@@ -157,19 +158,10 @@ export function Hero({
       <div className={h.card}>
         <div className={h.cardText}>
           <span className={h.pill}>{word}</span>
-          {d.trend ? (
-            <>
-              <span className={h.change}>
-                <Icon name={d.trend.delta >= 0 ? "up" : "down"} size={14} stroke={1.8} />
-                {d.trend.delta === 0
-                  ? "Holding steady"
-                  : `${d.trend.delta > 0 ? "Up" : "Down"} ${Math.abs(d.trend.delta)} ${Math.abs(d.trend.delta) === 1 ? "point" : "points"}`}
-              </span>
-              <span className={h.since}>since {fmtDay(d.trend.from.takenAt, scanTz(d.trend.from) ?? tz)}</span>
-            </>
-          ) : (
-            <span className={h.change}>Your starting point</span>
-          )}
+          <span className={h.change}>
+            {d.trend && <Icon name={d.trend.delta >= 0 ? "up" : "down"} size={14} stroke={1.8} />}
+            {sinceStart(d)}
+          </span>
         </div>
         <button className={h.scan} onClick={onScan} aria-label={`Open your scan from ${fmtDay(lens.takenAt, tz)}`}>
           <Photo scan={lens} priority alt="" className={h.scanPhoto} style={{ viewTransitionName: "skin-photo" }} />

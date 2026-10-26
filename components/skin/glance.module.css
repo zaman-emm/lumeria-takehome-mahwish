@@ -19,6 +19,37 @@
   }
 }
 
+/* ------------------------------------------------ month story */
+
+.story {
+  composes: card from "./surface.module.css";
+  padding: 30px 12px 12px;
+  border-radius: 20px;
+}
+
+/* The month in one sentence; the curve's pins sit under it, so it leaves them room. */
+.story:has(.storyLine) {
+  padding-top: 18px;
+}
+
+.storyLine {
+  margin: 0 6px 32px;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 400;
+  color: var(--bark);
+  text-wrap: pretty;
+}
+
+.storyDates {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 4px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark-3);
+}
+
 /* ------------------------------------------------ rings */
 
 .rings {
@@ -69,6 +100,15 @@
   flex-direction: column;
   padding: 16px 12px 14px;
   border-radius: 20px;
+}
+
+/* Her own note, said back to her. */
+.echo {
+  margin: 14px 6px 6px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--bark);
+  text-wrap: pretty;
 }
 
 .tip {

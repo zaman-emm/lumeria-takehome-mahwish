@@ -7,9 +7,10 @@ import { useWidth } from "./hooks";
 import { Icon } from "./Icon";
 import c from "./curve.module.css";
 
-// A score across the period as one smooth curve. The product's own days sit
-// on a soft band and carry its colour; a trip that may share the blame shows
-// as a hatched band with a plane. Drag along it to read any scan day.
+// A score across the period as one smooth curve. Products sit on soft bands
+// in their colour and trips on hatched ones; when one band is in focus the
+// line wears its colour only there. Pins at the top of each band can be
+// tapped for its name, and dragging along the curve reads any scan day.
 
 export interface CurvePoint {
   /** Day index from the start of the period. */
@@ -22,9 +23,14 @@ export interface CurveBand {
   id: string;
   from: number;
   to: number;
+  kind: "product" | "trip";
+  tone: "helped" | "held" | "neutral";
+  /** What a tapped pin says, e.g. "Retinol 0.3% Night Serum · Sep 30–Oct 11". */
+  label?: string;
 }
 
-const H = 84;
+type Tone = "helped" | "held" | "neutral";
+
 const PAD_X = 6;
 const PAD_TOP = 10;
 const PAD_BOTTOM = 8;
@@ -32,27 +38,38 @@ const PAD_BOTTOM = 8;
 export function DayCurve({
   days,
   points,
-  band,
-  trips = [],
+  bands = [],
+  focus,
+  pins = false,
   marks,
+  values = false,
   tone,
   label,
+  height = 84,
   reveal = "done",
 }: {
   /** How many days the period spans. */
   days: number;
   points: CurvePoint[];
-  band?: CurveBand;
-  trips?: CurveBand[];
+  bands?: CurveBand[];
+  /** The band whose days the line wears its colour on. Without one, the whole line does. */
+  focus?: string;
+  /** Pin every band, not only trips. */
+  pins?: boolean;
   /** Day indexes of the "was" and "now" dots. */
   marks?: { from?: number; to?: number };
-  tone: "helped" | "held" | "neutral";
+  /** Print the score beside the "was" and "now" dots. */
+  values?: boolean;
+  tone: Tone;
   label: string;
+  height?: number;
   reveal?: RevealState;
 }) {
   const id = useId().replace(/:/g, "");
+  const H = height;
   const [box, w] = useWidth<HTMLDivElement>();
   const [at, setAt] = useState<CurvePoint | null>(null);
+  const [pinned, setPinned] = useState<CurveBand | null>(null);
 
   const { x, y, path, fill } = useMemo(() => {
     const vs = points.map((p) => p.value);
@@ -70,14 +87,16 @@ export function DayCurve({
       .y1((p) => y(p.value))
       .curve(curveMonotoneX)(points);
     return { x, y, path: path ?? "", fill: fill ?? "" };
-  }, [points, days, w]);
+  }, [points, days, w, H]);
 
-  // A product used all period needs no band: the whole line wears its colour.
-  const whole = band != null && band.from <= 0 && band.to >= days - 1;
+  // A band that covers the whole period needs no shading: the line says it.
+  const shown = bands.filter((b) => !(b.from <= 0 && b.to >= days - 1));
+  const lit = bands.find((b) => b.id === focus);
   const bandX = (b: CurveBand) => ({ left: x(b.from) - 4, width: x(b.to) - x(b.from) + 8 });
   const dot = (i?: number) => points.find((p) => p.i === i);
   const from = dot(marks?.from);
   const to = dot(marks?.to);
+  const pinsShown = shown.filter((b) => pins || b.kind === "trip");
 
   // Nearest scan day to the finger.
   const read = (e: PointerEvent<HTMLDivElement>) => {
@@ -85,15 +104,22 @@ export function DayCurve({
     const px = e.clientX - r.left;
     let best = points[0];
     for (const p of points) if (Math.abs(x(p.i) - px) < Math.abs(x(best.i) - px)) best = p;
+    setPinned(null);
     setAt(best);
   };
+  // The pill centres on its day or band, kept inside the chart by half its width.
+  const pillText = at ? `${at.label} · ${at.value}` : (pinned?.label ?? "");
+  const half = pillText.length * 3.4 + 12;
+  const pillAt = Math.max(half, Math.min(w - half, at ? x(at.i) : pinned ? x((pinned.from + pinned.to) / 2) : 0));
 
   return (
     <div
       ref={box}
       className={c.curve}
       data-tone={tone}
+      data-focus={Boolean(lit)}
       data-reveal={reveal}
+      style={{ height: H } as CSSProperties}
       role="img"
       aria-label={label}
       onPointerDown={read}
@@ -114,21 +140,27 @@ export function DayCurve({
                 <rect width="6" height="6" className={c.hatchBg} />
                 <line x1="0" y1="0" x2="0" y2="6" className={c.hatchLine} />
               </pattern>
-              {band && (
+              {lit && (
                 <clipPath id={`${id}-in`}>
-                  <rect x={x(band.from)} y={0} width={Math.max(0, x(band.to) - x(band.from))} height={H} />
+                  <rect x={x(lit.from)} y={0} width={Math.max(0, x(lit.to) - x(lit.from))} height={H} />
                 </clipPath>
               )}
             </defs>
 
-            {band && !whole && <rect className={c.band} x={bandX(band).left} y={0} width={bandX(band).width} height={H} rx={10} />}
-            {trips.map((t) => (
-              <rect key={t.id} className={c.trip} x={bandX(t).left} y={0} width={bandX(t).width} height={H} rx={10} fill={`url(#${id}-hatch)`} />
-            ))}
+            {shown
+              .filter((b) => b.kind === "product")
+              .map((b) => (
+                <rect key={b.id} className={c.band} data-tone={b.tone} x={bandX(b).left} y={0} width={bandX(b).width} height={H} rx={10} />
+              ))}
+            {shown
+              .filter((b) => b.kind === "trip")
+              .map((b) => (
+                <rect key={b.id} className={c.trip} x={bandX(b).left} y={0} width={bandX(b).width} height={H} rx={10} fill={`url(#${id}-hatch)`} />
+              ))}
 
-            <path className={c.fill} d={fill} fill={`url(#${id}-wash)`} clipPath={band ? `url(#${id}-in)` : undefined} />
-            <path className={c.rest} d={path} pathLength={1} />
-            {band && <path className={c.line} d={path} pathLength={1} clipPath={`url(#${id}-in)`} />}
+            <path className={c.fill} d={fill} fill={`url(#${id}-wash)`} clipPath={lit ? `url(#${id}-in)` : undefined} />
+            {lit && <path className={c.rest} d={path} pathLength={1} />}
+            <path className={c.line} d={path} pathLength={1} clipPath={lit ? `url(#${id}-in)` : undefined} />
 
             {from && <circle className={c.from} cx={x(from.i)} cy={y(from.value)} r={4} />}
             {to && <circle className={c.to} cx={x(to.i)} cy={y(to.value)} r={4.5} />}
@@ -141,15 +173,44 @@ export function DayCurve({
             )}
           </svg>
 
-          {trips.map((t) => (
-            <span key={t.id} className={c.plane} style={{ left: x((t.from + t.to) / 2) } as CSSProperties} aria-hidden>
-              <Icon name="plane" size={12} />
-            </span>
+          {pinsShown.map((b, i) => (
+            <button
+              key={b.id}
+              type="button"
+              className={c.pin}
+              data-tone={b.kind === "trip" ? "trip" : b.tone}
+              data-on={pinned?.id === b.id}
+              style={{ left: x(b.from + Math.min(2, (b.to - b.from) / 2)), "--i": i } as CSSProperties}
+              aria-label={b.label ?? b.id}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => {
+                setAt(null);
+                setPinned((p) => (p?.id === b.id ? null : b));
+              }}
+            >
+              <Icon name={b.kind === "trip" ? "plane" : "bottle"} size={12} />
+            </button>
           ))}
 
-          {at && (
-            <span className={c.pill} style={{ left: Math.max(36, Math.min(w - 36, x(at.i))) } as CSSProperties} aria-hidden>
-              {at.label} · <b>{at.value}</b>
+          {values &&
+            [from, to].map(
+              (pt, k) =>
+                pt && (
+                  <span key={k} className={c.value} data-end={k === 1} style={{ left: x(pt.i), top: y(pt.value) } as CSSProperties} aria-hidden>
+                    {pt.value}
+                  </span>
+                ),
+            )}
+
+          {(at || pinned?.label) && (
+            <span className={c.pill} style={{ left: pillAt } as CSSProperties} aria-live="polite">
+              {at ? (
+                <>
+                  {at.label} · <b>{at.value}</b>
+                </>
+              ) : (
+                pinned?.label
+              )}
             </span>
           )}
         </>

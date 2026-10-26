@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { daysBetween, fmtDay, metricMeta, type Derived } from "@/lib/insights";
+import { daysBetween, fmtDay, fmtRange, metricMeta, type Derived } from "@/lib/insights";
 import { BUDGET_TIER, dailySeries, factorFor, swapsFor, trial } from "@/lib/routine";
 import type { Product } from "@/lib/types";
 import { useReportApi } from "./context";
-import { DayCurve, type CurvePoint } from "./DayCurve";
+import { DayCurve, type CurveBand, type CurvePoint } from "./DayCurve";
 import { useReveal, useWidth, type RevealState } from "./hooks";
 import { Icon } from "./Icon";
 import { Chip, FromTo, ScheduleChip } from "./ui";
@@ -27,7 +27,7 @@ export function ProductsTab() {
         <span className={p.emptyIcon}>
           <Icon name="bottle" size={22} />
         </span>
-        <h2>No products yet</h2>
+        <h2>Tell me what you use and I’ll watch how your skin takes it.</h2>
       </div>
     );
   }
@@ -135,7 +135,7 @@ function ProductCurve({ d, product, reveal }: { d: Derived; product: Product; re
   const n = series.length;
   const idx = (day: string) => Math.max(0, Math.min(n - 1, daysBetween(d.start, day)));
   const points: CurvePoint[] = series.flatMap((v, i) => (v.value == null ? [] : [{ i, value: v.value, label: fmtDay(v.day) }]));
-  const band = span && f ? { id: span.id, from: idx(span.start), to: idx(span.end) } : undefined;
+  const band: CurveBand | undefined = span && f ? { id: span.id, from: idx(span.start), to: idx(span.end), kind: "product", tone: f.direction } : undefined;
   const before = band ? points.filter((pt) => pt.i < band.from) : [];
   const during = band ? points.filter((pt) => pt.i >= band.from && pt.i <= band.to) : [];
   const marks = band ? { from: (before[before.length - 1] ?? points[0])?.i, to: during[during.length - 1]?.i } : undefined;
@@ -163,8 +163,11 @@ function ProductCurve({ d, product, reveal }: { d: Derived; product: Product; re
       <DayCurve
         days={n}
         points={points}
-        band={band}
-        trips={trips.map((t) => ({ id: t.id, from: idx(t.start), to: idx(t.end) }))}
+        bands={[
+          ...(band ? [band] : []),
+          ...trips.map((t): CurveBand => ({ id: t.id, from: idx(t.start), to: idx(t.end), kind: "trip", tone: "held", label: `${t.label} · ${fmtRange(t.start, t.end)}` })),
+        ]}
+        focus={band?.id}
         marks={marks}
         tone={f?.direction ?? "neutral"}
         reveal={reveal}

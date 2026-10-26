@@ -36,6 +36,7 @@
   font-weight: 300;
   letter-spacing: -0.6px;
   text-align: center;
+  text-wrap: balance;
 }
 
 /* ------------------------------------------------ gauge */
@@ -184,11 +185,6 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--evergreen);
-}
-
-.since {
-  font-size: 12px;
-  color: rgba(46, 38, 32, 0.8);
 }
 
 .scan {

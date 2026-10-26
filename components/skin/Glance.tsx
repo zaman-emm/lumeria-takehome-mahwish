@@ -2,17 +2,20 @@
 
 import { useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
-import { EXTRAS, METRICS, faceMarks, score, shortTip, type ScoreKey } from "@/lib/insights";
+import { EXTRAS, METRICS, faceMarks, score, type ScoreKey } from "@/lib/insights";
 import { skinTypeOf } from "@/lib/extended";
+import { noteEcho, streakLine } from "@/lib/voice";
 import type { WeekStreak } from "@/lib/weeks";
 import { useReportApi } from "./context";
 import { useCountUp, useFirstTime, useReveal } from "./hooks";
 import { Icon } from "./Icon";
+import { MonthStory } from "./MonthStory";
 import { Delta, FaceMap, Ring } from "./ui";
 import g from "./glance.module.css";
 
-// At a glance, under the hero: the five scores as rings, what the latest scan
-// saw on a face, the week streak, and the extra measures folded away.
+// At a glance, under the hero: the month as one curve, the five scores as
+// rings, what the latest scan saw on a face, the week streak, and the extra
+// measures folded away.
 
 /** When the sections start rising in on first load, in ms: as the hero's card lands. */
 const ENTER = 1000;
@@ -27,10 +30,12 @@ export function Glance({ streak }: { streak: WeekStreak }) {
   const [faceRef, faceReveal] = useReveal<HTMLElement>("glance-face");
   const change = (key: ScoreKey) => d.changes.find((c) => c.key === key);
   const marks = faceMarks(latest.summary.observations);
+  const echo = noteEcho(d);
 
   return (
     <div className={g.stack} data-enter={enter}>
-      <section className={g.rings} aria-label="Your scores" style={{ "--n": 0 } as CSSProperties}>
+      <MonthStory d={d} n={0} />
+      <section className={g.rings} aria-label="Your scores" style={{ "--n": 1 } as CSSProperties}>
         {METRICS.map((m, i) => {
           const c = change(m.key);
           const v = score(latest, m.key);
@@ -54,11 +59,12 @@ export function Glance({ streak }: { streak: WeekStreak }) {
         })}
       </section>
 
-      <section ref={faceRef} className={g.read} aria-label="What this scan saw" style={{ "--n": 1 } as CSSProperties}>
+      <section ref={faceRef} className={g.read} aria-label="What this scan saw" style={{ "--n": 2 } as CSSProperties}>
         <FaceMap marks={marks} area={latest.area} reveal={faceReveal} />
+        {echo && <p className={g.echo}>{echo}</p>}
         <p className={g.tip}>
           <Icon name="spark" size={14} />
-          {shortTip(latest.summary.tip)}
+          {latest.summary.tip}
         </p>
         <p className={g.ai}>AI-generated · not medical advice</p>
         <button className={g.full} onClick={() => openScan(latest)}>
@@ -81,7 +87,7 @@ function Streak({ streak }: { streak: WeekStreak }) {
     <section ref={ref} className={g.streak} data-reveal={reveal} aria-label={`${run} weeks in a row with a scan`} style={{ "--n": 2 } as CSSProperties}>
       <p className={g.streakHead} aria-hidden>
         <b ref={count}>{run}</b>
-        <span>{streak.current ? "weeks in a row" : "weeks, your best run"}</span>
+        <span>{streakLine(streak)}</span>
       </p>
       <div className={g.weeks} aria-hidden>
         {streak.weeks.map((on, i) => (

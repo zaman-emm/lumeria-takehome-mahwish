@@ -274,9 +274,12 @@
 }
 
 .empty h2 {
+  max-width: 280px;
   margin: 6px 0 0;
   font-size: 17px;
+  line-height: 24px;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .empty p {
