@@ -8,9 +8,7 @@ import type { Product } from "./types";
 export interface Schedule {
   am: boolean;
   pm: boolean;
-  /** "PM · 3× a week". Omitted when the icons say it all (AM + PM). */
-  label?: string;
-  /** For screen readers, since the chip can be icons only. */
+  /** For screen readers, since the chip is icons only: "Night, 3× a week". */
   spoken: string;
 }
 
@@ -25,9 +23,7 @@ export function schedule(p: Product): Schedule {
     .trim()
     .replace(/\s+/g, " ");
   const when = am && pm ? "Morning and night" : am ? "Morning" : pm ? "Night" : "";
-  if (!freq) return { am, pm, spoken: when };
-  const label = [am && pm ? null : am ? "AM" : pm ? "PM" : null, freq].filter(Boolean).join(" · ");
-  return { am, pm, label, spoken: [when, freq].filter(Boolean).join(", ") };
+  return { am, pm, spoken: [when, freq].filter(Boolean).join(", ") };
 }
 
 export const TRIAL_DAYS = 14;

@@ -123,30 +123,38 @@ export function ScanSheet({ scan }: { scan: Scan }) {
       {/* Her note, with what she tagged and how stressed she said she was that day. */}
       {ann && (
         <NoteCard scan={scan} addable className={m.note}>
-          <dl className={m.tagged}>
-            {ann.tags.length > 0 && (
-              <div>
-                <dt>You tagged</dt>
-                <dd>
-                  {ann.tags.map((t) => (
-                    <span key={t} className={m.tag}>
-                      {t}
+          <div className={m.taggedWrap}>
+            {/* Shows that tags and stress can be changed; not wired up in this prototype. */}
+            {(ann.tags.length > 0 || stress != null) && (
+              <button type="button" className={m.tagEdit} aria-label="Edit tags and stress">
+                <Icon name="pencil" size={13} stroke={1.6} />
+              </button>
+            )}
+            <dl className={m.tagged}>
+              {ann.tags.length > 0 && (
+                <div>
+                  <dt>You tagged</dt>
+                  <dd>
+                    {ann.tags.map((t) => (
+                      <span key={t} className={m.tag}>
+                        {t}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              )}
+              {stress != null && (
+                <div>
+                  <dt>Stress</dt>
+                  <dd>
+                    <span className={m.stress} data-high={stress >= 4}>
+                      {stressWord(stress)} · {stress} of 5
                     </span>
-                  ))}
-                </dd>
-              </div>
-            )}
-            {stress != null && (
-              <div>
-                <dt>Stress</dt>
-                <dd>
-                  <span className={m.stress} data-high={stress >= 4}>
-                    {stressWord(stress)} · {stress} of 5
-                  </span>
-                </dd>
-              </div>
-            )}
-          </dl>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
         </NoteCard>
       )}
 
