@@ -106,7 +106,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 47%;
+  top: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -126,16 +126,6 @@
 
 .digits {
   display: inline-block;
-}
-
-.label {
-  margin-top: 10px;
-  font-size: 11px;
-  line-height: 13px;
-  font-weight: 600;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  color: var(--forest);
 }
 
 /* ------------------------------------------------ status card */
@@ -331,10 +321,6 @@
 
 .hero[data-play="true"] .digits {
   animation: fade 300ms var(--ease-out) 150ms both;
-}
-
-.hero[data-play="true"] .label {
-  animation: fade 400ms var(--ease-out) 1000ms both;
 }
 
 .hero[data-play="true"] .card {

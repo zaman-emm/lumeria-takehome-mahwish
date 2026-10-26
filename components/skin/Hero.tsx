@@ -141,7 +141,6 @@ export function Hero({
               {value}
             </span>
           </span>
-          <span className={h.label}>Overall score</span>
         </div>
       </div>
 
