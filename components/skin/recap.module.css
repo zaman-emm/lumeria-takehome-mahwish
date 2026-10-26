@@ -547,17 +547,17 @@
    deal out when the card turns over to the cover. */
 .snaps {
   position: absolute;
-  inset: 10% 0 auto;
-  height: 52%;
+  /* Sits just above the month's name: its padding, its size and a small gap. */
+  inset: 0 0 calc(16px + min(30px, 21cqw) + 8cqw);
 }
 
 .snap {
   --rot: calc((var(--i) - 1) * 11deg);
   --dx: calc((var(--i) - 1) * 28%);
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 50%;
-  width: 42cqw;
+  width: 46cqw;
   padding: 3cqw 3cqw 9cqw;
   border-radius: 3px;
   background: #fffdf8;
