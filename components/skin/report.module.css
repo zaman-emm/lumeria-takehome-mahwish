@@ -176,38 +176,47 @@
 .exploreHeader::before {
   content: "";
   position: absolute;
-  inset: 0 0 -64px;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: #F5F0E6;
-  -webkit-backdrop-filter: blur(20px) saturate(1.25);
-  backdrop-filter: blur(20px) saturate(1.25);
-  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 64px), rgba(0, 0, 0, 0.85) calc(100% - 52px), rgba(0, 0, 0, 0.35) calc(100% - 28px), transparent 100%);
-  mask-image: linear-gradient(180deg, #000 calc(100% - 64px), rgba(0, 0, 0, 0.85) calc(100% - 52px), rgba(0, 0, 0, 0.35) calc(100% - 28px), transparent 100%);
+  background: #d7b35f;
 }
 
-.exploreBrandRow { position: relative; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+.exploreHeader[data-scrolled="true"]::before {
+  background: rgba(215, 179, 95, 0.82);
+  -webkit-backdrop-filter: blur(20px) saturate(1.25);
+  backdrop-filter: blur(20px) saturate(1.25);
+}
+
+.exploreBrandRow { position: relative; height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 8px; }
 .exploreBrandRow button { position: relative; z-index: 1; }
 .exploreBrandRow button:first-child { color: #14241a; background: rgba(255, 255, 255, 0.5); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(20,36,26,0.18); }
 .exploreBrand {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 184px;
-  height: 36px;
+  top: 24px;
+  width: 128px;
+  height: 28px;
   transform: translate(-50%, -50%);
-  transform-origin: center;
   background: #14241a;
   -webkit-mask: url('/brand/lumeria-horizontal.svg') center / contain no-repeat;
   mask: url('/brand/lumeria-horizontal.svg') center / contain no-repeat;
-  transition: left 300ms var(--ease-out), width 300ms var(--ease-out), transform 300ms var(--ease-out);
 }
-.exploreHeader[data-compact="true"] .exploreBrand { left: 50%; width: 124px; transform: translate(-50%, -50%); }
+.exploreTitle {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  transform: translate(-50%, -50%);
+  color: #14241a;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+}
 .page[data-iteration="true"] { --tabs-top: 0px; }
 .page[data-iteration="true"][data-tab="glance"] { background: var(--canvas); }
 .page[data-iteration="true"]:not([data-tab="glance"]) .panel { padding-top: 64px; }
-@media (prefers-reduced-motion: reduce) { .exploreBrand { transition: none; } }
 @media (prefers-reduced-transparency: reduce) {
-  .exploreHeader::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .exploreHeader::before,
+  .exploreHeader[data-scrolled="true"]::before { background: #d7b35f; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .exploreBrandRow button:first-child { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }

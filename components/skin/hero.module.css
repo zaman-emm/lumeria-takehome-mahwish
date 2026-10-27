@@ -601,10 +601,11 @@
   }
 }
 
-.hero[data-iteration="true"] { padding-top: 72px; }
+.hero[data-iteration="true"] {
+  padding-top: 48px;
+  background: linear-gradient(180deg, #d7b35f 0, #d7b35f 100px, #ddc17c 38%, #e8d4a4 62%, #f1e6cd 82%, var(--canvas) 100%);
+}
 .hero[data-iteration="true"] > :is(.logo, .back, .profile) { display: none; }
-.hero[data-iteration="true"] .title { font-weight: 400; color: #14241a; }
-.hero[data-iteration="true"] .gaugeBox { margin-top: 8px; }
+.hero[data-iteration="true"] .title { line-height: 36px; }
 .hero[data-iteration="true"] .month { margin-top: 0; }
 .hero[data-iteration="true"] .hi { margin-top: 16px; }
-.hero[data-iteration="true"] .card { margin-top: 12px; }

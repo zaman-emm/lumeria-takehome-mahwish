@@ -54,7 +54,6 @@ export function Report({ d, fitnessLayout = false }: { d: Derived; fitnessLayout
   // The splash opens the first load of a page, never again, and never for
   // people who asked for less motion (splashState.ts).
   const [splash, setSplash] = useState<"wait" | "go" | "done">(() => (!fitnessLayout && willSplash() ? "wait" : "done"));
-  const [compactHeader, setCompactHeader] = useState(false);
   const [barReady, setBarReady] = useState(() => splash === "done");
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [recap, setRecap] = useState(false);
@@ -145,6 +144,7 @@ export function Report({ d, fitnessLayout = false }: { d: Derived; fitnessLayout
   // The slim header slides away as you scroll down and comes back the moment
   // you scroll up, like an iOS navigation bar.
   const [headAway, setHeadAway] = useState(false);
+  const [fitnessScrolled, setFitnessScrolled] = useState(false);
   useEffect(() => {
     if (tab === "glance") return setHeadAway(false);
     let last = window.scrollY;
@@ -163,12 +163,11 @@ export function Report({ d, fitnessLayout = false }: { d: Derived; fitnessLayout
 
   useEffect(() => {
     if (!fitnessLayout) return;
-    const update = () => setCompactHeader(window.scrollY > 40);
+    const update = () => setFitnessScrolled(window.scrollY > 1);
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, [fitnessLayout]);
-
 
   return (
     <ReportContext.Provider value={api}>
@@ -178,10 +177,10 @@ export function Report({ d, fitnessLayout = false }: { d: Derived; fitnessLayout
             <Drawer.IndentBackground className={r.indentBg} />
             <Drawer.Indent className={r.indent} style={{ "--origin": `${origin}px` } as CSSProperties}>
               <div className={r.page} data-iteration={fitnessLayout || undefined} data-tab={tab} data-head={headAway ? "away" : "shown"} data-splash={splash === "done" ? undefined : splash}>
-                {fitnessLayout && <div className={r.exploreHeader} data-compact={compactHeader} data-page-chrome>
+                {fitnessLayout && <div className={r.exploreHeader} data-scrolled={fitnessScrolled} data-page-chrome>
                   <div className={r.exploreBrandRow}>
                     <BackButton />
-                    <span className={r.exploreBrand} role="img" aria-label="Lumeria" />
+                    {fitnessScrolled ? <span className={r.exploreTitle}>Report</span> : <span className={r.exploreBrand} role="img" aria-label="Lumeria" />}
                     <ProfileButton name={d.firstName} />
                   </div>
                   <Tabs tabs={TABS} active={tab} onChange={changeTab} fitnessLayout />
