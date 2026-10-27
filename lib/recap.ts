@@ -57,7 +57,6 @@ export type Slide =
       month: string;
       /** That month as a Sunday-first grid, padded with the days either side of it. */
       days: { day: string; date: number; inMonth: boolean; scanned: boolean; latest: boolean }[];
-      body: string;
     }
   | { kind: "scanTime"; title: Title; hour: number; minutes: number[]; stats: Stat[]; body: string }
   | {
@@ -190,7 +189,6 @@ export function buildRecap(d: Derived): Slide[] {
   // The cover's snapshots: the first scan, one from the middle and the latest.
   const inOrder = [...d.scans].sort(byTime);
   const snaps = [...new Set([0, Math.floor((inOrder.length - 1) / 2), inOrder.length - 1])].map((i) => inOrder[i]).filter(Boolean);
-  const next = ws.milestones.find((m) => !m.earned);
   const run = ws.current || ws.best;
   out.push({
     kind: "showedUp",
@@ -206,11 +204,6 @@ export function buildRecap(d: Derived): Slide[] {
     ],
     month: new Intl.DateTimeFormat("en-US", { month: "long", timeZone: "UTC" }).format(new Date(`${monthStart}T12:00:00Z`)),
     days: grid,
-    body:
-      `${cap(word(run))} ${run === 1 ? "week" : "weeks"} in a row, and it shows.` +
-      (next
-        ? ` ${cap(word(next.weeks - run))} more and you’re at ${next.weeks}. Keep doing exactly this.`
-        : " Keep doing exactly this."),
   });
 
   // 3. Scan time: the hour most scans land in, one minute hand per scan.

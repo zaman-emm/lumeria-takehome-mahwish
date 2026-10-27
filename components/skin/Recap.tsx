@@ -427,9 +427,6 @@ function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
           </span>
         </span>
       </In>
-      <In i={5} className={s.body}>
-        {slide.body}
-      </In>
     </>
   );
 }

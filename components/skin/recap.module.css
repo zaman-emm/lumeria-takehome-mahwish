@@ -755,7 +755,9 @@
   --ink: var(--bark);
   --ink-soft: rgba(46, 38, 32, 0.8);
   flex: none;
-  margin-top: 20px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 12px;
 }
 
 .calMonth {
@@ -768,9 +770,10 @@
 
 .cal {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   row-gap: 2px;
   justify-items: center;
+  width: 100%;
 }
 
 .calHead {
@@ -789,8 +792,8 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: clamp(32px, 4.6dvh, 40px);
-  height: clamp(32px, 4.6dvh, 40px);
+  width: min(100%, 36px);
+  aspect-ratio: 1;
   border-radius: 50%;
   font-variant-numeric: tabular-nums;
 }
@@ -867,11 +870,6 @@
   height: 12px;
   border-radius: 50%;
   background: var(--bronze-deep);
-}
-
-.slide[data-kind="showedUp"] .body {
-  margin-top: auto;
-  padding-top: 16px;
 }
 
 /* ------------------------------------------------ 3 · scan time */
