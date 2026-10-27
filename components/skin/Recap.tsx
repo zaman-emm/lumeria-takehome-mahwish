@@ -26,7 +26,7 @@ const glow = (x: number, y: number, r: number, c: string) => `radial-gradient(${
 
 const THEMES: Record<Slide["kind"], Theme> = {
   highs: {
-    bg: "#c0913f",
+    bg: "#d09f37",
     glows: [glow(360, 100, 200, "rgba(244,239,230,.55)"), glow(30, 610, 210, "rgba(128,96,31,.55)"), glow(350, 690, 150, "rgba(232,223,206,.35)")].join(","),
     ink: "dark",
   },

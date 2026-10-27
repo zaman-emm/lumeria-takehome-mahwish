@@ -27,17 +27,19 @@
   --canvas: #f4efe6;
   --canvas-rgb: 244, 239, 230;
   --card: #fbf8f2;
-  --sunrise: linear-gradient(180deg, #e6cf9f 0%, #d7b46f 45%, #c0913f 100%);
-  --sunrise-x: linear-gradient(90deg, #e6cf9f 0%, #d7b46f 55%, #c0913f 100%);
+  /* The gold surfaces: brand bronze warmed a few degrees toward gold and
+     brightened, so large areas read sunlit rather than brown. */
+  --sunrise: linear-gradient(180deg, #eed69b 0%, #e2bd68 45%, #d09f37 100%);
+  --sunrise-x: linear-gradient(90deg, #eed69b 0%, #e2bd68 55%, #d09f37 100%);
   /* The At a glance ground: the sunrise, then easing back into the page's own
      canvas, so the gold has no hard edge. */
   --sunrise-fade: linear-gradient(
     180deg,
-    #e6cf9f 0%,
-    #d7b46f 30%,
-    #c99d4f 52%,
-    #dcc08a 70%,
-    #efe3c9 85%,
+    #eed69b 0%,
+    #e2bd68 30%,
+    #d7a843 52%,
+    #e4c782 70%,
+    #f2e5c5 85%,
     var(--canvas) 100%
   );
 

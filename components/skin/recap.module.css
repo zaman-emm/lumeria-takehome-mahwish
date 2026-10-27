@@ -456,7 +456,7 @@
 }
 
 .flip[data-tone="gold"] {
-  --card-bg: radial-gradient(80% 70% at 40% 25%, rgba(255, 250, 240, 0.45), transparent 70%), linear-gradient(160deg, #ead6a8, #d7b46f 55%, #c0913f);
+  --card-bg: radial-gradient(80% 70% at 40% 25%, rgba(255, 250, 240, 0.45), transparent 70%), linear-gradient(160deg, #f0daa4, #e2bd68 55%, #d09f37);
   /* White on gold, lifted by a soft bronze shadow so it holds on the light top. */
   --card-ink: #ffffff;
   --card-soft: rgba(255, 255, 255, 0.95);
