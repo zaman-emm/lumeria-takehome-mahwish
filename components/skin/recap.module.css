@@ -551,12 +551,13 @@
   transform: rotateY(180deg);
 }
 
-/* The month's name in a serif, under the photos. */
+/* The month's name under the photos, in the brand's light title weight. */
 .coverName {
   position: relative;
-  font-family: Georgia, "Times New Roman", serif;
-  /* About half an em per letter in this serif, kept within the card's inner 80%. */
-  font-size: min(30px, 21cqw, calc(80cqw / (var(--len, 7) * 0.5)));
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  /* Montserrat runs about 0.6em a letter; kept within the card's inner 80%. */
+  font-size: min(28px, 20cqw, calc(80cqw / (var(--len, 7) * 0.6)));
   white-space: nowrap;
   line-height: 1;
   text-align: center;
