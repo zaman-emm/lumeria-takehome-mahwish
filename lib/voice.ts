@@ -66,13 +66,6 @@ export function streakLine(streak: WeekStreak): string {
   return next ? `${weeks} in a row. ${next.weeks - run} more for ${next.weeks}.` : `${weeks} in a row.`;
 }
 
-/** The answer to her own words, when the scan proves her right. Her note shows above it, in its card. */
-export function noteEcho(d: Derived): string | null {
-  const note = d.latest.annotation?.note?.trim();
-  if (!note || !d.isBest || !d.trend) return null;
-  return `You’re right: ${d.trend.to.scores.overall} is your high.`;
-}
-
 /** How each routine change and trip moved the month, in order: "Retinol stung, Phoenix dried you out, and azelaic acid brought the calm back." */
 export function monthStory(d: Derived): string | null {
   const shaped = d.spans

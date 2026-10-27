@@ -70,17 +70,9 @@
   border-radius: 20px;
 }
 
-/* Her own note, said back to her. */
+/* Her own note on the latest scan. */
 .echoNote {
-  margin: 0;
-}
-
-.echo {
-  margin: 10px 6px 6px;
-  font-size: 15px;
-  line-height: 22px;
-  color: var(--bark);
-  text-wrap: pretty;
+  margin: 0 0 4px;
 }
 
 .ai {

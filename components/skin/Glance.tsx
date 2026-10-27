@@ -3,7 +3,7 @@
 import { useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
 import { skinTypeOf } from "@/lib/extended";
-import { noteEcho, streakLine } from "@/lib/voice";
+import { streakLine } from "@/lib/voice";
 import type { WeekStreak } from "@/lib/weeks";
 import { useReportApi } from "./context";
 import { useCountUp, useFirstTime, useReveal } from "./hooks";
@@ -25,7 +25,6 @@ export function Glance({ streak }: { streak: WeekStreak }) {
   const reduce = useReducedMotion();
   // On first load the sections rise in after the hero's card, top to bottom.
   const enter = first && !reduce;
-  const echo = noteEcho(d);
 
   return (
     <div className={g.stack} data-enter={enter}>
@@ -35,13 +34,8 @@ export function Glance({ streak }: { streak: WeekStreak }) {
       </div>
 
       <section className={g.read} aria-label="Your latest scan" style={{ "--n": 2 } as CSSProperties}>
-        {/* Her note in its card, answered under it, then the scan's suggestion. */}
-        {echo && (
-          <>
-            <NoteCard scan={latest} className={g.echoNote} />
-            <p className={g.echo}>{echo}</p>
-          </>
-        )}
+        {/* Her note on the latest scan, in its card, then the scan's suggestion. */}
+        {latest.annotation?.note?.trim() && <NoteCard scan={latest} className={g.echoNote} />}
         <p className={g.tip}>
           <Icon name="spark" size={14} />
           {latest.summary.tip}
