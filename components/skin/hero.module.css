@@ -271,6 +271,10 @@
 
 /* A plain call to action on the gold: glass pill, words and a chevron. */
 .month {
+  position: relative;
+  /* Its own layer, so the glint can sit between the cream and the words. */
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -279,10 +283,9 @@
   margin-top: 8px;
   padding: 0 22px 0 24px;
   border-radius: 24px;
-  /* Flat cream with a 2D glint: a soft wash at the top-left and one thin
-     diagonal streak of light, like a reflection on glass. No depth shading. */
+  /* Flat cream with a soft wash at the top-left; the glint (::after) sweeps
+     across it now and then. No depth shading. */
   background:
-    linear-gradient(115deg, transparent 0 30%, rgba(255, 255, 255, 0.85) 34%, transparent 38%, transparent 44%, rgba(255, 255, 255, 0.5) 46%, transparent 48%),
     linear-gradient(160deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 45%),
     #f8efdc;
   box-shadow:
@@ -295,6 +298,36 @@
   font-weight: 600;
   white-space: nowrap;
   transition: transform 160ms var(--ease-out);
+}
+
+/* The shine: a diagonal band of light that glides across behind the words,
+   then rests. */
+.month::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.9) 42%,
+    rgba(255, 255, 255, 0.35) 47%,
+    rgba(255, 255, 255, 0.85) 50%,
+    transparent 60%
+  );
+  transform: translateX(-110%);
+  animation: shine 4.2s cubic-bezier(0.45, 0, 0.2, 1) 1.4s infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-110%);
+  }
+  28%,
+  100% {
+    transform: translateX(110%);
+  }
 }
 
 .month:active {
@@ -443,6 +476,12 @@
 @media (prefers-reduced-motion: reduce) {
   .hero[data-splash] :is(.logo, .hi, .title, .card, .month, .pairItem) {
     animation: none;
+  }
+
+  /* The glint rests in place instead of sweeping. */
+  .month::after {
+    animation: none;
+    transform: translateX(-8%);
   }
 }
 
