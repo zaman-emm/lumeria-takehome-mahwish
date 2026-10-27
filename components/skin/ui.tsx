@@ -162,19 +162,17 @@ export function FromTo({ from, to }: { from: number; to: number }) {
 /**
  * A score as twenty ticks, one per five points, filled up to the score and
  * faint past it, so where a score falls reads at a glance. The tall tick is
- * now; the dot marks the previous scan of the same spot. Each tick sits in an
- * equal cell, so TickAxis lines up with it at any width.
+ * the score; the change since last time is said in numbers beside it. Each
+ * tick sits in an equal cell, so TickAxis lines up with it at any width.
  */
-export function Ticks({ value, prev, reveal = "done", order = 0 }: { value: number | null; prev?: number | null; reveal?: RevealState; order?: number }) {
+export function Ticks({ value, reveal = "done", order = 0 }: { value: number | null; reveal?: RevealState; order?: number }) {
   const now = value == null ? -1 : Math.min(19, Math.floor(value / 5));
-  const was = prev == null ? -1 : Math.min(19, Math.floor(prev / 5));
   return (
     <span className={u.ticks} data-reveal={reveal} aria-hidden>
       {Array.from({ length: 20 }, (_, i) => (
         <i
           key={i}
           data-now={i === now}
-          data-was={i === was && was !== now}
           data-fill={i <= now}
           data-off={value == null}
           style={{ "--d": `${order * 40 + i * 14}ms` } as CSSProperties}
