@@ -14,7 +14,7 @@ import b from "./tabbar.module.css";
 
 const TABS: { id: string; label: string; icon: IconName }[] = [
   { id: "home", label: "Home", icon: "home" },
-  { id: "trends", label: "Trends", icon: "trends" },
+  { id: "trends", label: "Report", icon: "report" },
   { id: "scan", label: "Scan", icon: "scan" },
 ];
 const ACTIVE = "trends";
