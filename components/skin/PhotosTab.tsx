@@ -7,7 +7,7 @@ import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { ChangeSince, Delta, LIGHTS, LightTag, Photo, hasLights, photoFor, type Light } from "./ui";
+import { ChangeSince, Delta, LIGHTS, Photo, hasLights, photoFor, type Light } from "./ui";
 import { monthStory } from "@/lib/voice";
 import ph from "./photos.module.css";
 
@@ -110,7 +110,6 @@ function Polaroid({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
     <button className={ph.polaroid} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}`}>
       <i className={ph.tape} aria-hidden />
       <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.thumb} say />
-      {photoFor(scan, "ambient") && <LightTag light={lightFor(scan, light)} className={ph.thumbTag} />}
       <span className={ph.pMeta}>
         <span>{fmtDay(scan.takenAt, tz)}</span>
         <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>
@@ -130,10 +129,7 @@ function PhotoRow({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
   return (
     <div className={ph.row}>
       <button className={ph.rowHit} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}. Open scan`} />
-      <span className={ph.rowPhotoBox}>
-        <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.rowPhoto} />
-        {photoFor(scan, "ambient") && <LightTag light={lightFor(scan, light)} className={ph.rowTag} />}
-      </span>
+      <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.rowPhoto} />
       <span className={ph.rowText}>
         <span className={ph.rowWhen} aria-hidden>
           {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}

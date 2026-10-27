@@ -243,7 +243,9 @@ function draw(ctx: CanvasRenderingContext2D, contours: Pt[][], t: number, still:
         else ctx.lineTo(x, y);
       }
       if (index === 3 && morph < 1) {
-        ctx.fillStyle = "rgba(255,250,238,.7)";
+        // The small disc the scope grows from fades as it forms, so the
+        // lens shows through as it opens instead of the scope sitting white.
+        ctx.fillStyle = `rgba(255,250,238,${0.7 * (1 - morph) ** 2})`;
         ctx.fill();
       }
       if (index >= 8 && join > 0.9) {
