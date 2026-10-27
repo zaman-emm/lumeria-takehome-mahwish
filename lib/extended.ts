@@ -27,9 +27,16 @@ function extrasFor(s: Scan): ScanExtras {
   };
 }
 
+/**
+ * The starter's generated placeholders (.svg) swapped for closer-to-life ones,
+ * made by scripts/placeholders.py into public/placeholders. A real photo (.jpg
+ * from the scope) and a failed upload (null) are left as they are.
+ */
+const placeholderFor = (s: Scan) => (s.photoUrl?.endsWith(".svg") ? `/placeholders/${s.id}.jpg` : s.photoUrl);
+
 /** The report as if the API also returned the extra measures. */
 export function extend(report: SkinReport): SkinReport {
-  return { ...report, scans: report.scans.map((s) => ({ ...s, extras: extrasFor(s) })) };
+  return { ...report, scans: report.scans.map((s) => ({ ...s, photoUrl: placeholderFor(s), extras: extrasFor(s) })) };
 }
 
 // ---------------------------------------------------------------- skin type
