@@ -147,13 +147,13 @@ def make(person: str, scan: dict) -> dict[str, Image.Image]:
     pol -= pores[..., None] * 12
     pol -= hair[..., None] * hair_tint * 0.8
 
-    # UV (365 nm): the skin goes dark violet, pigment darker still, and oil
-    # and porphyrins fluoresce.
+    # UV (365 nm): the skin takes a pale lavender cast, pigment shows darker,
+    # and oil and porphyrins fluoresce.
     lum = (day.mean(axis=2) - 60) / 180
-    uv = np.stack([lum * 44 + 20, lum * 34 + 16, lum * 86 + 46], axis=2)
-    uv -= marks[..., None] * np.array([26, 18, 46], dtype=np.float32)
+    uv = np.stack([lum * 80 + 128, lum * 74 + 120, lum * 60 + 182], axis=2)
+    uv -= marks[..., None] * np.array([60, 58, 50], dtype=np.float32)
     uv += sebum[..., None] * np.array([18, 26, 34], dtype=np.float32)
-    uv += porphyrins[..., None] * np.array([250, 130, 20], dtype=np.float32)
+    uv += porphyrins[..., None] * np.array([120, -10, -170], dtype=np.float32)
 
     return {"": finish(day), "-polarized": finish(pol, 0.6), "-uva": finish(uv, 0.5)}
 
