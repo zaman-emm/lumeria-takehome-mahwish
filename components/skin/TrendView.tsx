@@ -124,8 +124,8 @@ export function TrendView({
         <div className={t.chartVoid}>
           <p className={t.emptyTrend}>
             {scans.length
-              ? `One ${metricMeta(metric).label.toLowerCase()} read so far. Your line starts with the next scan.`
-              : `No ${metricMeta(metric).label.toLowerCase()} reads for this spot yet.`}
+              ? `Just one ${area.toLowerCase()} scan so far. Scan it again to see how your ${metricMeta(metric).label.toLowerCase()} score changes.`
+              : `No ${metricMeta(metric).label.toLowerCase()} readings for your ${area.toLowerCase()} yet.`}
           </p>
         </div>
       )}

@@ -41,11 +41,11 @@ export function ScanSheet({ scan }: { scan: Scan }) {
       ? [
           ["Sleep", `${scan.checkin.sleepHours} h`],
           ["Water", `${scan.checkin.waterGlasses} glasses`],
-          ["Stress", `${scan.checkin.stress} of 5`],
         ]
       : [];
-  // The tiles already show a check-in's stress; the note card shows the stress she logged with her note.
-  const stress = ann?.stress;
+  // Stress lives in the note card, whether it came with a note or a check-in.
+  const stress = ann?.stress ?? scan.checkin?.stress ?? null;
+  const tags = ann?.tags ?? [];
 
   return (
     <article className={m.scan}>
@@ -120,46 +120,45 @@ export function ScanSheet({ scan }: { scan: Scan }) {
       </div>
       <i className={m.band} aria-hidden />
 
-      {/* Her note, with what she tagged and how stressed she said she was that day. */}
-      {ann && (
-        <NoteCard scan={scan} addable className={m.note}>
-          <div className={m.taggedWrap}>
-            {/* Shows that tags and stress can be changed; not wired up in this prototype. */}
-            {(ann.tags.length > 0 || stress != null) && (
-              <button type="button" className={m.tagEdit} aria-label="Edit tags and stress">
-                <Icon name="pencil" size={13} stroke={1.6} />
-              </button>
-            )}
-            <dl className={m.tagged}>
-              {ann.tags.length > 0 && (
-                <div>
-                  <dt>You tagged</dt>
-                  <dd>
-                    {ann.tags.map((t) => (
-                      <span key={t} className={m.tag}>
-                        {t}
-                      </span>
-                    ))}
-                  </dd>
-                </div>
-              )}
+      {/* The note, what was tagged and how stressed that day. Always shown, so
+          there's somewhere to add them even when nothing was logged. */}
+      <NoteCard scan={scan} addable className={m.note}>
+        <div className={m.taggedWrap}>
+          {/* Shows that tags and stress can be changed; not wired up in this prototype. */}
+          <button type="button" className={m.tagEdit} aria-label="Edit tags and stress">
+            <Icon name="pencil" size={13} stroke={1.6} />
+          </button>
+          <dl className={m.tagged}>
+            <div>
+              <dt>You tagged</dt>
+              <dd>
+                {tags.length > 0 ? (
+                  tags.map((t) => (
+                    <span key={t} className={m.tag}>
+                      {t}
+                    </span>
+                  ))
+                ) : (
+                  <span className={m.none}>None yet</span>
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Stress</dt>
+              <dd>
+                {/* What was entered, as it was entered. */}
+                {stress != null ? <span className={m.stress}>{stress} of 5</span> : <span className={m.none}>Not logged</span>}
+              </dd>
+              {/* The app's reading of it, kept apart on the right. */}
               {stress != null && (
-                <div>
-                  <dt>Stress</dt>
-                  <dd>
-                    {/* What she entered, as she entered it. */}
-                    <span className={m.stress}>{stress} of 5</span>
-                  </dd>
-                  {/* The app's reading of it, kept apart on the right. */}
-                  <span className={m.stressRead} data-high={stress >= 4}>
-                    {stressWord(stress)}
-                  </span>
-                </div>
+                <span className={m.stressRead} data-high={stress >= 4}>
+                  {stressWord(stress)}
+                </span>
               )}
-            </dl>
-          </div>
-        </NoteCard>
-      )}
+            </div>
+          </dl>
+        </div>
+      </NoteCard>
 
       {context.length > 0 && (
         <dl className={m.tiles}>

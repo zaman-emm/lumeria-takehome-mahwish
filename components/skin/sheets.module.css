@@ -310,6 +310,13 @@
   font-weight: 600;
 }
 
+/* Nothing logged yet: quiet, so the row still shows where it would go. */
+.none {
+  font-size: 12px;
+  line-height: 24px;
+  color: var(--bark-3);
+}
+
 /* How the app reads the stress number: a caution in clay when it's high. */
 .stressRead {
   display: inline-flex;
