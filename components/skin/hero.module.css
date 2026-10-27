@@ -279,15 +279,15 @@
   margin-top: 8px;
   padding: 0 22px 0 24px;
   border-radius: 24px;
-  /* Polished cream: a bright streak across the top-left over a cream that
-     warms toward pale gold, so the shine has something to catch against. */
+  /* Flat cream with a 2D glint: a soft wash at the top-left and one thin
+     diagonal streak of light, like a reflection on glass. No depth shading. */
   background:
-    linear-gradient(160deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.55) 22%, rgba(255, 255, 255, 0) 46%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0.45) 100%),
-    linear-gradient(180deg, #fbf4e4 0%, #f1dcae 70%, #ead09a 100%);
+    linear-gradient(115deg, transparent 0 30%, rgba(255, 255, 255, 0.85) 34%, transparent 38%, transparent 44%, rgba(255, 255, 255, 0.5) 46%, transparent 48%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 45%),
+    #f8efdc;
   box-shadow:
-    var(--lg-rim),
-    inset 0 -3px 5px rgba(192, 145, 63, 0.28),
-    0 6px 16px -8px rgba(128, 96, 31, 0.35);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.75),
+    0 4px 12px -8px rgba(128, 96, 31, 0.3);
   -webkit-backdrop-filter: var(--lg-blur);
   backdrop-filter: var(--lg-blur);
   color: var(--evergreen);
