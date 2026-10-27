@@ -432,7 +432,6 @@
 .changes {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -443,8 +442,22 @@
   grid-template-columns: 16px 64px 1fr;
   align-items: center;
   gap: 10px;
+  padding: 11px 0;
   font-size: 13px;
   color: var(--bark);
+}
+
+.changes li:first-child {
+  padding-top: 2px;
+}
+
+.changes li:last-child {
+  padding-bottom: 0;
+}
+
+/* A hairline between factors, as between the products' rows. */
+.changes li + li {
+  border-top: 1px solid var(--sand-deep);
 }
 
 .changes svg {
