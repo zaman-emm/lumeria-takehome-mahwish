@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReportState } from "@/lib/useReport";
+import { Loader } from "./Loader";
 import { Logo } from "./Logo";
 import st from "./state.module.css";
 
@@ -13,12 +14,15 @@ export function StateScreen({
 }: {
   state: Exclude<ReportState, { status: "ready" }>;
 }) {
-  // Loading has no screen of its own: just the home page's gold, empty, which
+  // Loading: the Lumoscope forms on the home page's gold under the same glass
   // the splash then opens on. Screen readers still hear that it's opening.
   if (state.status === "loading") {
     return (
       <div className={st.home} data-skin>
         <div className={st.veil} aria-hidden />
+        <div className={st.loader}>
+          <Loader />
+        </div>
         <p className={st.sr} role="status">
           Opening your report
         </p>

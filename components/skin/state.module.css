@@ -47,6 +47,18 @@
   pointer-events: none;
 }
 
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  /* Flex, so the canvas stays centred even where it's wider than the screen. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .sr {
   position: absolute;
   width: 1px;
