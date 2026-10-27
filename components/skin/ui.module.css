@@ -9,9 +9,19 @@
 
 .noPhoto {
   display: grid;
-  place-items: center;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
   background: var(--sand);
   color: var(--bark-3);
+}
+
+.noPhotoText {
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  color: var(--bark-2);
 }
 
 /* ------------------------------------------------ ring */

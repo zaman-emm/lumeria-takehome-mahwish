@@ -71,7 +71,7 @@ export function ScanSheet({ scan }: { scan: Scan }) {
             <Photo key={l.key} scan={scan} light={l.key} className={m.photoImg} on={l.key === light} alt={`${scan.area}, ${l.label.toLowerCase()} light`} />
           ))
         ) : (
-          <Photo scan={scan} className={m.photoImg} />
+          <Photo scan={scan} className={m.photoImg} say />
         )}
       </div>
       {scan.photos && (
@@ -106,7 +106,7 @@ export function ScanSheet({ scan }: { scan: Scan }) {
           return (
             <div key={mm.key} className={m.tickRow}>
               <span className={m.tickLabel}>{mm.label}</span>
-              {v == null ? <span className={m.tickNone}>Not measured this scan</span> : <Ticks value={v} prev={pv} order={i} />}
+              {v == null ? <span className={m.tickNone}>Couldn’t read this time</span> : <Ticks value={v} prev={pv} order={i} />}
               <b className={m.tickValue}>{v ?? "–"}</b>
               <span className={m.tickDelta}>{v != null && pv != null ? signed(v - pv) : ""}</span>
               <span className="sr-only">{v != null && pv != null ? `, ${signed(v - pv)} since last time` : ""}</span>

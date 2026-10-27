@@ -35,6 +35,7 @@ export function Photo({
   priority,
   style,
   on,
+  say,
 }: {
   scan: Scan;
   light?: Light;
@@ -44,12 +45,16 @@ export function Photo({
   style?: CSSProperties;
   /** Sets data-on, for stacks that crossfade between lights. */
   on?: boolean;
+  /** Where there's room, say in words that the photo didn't upload. */
+  say?: boolean;
 }) {
   const src = photoFor(scan, light);
   if (!src) {
+    // photoUrl is null when the upload failed (lib/types.ts): the scan and its scores are fine.
     return (
-      <span className={`${u.noPhoto} ${className ?? ""}`} style={style} role="img" aria-label="No photo for this scan">
+      <span className={`${u.noPhoto} ${className ?? ""}`} style={style} role="img" aria-label="Photo didn’t upload">
         <Icon name="target" size={18} />
+        {say && <span className={u.noPhotoText}>Photo didn’t upload</span>}
       </span>
     );
   }

@@ -109,7 +109,7 @@ function Polaroid({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
   return (
     <button className={ph.polaroid} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}`}>
       <i className={ph.tape} aria-hidden />
-      <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.thumb} />
+      <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.thumb} say />
       <span className={ph.pMeta}>
         <span>{fmtDay(scan.takenAt, tz)}</span>
         <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>

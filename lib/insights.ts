@@ -220,7 +220,9 @@ export const GALLERY_MAX = 12;
  * then and now), then evenly spaced picks between, up to `max`.
  */
 export function pickGallery(scans: Scan[], max = GALLERY_MAX): Scan[] {
-  const lit = scans.filter((s) => s.photoUrl || s.photos);
+  // A scan whose photo failed to upload stays in, as a stand-in tile, so the
+  // wall never quietly skips a scan. With no photo at all, there's no wall.
+  const lit = scans.some((s) => s.photoUrl || s.photos) ? scans : [];
   if (lit.length <= max) return lit;
   const keep = new Set<Scan>([lit[0], lit[lit.length - 1]]);
   const areas = [...new Set(lit.map((s) => s.area))];
