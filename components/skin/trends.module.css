@@ -587,6 +587,18 @@
   font-variant-numeric: tabular-nums;
 }
 
+.cardDelta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--evergreen);
+}
+
 .cardChevron {
   color: var(--bark-2);
   flex: none;

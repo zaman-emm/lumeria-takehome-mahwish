@@ -24,7 +24,7 @@ import { useReportApi } from "./context";
 import { useReveal, useWidth } from "./hooks";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { ChangeSince, Photo, Ring } from "./ui";
+import { Photo, Ring } from "./ui";
 import { tick } from "./DayCurve";
 import t from "./trends.module.css";
 
@@ -442,7 +442,12 @@ export function ScanCard({ scan, metric = "overall" }: { scan: Scan; metric?: Sc
         </span>
         <span className={t.cardScore}>
           <b>{v ?? "–"}</b>
-          {delta != null && delta !== 0 && prev && <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />}
+          {delta != null && delta !== 0 && (
+            <span className={t.cardDelta}>
+              <Icon name={delta > 0 ? "up" : "down"} size={9} stroke={2} />
+              {Math.abs(delta)}
+            </span>
+          )}
         </span>
         <Icon name="chevronR" size={12} stroke={1.8} className={t.cardChevron} />
       </div>
