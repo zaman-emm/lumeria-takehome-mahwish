@@ -135,13 +135,11 @@ export function SlimHeader({
   lens,
   streak,
   onScan,
-  onPlay,
 }: {
   d: Derived;
   lens: Scan;
   streak: string;
   onScan: () => void;
-  onPlay?: (from: HTMLElement) => void;
 }) {
   const tz = scanTz(lens) ?? d.tz;
   return (
@@ -159,11 +157,6 @@ export function SlimHeader({
         <Flame size={16} />
         {streak}
       </span>
-      {onPlay && (
-        <button className={h.play} onClick={(e) => onPlay(e.currentTarget)} aria-label={d.isMonthly ? "Check your month’s highlights" : "Check your highlights"}>
-          <Icon name="spark" size={16} />
-        </button>
-      )}
     </header>
   );
 }

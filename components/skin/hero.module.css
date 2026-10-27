@@ -445,7 +445,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   height: calc(72px + var(--top-inset));
   padding: var(--top-inset) 16px 0;
   background:
@@ -483,12 +483,14 @@
   border: 2px solid var(--bone);
 }
 
+/* The score takes the middle, with room either side before the photo and the streak. */
 .slimScore {
   display: flex;
   align-items: baseline;
   gap: 6px;
   flex: 1;
   min-width: 0;
+  padding: 0 4px;
 }
 
 .slimScore b {
@@ -521,29 +523,6 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--bark);
-}
-
-.play {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--lg-btn);
-  -webkit-backdrop-filter: var(--lg-btn-blur);
-  backdrop-filter: var(--lg-btn-blur);
-  box-shadow: var(--lg-btn-rim);
-  color: var(--evergreen);
-  flex: none;
-  transition: transform 160ms var(--ease-out);
-}
-
-.play svg {
-  transform: translateX(1px);
-}
-
-.play:active {
-  transform: scale(0.96);
 }
 
 @media (prefers-reduced-transparency: reduce) {

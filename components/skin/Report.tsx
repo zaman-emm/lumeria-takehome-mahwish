@@ -175,7 +175,7 @@ export function Report({ d }: { d: Derived }) {
                 {tab === "glance" ? (
                   <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} splash={splash} />
                 ) : (
-                  <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} />
+                  <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} />
                 )}
 
                 <Tabs tabs={TABS} active={tab} onChange={changeTab} />
