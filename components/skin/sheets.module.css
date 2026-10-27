@@ -88,6 +88,11 @@
   background: var(--sand);
 }
 
+.photoTag {
+  top: 12px;
+  left: 12px;
+}
+
 /* Where the photo goes when its upload failed: the message and a retry. */
 .noPhoto {
   grid-area: 1 / 1;

@@ -6,7 +6,7 @@ import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, photoFor, type Light } from "./ui";
+import { LIGHTS, LightTag, Photo, ScheduleChip, TickAxis, Ticks, hasLights, photoFor, type Light } from "./ui";
 import m from "./sheets.module.css";
 
 // Everything about one scan: the photo under each light, every score against
@@ -66,7 +66,8 @@ export function ScanSheet({ scan }: { scan: Scan }) {
       </header>
 
       <div className={m.photo}>
-        {scan.photos ? (
+        {photoFor(scan, "ambient") && <LightTag light={hasLights(scan) ? light : "ambient"} className={m.photoTag} />}
+        {hasLights(scan) ? (
           LIGHTS.map((l) => (
             <Photo key={l.key} scan={scan} light={l.key} className={m.photoImg} on={l.key === light} alt={`${scan.area}, ${l.label.toLowerCase()} light`} />
           ))
@@ -84,7 +85,7 @@ export function ScanSheet({ scan }: { scan: Scan }) {
           </div>
         )}
       </div>
-      {scan.photos && (
+      {hasLights(scan) && (
         <div className={m.lights} role="radiogroup" aria-label="Light" style={{ "--i": li } as CSSProperties}>
           <i className={m.lightKnob} aria-hidden />
           {LIGHTS.map((l) => (

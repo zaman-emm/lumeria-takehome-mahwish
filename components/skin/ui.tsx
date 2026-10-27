@@ -23,7 +23,17 @@ export const LIGHTS: { key: Light; label: string }[] = [
 
 export function photoFor(scan: Scan, light: Light) {
   if (scan.photos) return scan.photos[light];
+  // The generated placeholders come in all three lights (scripts/placeholders.py).
+  if (scan.photoUrl?.startsWith("/placeholders/")) return light === "ambient" ? scan.photoUrl : scan.photoUrl.replace(/\.jpg$/, `-${light}.jpg`);
   return light === "ambient" ? scan.photoUrl : null;
+}
+
+/** Whether the scan can be seen under every light, not just daylight. */
+export const hasLights = (scan: Scan) => Boolean(photoFor(scan, "polarized"));
+
+/** Names the light a photo was taken under, on the photo's corner. */
+export function LightTag({ light, className }: { light: Light; className?: string }) {
+  return <span className={`${u.lightTag} ${className ?? ""}`}>{LIGHTS.find((l) => l.key === light)!.label}</span>;
 }
 
 /** A scan photo, or a quiet stand-in when the upload didn't make it. */

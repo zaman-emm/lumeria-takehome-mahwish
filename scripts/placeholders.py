@@ -1,7 +1,8 @@
 """Generates the placeholder scan photos in public/placeholders/.
 
 The real scope photos are someone's own skin and stay out of the repo (see the
-README), so each scan gets a made-up close-up instead: a skin tone per person,
+README), so each scan gets made-up close-ups instead, one per light (daylight,
+polarized, UV), all from the same surface: a skin tone per person,
 fine surface lines, pores, a few hairs and the scope's soft lighting. Lower Calm
 adds a faint flush and lower Clarity a few brown marks, so a placeholder moves
 with its scan's scores. Nothing here comes from a real photo.
@@ -84,12 +85,14 @@ def hairs(rng: np.random.Generator, count: int) -> np.ndarray:
     return np.asarray(img.filter(ImageFilter.GaussianBlur(0.7)), dtype=np.float32) / 255
 
 
-def make(person: str, scan: dict) -> Image.Image:
+def make(person: str, scan: dict) -> dict[str, Image.Image]:
+    """The scan under each of the scope's three lights, from one shared surface."""
     rng = np.random.default_rng(zlib.crc32(scan["id"].encode()))
     light, shadow = (rgb(c) for c in TONES[person])
     scores = scan["scores"]
     calm = scores.get("redness") or 75
     clarity = scores.get("pigmentation") or 75
+    oil = scores.get("oiliness")
     area = scan["area"].lower()
 
     yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
@@ -100,28 +103,59 @@ def make(person: str, scan: dict) -> Image.Image:
     # Mottling at two sizes, then a flush (lower Calm) and brown marks (lower Clarity).
     base *= (0.9 + 0.12 * blurred_noise(rng, 45) + 0.06 * blurred_noise(rng, 12))[..., None]
     flush = blurred_noise(rng, 60) * np.clip((80 - calm) / 40, 0, 1)
-    base += flush[..., None] * np.array([28, -6, -8], dtype=np.float32)
     marks = dots(rng, int(np.clip((78 - clarity) / 4, 0, 8)), (4, 11), 3)
-    base -= marks[..., None] * np.array([38, 46, 44], dtype=np.float32)
 
     # Surface: fine lines, pores (more on chin and back), the odd hair on body skin.
     # The skin's surface relief: a soft shadow under each line and a lit edge beside it.
     lines = furrows(rng) * 0.7 + furrows(rng, 600, 0.7) * 0.5
     shifted = np.roll(np.roll(lines, 1, axis=0), 1, axis=1)
-    base -= lines[..., None] * 26
-    base += np.clip(shifted - lines, 0, 1)[..., None] * 14
+    relief = -lines * 26 + np.clip(shifted - lines, 0, 1) * 14
     pore_count = 420 if "chin" in area or "back" in area else 260
-    base -= dots(rng, pore_count, (0.9, 1.9), 1.1)[..., None] * 22
-    base += dots(rng, 140, (2, 6), 3.5)[..., None] * 9  # tiny highlights where skin catches the light
+    pores = dots(rng, pore_count, (0.9, 1.9), 1.1)
+    glare = dots(rng, 140, (2, 6), 3.5)  # tiny highlights where skin catches the light
+    hair = np.zeros((H, W), np.float32)
+    hair_tint = np.array([90, 78, 70], dtype=np.float32)
     if any(k in area for k in ("forearm", "back", "jaw")):
-        base -= hairs(rng, int(rng.integers(2, 5)))[..., None] * np.array([90, 78, 70], dtype=np.float32)
+        hair = hairs(rng, int(rng.integers(2, 5)))
     elif rng.random() < 0.35:
-        base -= hairs(rng, 1)[..., None] * np.array([55, 48, 44], dtype=np.float32)
+        hair = hairs(rng, 1)
+        hair_tint = np.array([55, 48, 44], dtype=np.float32)
+    grain = rng.normal(0, 2.2, (H, W))
+    # Porphyrins in the pores glow orange-red under UV; oilier skin, more of them.
+    glow_count = int(np.clip((70 - (oil if oil is not None else 60)) * 2 + 30, 15, 90))
+    porphyrins = dots(rng, glow_count, (1.2, 2.6), 1.4)
+    sebum = blurred_noise(rng, 30) * np.clip((70 - (oil if oil is not None else 60)) / 40, 0.15, 1)
 
-    # Fine sensor grain, then a whisper of softness like a close-up lens.
-    base += (rng.normal(0, 2.2, (H, W)))[..., None]
-    img = Image.fromarray(np.clip(base, 0, 255).astype(np.uint8), "RGB")
-    return img.filter(ImageFilter.GaussianBlur(0.4))
+    def finish(a: np.ndarray, blur: float = 0.4) -> Image.Image:
+        a = a + grain[..., None]
+        return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(blur))
+
+    # Daylight: the surface as the eye sees it, glare and all.
+    day = base + flush[..., None] * np.array([28, -6, -8], dtype=np.float32)
+    day -= marks[..., None] * np.array([38, 46, 44], dtype=np.float32)
+    day += relief[..., None]
+    day -= pores[..., None] * 22
+    day += glare[..., None] * 9
+    day -= hair[..., None] * hair_tint
+
+    # Polarized: the glare is filtered out, so the surface goes flat and matte,
+    # and redness and pigment under it show up more strongly.
+    pol = (base * 0.94 + base.mean(axis=(0, 1)) * 0.06) * np.array([1.0, 0.98, 0.97], dtype=np.float32)
+    pol += flush[..., None] * np.array([38, -10, -10], dtype=np.float32)
+    pol -= marks[..., None] * np.array([64, 74, 70], dtype=np.float32)
+    pol += relief[..., None] * 0.35
+    pol -= pores[..., None] * 12
+    pol -= hair[..., None] * hair_tint * 0.8
+
+    # UV (365 nm): the skin goes dark violet, pigment darker still, and oil
+    # and porphyrins fluoresce.
+    lum = (day.mean(axis=2) - 60) / 180
+    uv = np.stack([lum * 44 + 20, lum * 34 + 16, lum * 86 + 46], axis=2)
+    uv -= marks[..., None] * np.array([26, 18, 46], dtype=np.float32)
+    uv += sebum[..., None] * np.array([18, 26, 34], dtype=np.float32)
+    uv += porphyrins[..., None] * np.array([250, 130, 20], dtype=np.float32)
+
+    return {"": finish(day), "-polarized": finish(pol, 0.6), "-uva": finish(uv, 0.5)}
 
 
 def main() -> None:
@@ -132,8 +166,9 @@ def main() -> None:
         for scan in report["scans"]:
             if not scan.get("photoUrl"):
                 continue  # The upload failed; the app says so instead of showing a photo.
-            make(person, scan).save(OUT / f"{scan['id']}.jpg", quality=82, optimize=True, progressive=True)
-            made += 1
+            for suffix, img in make(person, scan).items():
+                img.save(OUT / f"{scan['id']}{suffix}.jpg", quality=82, optimize=True, progressive=True)
+                made += 1
     print(f"{made} placeholders in {OUT.relative_to(ROOT)}")
 
 

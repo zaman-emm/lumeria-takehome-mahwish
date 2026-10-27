@@ -7,7 +7,7 @@ import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { ChangeSince, Delta, LIGHTS, Photo, photoFor, type Light } from "./ui";
+import { ChangeSince, Delta, LIGHTS, LightTag, Photo, hasLights, photoFor, type Light } from "./ui";
 import { monthStory } from "@/lib/voice";
 import ph from "./photos.module.css";
 
@@ -23,7 +23,7 @@ export function PhotosTab() {
   const [area, setArea] = useState(ALL);
   const [view, setView] = useState<"grid" | "rows">("grid");
   const reduce = useReducedMotion();
-  const anyReal = d.realPhotos.length > 0;
+  const anyLights = d.gallery.some(hasLights);
   // The wall lists the gallery's dozen (lib/insights pickGallery), not every scan.
   const shown = [...d.gallery].reverse().filter((s) => area === ALL || s.area === area);
   const spring = reduce ? { duration: 0 } : { type: "spring" as const, duration: 0.35, bounce: 0 };
@@ -44,7 +44,7 @@ export function PhotosTab() {
     <div className={ph.tab}>
       <Compare d={d} light={light} area={area === ALL ? d.area : area} />
 
-      {anyReal && (
+      {anyLights && (
         <div className={ph.lights} role="radiogroup" aria-label="Light">
           {LIGHTS.map((l) => (
             <button key={l.key} role="radio" aria-checked={l.key === light} onClick={() => setLight(l.key)}>
@@ -110,6 +110,7 @@ function Polaroid({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
     <button className={ph.polaroid} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}`}>
       <i className={ph.tape} aria-hidden />
       <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.thumb} say />
+      {photoFor(scan, "ambient") && <LightTag light={lightFor(scan, light)} className={ph.thumbTag} />}
       <span className={ph.pMeta}>
         <span>{fmtDay(scan.takenAt, tz)}</span>
         <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>
@@ -129,7 +130,10 @@ function PhotoRow({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
   return (
     <div className={ph.row}>
       <button className={ph.rowHit} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}. Open scan`} />
-      <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.rowPhoto} />
+      <span className={ph.rowPhotoBox}>
+        <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.rowPhoto} />
+        {photoFor(scan, "ambient") && <LightTag light={lightFor(scan, light)} className={ph.rowTag} />}
+      </span>
       <span className={ph.rowText}>
         <span className={ph.rowWhen} aria-hidden>
           {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}
