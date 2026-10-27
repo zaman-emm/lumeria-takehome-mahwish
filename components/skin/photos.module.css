@@ -123,6 +123,15 @@
 .tag[data-at="top"] {
   top: 12px;
   left: 12px;
+  /* The spot and light, in the same light frosted label as the opened scan. */
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(255, 250, 238, 0.82);
+  color: var(--bark);
+  font-size: 9px;
+  line-height: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .tag[data-at="left"] {
