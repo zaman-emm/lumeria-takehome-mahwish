@@ -18,8 +18,8 @@ export const loaderStart = () => (startedAt ??= performance.now());
 
 const W = 280;
 const H = 310;
-/** Drawn at twice the source file's size, so the scope reads on a full phone screen. */
-const ZOOM = 2;
+/** Drawn at one and a half times the source file's size, so the scope reads on a full phone screen. */
+const ZOOM = 1.5;
 const TAU = Math.PI * 2;
 const RIM = "#c0913f";
 const LINE = "#2f4a35";
