@@ -55,7 +55,7 @@ export function ProductsTab() {
         <span className={p.emptyIcon}>
           <Icon name="bottle" size={22} />
         </span>
-        <h2>Tell me what you use and I’ll watch how your skin takes it.</h2>
+        <h2>Add what you use and see how your skin takes to it.</h2>
       </div>
     );
   }
