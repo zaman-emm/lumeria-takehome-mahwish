@@ -310,14 +310,16 @@
   inset: 0;
   background: linear-gradient(
     115deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.9) 42%,
-    rgba(255, 255, 255, 0.35) 47%,
-    rgba(255, 255, 255, 0.85) 50%,
-    transparent 60%
+    transparent 18%,
+    rgba(255, 255, 255, 0.55) 30%,
+    rgba(255, 255, 255, 0.95) 40%,
+    rgba(255, 255, 255, 0.5) 48%,
+    rgba(255, 255, 255, 0.9) 56%,
+    rgba(255, 255, 255, 0.45) 64%,
+    transparent 76%
   );
   transform: translateX(-110%);
-  animation: shine 3.2s cubic-bezier(0.4, 0, 0.2, 1) 1.2s infinite;
+  animation: shine 3.6s cubic-bezier(0.4, 0, 0.2, 1) 1.2s infinite;
   pointer-events: none;
 }
 
@@ -325,7 +327,7 @@
   0% {
     transform: translateX(-110%);
   }
-  25%,
+  30%,
   100% {
     transform: translateX(110%);
   }
