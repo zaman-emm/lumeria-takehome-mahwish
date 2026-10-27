@@ -310,17 +310,15 @@
 .since {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--gold);
   font-size: 11px;
-  line-height: 14px;
-  font-weight: 500;
-  color: var(--bark-2);
-  white-space: nowrap;
-}
-
-.since .delta {
   font-weight: 600;
-  color: var(--bark);
+  color: var(--evergreen);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {

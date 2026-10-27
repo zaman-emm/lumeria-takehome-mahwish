@@ -439,11 +439,10 @@ export function ScanCard({ scan, metric = "overall" }: { scan: Scan; metric?: Sc
             {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}
           </span>
           <span className={t.cardSaw}>{scan.summary.headline}</span>
-          {/* Under the words, not the number, so the text keeps its width. */}
-          {delta != null && delta !== 0 && prev && <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />}
         </span>
         <span className={t.cardScore}>
           <b>{v ?? "–"}</b>
+          {delta != null && delta !== 0 && prev && <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />}
         </span>
         <Icon name="chevronR" size={12} stroke={1.8} className={t.cardChevron} />
       </div>

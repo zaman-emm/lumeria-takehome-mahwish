@@ -218,14 +218,18 @@ export function ScheduleChip({ product }: { product: Product }) {
 }
 
 /**
- * A scan's change from the last scan of the same spot, said with what it's
- * measured from, so a bare "−3" never has to be guessed at: "↓ 3 since Sep 25".
+ * A scan's change from the last scan of the same spot, as a small gold pill
+ * under its score: an arrow and the number. What it's measured from is read
+ * out to screen readers ("down 3 since Sep 25").
  */
 export function ChangeSince({ n, since, className }: { n: number; since: string; className?: string }) {
   return (
     <span className={`${u.since} ${className ?? ""}`}>
-      <Delta n={n} />
-      <span>since {since}</span>
+      <Icon name={n > 0 ? "up" : "down"} size={9} stroke={2} />
+      <span aria-hidden>{Math.abs(n)}</span>
+      <span className="sr-only">
+        {n > 0 ? "up" : "down"} {Math.abs(n)} since {since}
+      </span>
     </span>
   );
 }
