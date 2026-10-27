@@ -4,8 +4,9 @@ import { useEffect, useRef } from "react";
 
 // The loading screen's Lumoscope: fine contour lines spin in, zoom and join
 // into the scope (glass, lens, clip, the ring of LEDs), then three glints
-// pulse on it. Drawn on a canvas in the bone palette, so it keeps its
-// transparency on the gold in every browser. People who asked for less motion
+// pulse on it. Drawn in cream light with a soft glow, like the score ring that
+// follows, around a faded evergreen lens. A canvas keeps its transparency on
+// the gold in every browser. People who asked for less motion
 // see the finished scope, still.
 
 /** One full play: spin, zoom, form, glints. */
@@ -21,9 +22,9 @@ const H = 310;
 /** Drawn at one and a half times the source file's size, so the scope reads on a full phone screen. */
 const ZOOM = 1.5;
 const TAU = Math.PI * 2;
-const RIM = "#c0913f";
-const LINE = "#2f4a35";
-const TINT = "rgba(47,74,53,.6)";
+const RIM = "rgba(255,250,238,.95)";
+const LINE = "rgba(255,250,238,.75)";
+const TINT = "rgba(47,74,53,.38)";
 
 const smooth = (t: number) => {
   t = Math.max(0, Math.min(1, t));
@@ -87,8 +88,8 @@ function draw(ctx: CanvasRenderingContext2D, contours: Pt[][], t: number, still:
   ctx.translate(140, 155);
   ctx.rotate(rotation);
   ctx.scale(scale, scale);
-  ctx.shadowColor = "rgba(47,74,53,.14)";
-  ctx.shadowBlur = 0.6;
+  ctx.shadowColor = "rgba(255,250,235,.9)";
+  ctx.shadowBlur = 6;
 
   if (morph > 0) {
     // A quiet suggestion of the clip anchors the otherwise floating lens.
@@ -97,9 +98,9 @@ function draw(ctx: CanvasRenderingContext2D, contours: Pt[][], t: number, still:
     ctx.shadowColor = "rgba(46,38,32,.08)";
     ctx.shadowBlur = 3;
     const clip = ctx.createLinearGradient(-19, -124, 19, -25);
-    clip.addColorStop(0, "rgba(47,74,53,.16)");
-    clip.addColorStop(0.35, "rgba(47,74,53,.38)");
-    clip.addColorStop(0.75, "rgba(20,36,26,.26)");
+    clip.addColorStop(0, "rgba(255,250,238,.2)");
+    clip.addColorStop(0.35, "rgba(255,250,238,.45)");
+    clip.addColorStop(0.75, "rgba(255,250,238,.25)");
     clip.addColorStop(1, "rgba(47,74,53,0)");
     ctx.fillStyle = clip;
     ctx.beginPath();
@@ -132,8 +133,8 @@ function draw(ctx: CanvasRenderingContext2D, contours: Pt[][], t: number, still:
     const lens = ctx.createRadialGradient(-15, -20, 3, 0, 0, 48);
     lens.addColorStop(0, "rgba(244,239,230,.42)");
     lens.addColorStop(0.28, TINT);
-    lens.addColorStop(0.65, "rgba(47,74,53,.4)");
-    lens.addColorStop(1, "rgba(20,36,26,.75)");
+    lens.addColorStop(0.65, "rgba(47,74,53,.3)");
+    lens.addColorStop(1, "rgba(20,36,26,.5)");
     ctx.fillStyle = lens;
     ctx.beginPath();
     ctx.arc(0, 0, 48, 0, TAU);
@@ -218,7 +219,7 @@ function draw(ctx: CanvasRenderingContext2D, contours: Pt[][], t: number, still:
   const patterns = [[0.1, 10], [20, 10], [5, 6]];
   contours.forEach((points, index) => {
     ctx.save();
-    ctx.strokeStyle = index < 2 ? RIM : index >= 8 ? "#c0913f" : LINE;
+    ctx.strokeStyle = index < 2 ? RIM : index >= 8 ? "rgba(255,250,238,.9)" : LINE;
     ctx.lineWidth = 0.62 / scale;
     if (index < 3) {
       const [dash, gap] = patterns[index];
@@ -242,7 +243,7 @@ function draw(ctx: CanvasRenderingContext2D, contours: Pt[][], t: number, still:
         else ctx.lineTo(x, y);
       }
       if (index === 3 && morph < 1) {
-        ctx.fillStyle = "#e8dbb6";
+        ctx.fillStyle = "rgba(255,250,238,.7)";
         ctx.fill();
       }
       if (index >= 8 && join > 0.9) {
@@ -310,7 +311,7 @@ function draw(ctx: CanvasRenderingContext2D, contours: Pt[][], t: number, still:
       const pulse = still ? 0.9 : 0.28 + 0.72 * Math.pow(Math.max(0, Math.sin(((t - 0.55 - delay) * TAU) / 1.5)), 2);
       if (pulse < 0.02) continue;
       ctx.globalAlpha = pulse * smooth((morph - 0.5) / 0.5);
-      ctx.fillStyle = "#a77519";
+      ctx.fillStyle = "#fffaee";
       ctx.shadowColor = "rgba(255,220,120,.8)";
       ctx.shadowBlur = 5;
       ctx.save();
