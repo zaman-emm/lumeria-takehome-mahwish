@@ -92,7 +92,8 @@ export function Hero({
                 <Icon name={d.trend.delta > 0 ? "up" : "down"} size={22} stroke={2} />
                 {Math.abs(d.trend.delta)}
               </span>
-              <span className={h.change}>since you started</span>
+              {/* The first scan's date sits under its photo, so the words don't repeat it. */}
+              <span className={h.change}>since your first scan</span>
             </>
           ) : (
             <span className={h.change}>{sinceStart(d)}</span>
