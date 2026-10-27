@@ -194,7 +194,7 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
               <span>
                 {was.value} → {now.value}
               </span>
-              <b className={p.delta}>{delta > 0 ? `+${delta}` : delta < 0 ? `−${-delta}` : "±0"}</b>
+              <Change n={delta} size={10} />
             </p>
           )}
         </div>
@@ -240,7 +240,7 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
                 →
               </span>
               <span>{now.value}</span>
-              <b className={p.delta}>{delta > 0 ? `+${delta}` : delta < 0 ? `−${-delta}` : "±0"}</b>
+              <Change n={delta} size={13} />
             </p>
           ) : (
             <p className={p.fromTo} data-empty aria-label="No change to show yet">
@@ -294,6 +294,16 @@ function ProductCard({ d, product }: { d: Derived; product: Product }) {
 }
 
 const maxDay = (a: string, b: string) => (a > b ? a : b);
+
+/** The change as an arrow and a number, the way the rest of the report shows it; the arrow says which way, so no sign. */
+function Change({ n, size }: { n: number; size: number }) {
+  return (
+    <b className={p.delta}>
+      {n !== 0 && <Icon name={n > 0 ? "up" : "down"} size={size} stroke={2} />}
+      {n === 0 ? "±0" : Math.abs(n)}
+    </b>
+  );
+}
 
 /** One score for one spot, a value per day it was scanned (averaged if twice). */
 function seriesFor(d: Derived, area: string, key: ScoreKey, from: string, to: string) {
