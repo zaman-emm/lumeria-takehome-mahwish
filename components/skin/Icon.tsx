@@ -68,8 +68,8 @@ export function Icon({
       <path
         d={d}
         fill={filled ? "currentColor" : "none"}
-        stroke={filled ? "none" : "currentColor"}
-        strokeWidth={stroke}
+        stroke={mark || !filled ? "currentColor" : "none"}
+        strokeWidth={mark ? stroke * 0.32 : stroke}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
