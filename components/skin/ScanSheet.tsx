@@ -6,7 +6,7 @@ import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, type Light } from "./ui";
+import { LIGHTS, Photo, ScheduleChip, TickAxis, Ticks, photoFor, type Light } from "./ui";
 import m from "./sheets.module.css";
 
 // Everything about one scan: the photo under each light, every score against
@@ -70,8 +70,18 @@ export function ScanSheet({ scan }: { scan: Scan }) {
           LIGHTS.map((l) => (
             <Photo key={l.key} scan={scan} light={l.key} className={m.photoImg} on={l.key === light} alt={`${scan.area}, ${l.label.toLowerCase()} light`} />
           ))
+        ) : photoFor(scan, "ambient") ? (
+          <Photo scan={scan} className={m.photoImg} />
         ) : (
-          <Photo scan={scan} className={m.photoImg} say />
+          // The upload failed (photoUrl is null); the scan's reading is fine. Offer
+          // another go. Shows the action only; not wired up in this prototype.
+          <div className={m.noPhoto} role="group" aria-label="Photo didn’t upload">
+            <Icon name="target" size={18} />
+            <p>Photo didn’t upload</p>
+            <button type="button" className={m.retry}>
+              Try again
+            </button>
+          </div>
         )}
       </div>
       {scan.photos && (

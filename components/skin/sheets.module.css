@@ -88,6 +88,34 @@
   background: var(--sand);
 }
 
+/* Where the photo goes when its upload failed: the message and a retry. */
+.noPhoto {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--bark-3);
+}
+
+.noPhoto p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.retry {
+  min-height: 36px;
+  margin-top: 6px;
+  padding: 0 16px;
+  border-radius: 18px;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .photoImg {
   grid-area: 1 / 1;
   width: 100%;
