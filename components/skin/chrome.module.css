@@ -1,5 +1,5 @@
 /* The pretend phone: only on a laptop (fine pointer), where there's no real
-   status bar or home indicator. --chrome-top (globals.css) gives the page
+   status bar. --chrome-top (globals.css) gives the page
    the same room a real phone's safe area would. */
 
 .chrome {
@@ -88,18 +88,4 @@
   height: 100%;
   border-radius: 2px;
   background: currentColor;
-}
-
-.home {
-  position: fixed;
-  bottom: 8px;
-  left: 50%;
-  z-index: 1000;
-  width: 139px;
-  height: 5px;
-  border-radius: 3px;
-  background: #000;
-  transform: translateX(-50%);
-  pointer-events: none;
-  view-transition-name: skin-home;
 }

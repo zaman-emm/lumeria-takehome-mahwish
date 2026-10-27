@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import c from "./chrome.module.css";
 
 // The phone around the report when it's opened on a laptop: the status bar
-// (clock, the island, signal, wifi and battery) and the home indicator. Purely
-// for show; on a real phone the system draws its own, so this stays hidden.
+// (clock, the island, signal, wifi and battery). Purely for show; on a real
+// phone the system draws its own, so this stays hidden.
 
 function clock() {
   return new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).replace(/\s?[AP]M$/, "");
@@ -41,7 +41,6 @@ export function DeviceChrome() {
           </span>
         </span>
       </div>
-      <span className={c.home} />
     </div>
   );
 }

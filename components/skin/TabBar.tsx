@@ -4,10 +4,10 @@ import { Icon, type IconName } from "./Icon";
 import { SunOrb } from "./SunOrb";
 import b from "./tabbar.module.css";
 
-// The app's tab bar, the iOS 26 way (Music is the reference): a floating Liquid
-// Glass capsule of icon-over-label tabs, the selected one in a lighter pill
-// with the tint colour, and one round glass button beside it. Where Music keeps
-// Search, Lumeria keeps Lumi.
+// The app's tab bar, the iOS 26 way (the TV app is the reference): one floating
+// Liquid Glass capsule of icon-over-label tabs, the selected one in a lighter
+// pill with the tint colour. Where TV keeps Search as the last tab, Lumeria
+// keeps Lumi, with the orb as its icon.
 //
 // The report is the Trends destination; Home and Scan belong to the rest of
 // the app, which this prototype doesn't build, so they show but do nothing.
@@ -46,12 +46,13 @@ export function TabBar({
             </button>
           );
         })}
+        <button className={`${b.item} ${b.lumi}`} onClick={onLumi} aria-label={lumiCount ? `Ask Lumi AI, ${things} to talk about` : "Ask Lumi AI"}>
+          <span className={b.orb} aria-hidden>
+            <SunOrb paused={hidden || lumiPaused} />
+          </span>
+          <span aria-hidden>Lumi</span>
+        </button>
       </div>
-      <button className={b.lumi} onClick={onLumi} aria-label={lumiCount ? `Ask Lumi AI, ${things} to talk about` : "Ask Lumi AI"}>
-        <span className={b.orb} aria-hidden>
-          <SunOrb paused={hidden || lumiPaused} />
-        </span>
-      </button>
     </nav>
   );
 }

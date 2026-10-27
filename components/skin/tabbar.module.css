@@ -1,18 +1,16 @@
 /* The floating tab bar (TabBar.tsx), sized like iOS 26's: a 62pt Liquid Glass
-   capsule 21pt in from the edges with a 62pt round button beside it, sitting
-   just above the home indicator. */
+   capsule 20pt in from the edges, its bottom 20pt off the screen's. */
 
 .bar {
   --tabbar-h: 62px;
   position: fixed;
   z-index: 30;
   left: 50%;
-  bottom: max(12px, calc(var(--bottom-inset) - 13px));
+  bottom: max(12px, calc(var(--bottom-inset) - 14px));
   display: flex;
   align-items: center;
-  gap: 10px;
   width: min(100%, var(--phone));
-  padding: 0 21px;
+  padding: 0 20px;
   transform: translateX(-50%);
   pointer-events: none;
   transition:
@@ -89,58 +87,16 @@
   box-shadow: inset 0 0.5px 0.5px rgba(255, 255, 255, 0.8);
 }
 
-/* Lumi, where Music keeps Search: the orb itself is the button, no glass
-   around it. */
-.lumi {
-  position: relative;
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: var(--tabbar-h);
-  height: var(--tabbar-h);
-  border-radius: 50%;
-  pointer-events: auto;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 140ms var(--ease-out);
-}
-
-/* Lumi's aura: a warm glow behind the orb that breathes slowly, so she
-   still stands out on the gold hero and the pale page alike. */
-.lumi::before {
-  content: "";
-  position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 226, 150, 0.9) 0%,
-    rgba(255, 205, 110, 0.55) 38%,
-    rgba(240, 180, 80, 0.22) 58%,
-    transparent 72%
-  );
-  pointer-events: none;
-  animation: aura 3.2s ease-in-out infinite;
-}
-
-@keyframes aura {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: scale(0.94);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-}
-
+/* Lumi, where TV keeps Search: the orb is the tab's icon, with a soft warm
+   glow so it reads as alive without pulling at the eye. */
 .orb {
   position: relative;
   display: block;
-  width: 58px;
-  height: 58px;
-  /* A bright warm glow lifts her off gold backgrounds. */
-  filter: drop-shadow(0 0 10px rgba(255, 196, 90, 0.85)) drop-shadow(0 6px 10px rgba(128, 96, 31, 0.3));
+  width: 26px;
+  height: 26px;
+  /* Takes the room of a 24px icon, so the label sits level with the others. */
+  margin: -1px 0;
+  filter: drop-shadow(0 0 5px rgba(255, 196, 90, 0.75)) drop-shadow(0 1px 2px rgba(128, 96, 31, 0.3));
 }
 
 /* Feedback on the press, not the release. Home and Scan are placeholders,
@@ -161,13 +117,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bar,
-  .item,
-  .lumi {
+  .item {
     transition-duration: 0ms;
-  }
-
-  .lumi::before {
-    animation: none;
   }
 }
 

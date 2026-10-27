@@ -105,7 +105,8 @@
      frame's placeholder paint the same height, so the gold's edge never moves when
      the real hero takes over. Re-measure if the hero's layout changes. */
   --hero-h: calc(var(--top-inset) + 680px);
-  /* The same for the bottom: room for the home indicator. */
+  /* The same for the bottom: a real iPhone's bottom safe area (34pt), so the
+     tab bar lands where it does on a phone. */
   --chrome-bottom: 0px;
   --bottom-inset: max(env(safe-area-inset-bottom, 0px), var(--chrome-bottom));
 }
@@ -268,17 +269,14 @@ img {
   animation: none;
 }
 
-/* The phone's own chrome (status bar, home indicator) is not part of the page:
+/* The phone's own chrome (the status bar) is not part of the page:
    it stays exactly where it is, drawn live, above everything that morphs. */
 ::view-transition-group(skin-status),
-::view-transition-group(skin-home),
-::view-transition-new(skin-status),
-::view-transition-new(skin-home) {
+::view-transition-new(skin-status) {
   animation: none;
 }
 
-::view-transition-old(skin-status),
-::view-transition-old(skin-home) {
+::view-transition-old(skin-status) {
   display: none;
 }
 
@@ -355,6 +353,6 @@ html[data-vt="back"]::view-transition-new(skin-panel) {
 @media (hover: hover) and (pointer: fine) {
   :root {
     --chrome-top: 59px;
-    --chrome-bottom: 24px;
+    --chrome-bottom: 34px;
   }
 }
