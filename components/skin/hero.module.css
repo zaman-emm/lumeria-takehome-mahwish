@@ -276,8 +276,10 @@
 }
 
 /* The progress as a pill: it reads, it doesn't open anything. */
+/* The same size as the highlights button it replaced, whatever its text. */
 .month[data-static] {
   gap: 6px;
+  min-width: 304px;
   cursor: default;
 }
 
@@ -285,9 +287,13 @@
   transform: none;
 }
 
-/* The number and its words at one size, so the pill reads as one line. */
+/* The number at its original size, and its words grown to match it, so
+   the pill reads as one even line. */
+.month[data-static] {
+  font-size: 18px;
+}
+
 .month b {
-  font-size: inherit;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
