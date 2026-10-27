@@ -32,15 +32,21 @@
   --line: var(--evergreen);
 }
 
+/* The slides' backgrounds. The new one fades in on top while the one it
+   replaces stays fully opaque underneath until the fade is done, so the page
+   behind the story never shows through mid-change. */
 .bg {
   position: absolute;
   inset: 0;
+  z-index: 0;
   opacity: 0;
-  transition: opacity 450ms ease;
+  transition: opacity 0s linear 450ms;
 }
 
 .bg[data-on="true"] {
+  z-index: 1;
   opacity: 1;
+  transition: opacity 450ms ease;
 }
 
 .top {
