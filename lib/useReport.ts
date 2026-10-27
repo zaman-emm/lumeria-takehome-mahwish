@@ -7,7 +7,7 @@ import type { SkinReport } from "./types";
 
 export type ReportState =
   | { status: "loading" }
-  | { status: "error"; kind: "missing" | "failed"; retry: () => void }
+  | { status: "error"; kind: "missing" | "failed" | "offline"; retry: () => void }
   | { status: "empty"; firstName: string }
   | { status: "ready"; data: Derived };
 
@@ -29,7 +29,9 @@ export function useReport(id: string, fail: boolean): ReportState {
         setState(data ? { status: "ready", data } : { status: "empty", firstName: report.person.firstName });
       })
       .catch((err) => {
-        if (err?.name !== "AbortError") setState({ status: "error", kind: "failed", retry });
+        if (err?.name === "AbortError") return;
+        // The request never reached us (no connection), as opposed to the server answering with an error.
+        setState({ status: "error", kind: err instanceof TypeError || !navigator.onLine ? "offline" : "failed", retry });
       });
     return () => ctrl.abort();
   }, [id, fail, attempt, retry]);

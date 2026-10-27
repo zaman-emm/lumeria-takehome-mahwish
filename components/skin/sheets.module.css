@@ -206,6 +206,12 @@
   color: var(--bark);
 }
 
+/* In place of the ticks when this scan couldn't read the score. */
+.tickNone {
+  font-size: 12px;
+  color: var(--bark-3);
+}
+
 .tickValue {
   justify-self: end;
   font-size: 17px;

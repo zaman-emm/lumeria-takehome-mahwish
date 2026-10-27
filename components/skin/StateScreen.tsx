@@ -43,15 +43,23 @@ export function StateScreen({
               </button>
             </>
           )}
+          {state.status === "error" && state.kind === "offline" && (
+            <>
+              <ScopeRings still />
+              <h1 className={st.title}>You seem to be offline</h1>
+              <p className={st.text}>Your scans are safe. Check your connection and try again.</p>
+              <button className={st.button} onClick={state.retry}>
+                Try again
+              </button>
+            </>
+          )}
           {state.status === "error" && state.kind === "missing" && (
             <>
               <ScopeRings still />
               <h1 className={st.title}>We can’t find this report</h1>
-              <p className={st.text}>
-                The link may be incomplete. Open it again from the Lumeria app.
-              </p>
+              <p className={st.text}>Sorry, we ran into some trouble. Try opening it again in a moment.</p>
               <Link className={st.button} href="/report/noor">
-                See an example report
+                See what a report looks like
               </Link>
             </>
           )}

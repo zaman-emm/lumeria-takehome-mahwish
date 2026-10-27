@@ -352,6 +352,16 @@
   color: var(--bark);
 }
 
+/* Skin type isn't set: a quiet link-style invitation to add it. */
+.addType {
+  min-height: 32px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--forest);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 
 @media (prefers-reduced-motion: reduce) {
   .moreBody {

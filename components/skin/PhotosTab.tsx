@@ -27,6 +27,20 @@ export function PhotosTab() {
   // The wall lists the gallery's dozen (lib/insights pickGallery), not every scan.
   const shown = [...d.gallery].reverse().filter((s) => area === ALL || s.area === area);
   const spring = reduce ? { duration: 0 } : { type: "spring" as const, duration: 0.35, bounce: 0 };
+  // Scans that came without a photo can't go on the wall; say so rather than drop them silently.
+  const noPhoto = d.scans.filter((s) => !photoFor(s, "ambient")).length;
+
+  if (d.gallery.length === 0) {
+    return (
+      <div className={ph.empty}>
+        <span className={ph.emptyIcon}>
+          <Icon name="target" size={22} />
+        </span>
+        <h2>No photos yet</h2>
+        <p>Your scans’ photos will show up here.</p>
+      </div>
+    );
+  }
 
   return (
     <div className={ph.tab}>
@@ -83,6 +97,12 @@ export function PhotosTab() {
           ))}
         </AnimatePresence>
       </ul>
+
+      {noPhoto > 0 && (
+        <p className={ph.missing}>
+          {noPhoto === 1 ? "1 scan has" : `${noPhoto} scans have`} no photo, so {noPhoto === 1 ? "it isn’t" : "they aren’t"} shown here.
+        </p>
+      )}
     </div>
   );
 }

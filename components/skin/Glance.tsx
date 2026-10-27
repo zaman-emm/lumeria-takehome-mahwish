@@ -114,7 +114,14 @@ function MoreMetrics() {
           <dl className={g.profile}>
             <div>
               <dt>Skin type</dt>
-              <dd>{skinType ?? "Not set"}</dd>
+              <dd>
+                {skinType ?? (
+                  // Shows where it would be added; not wired up in this prototype.
+                  <button type="button" className={g.addType}>
+                    Add your skin type
+                  </button>
+                )}
+              </dd>
             </div>
           </dl>
         </div>
