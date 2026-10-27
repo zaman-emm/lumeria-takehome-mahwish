@@ -61,6 +61,7 @@ export function Hero({
   return (
     <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-skin-hero>
       <BackButton />
+      <ProfileButton name={d.firstName} />
       <span className={h.logo} role="img" aria-label="Lumeria" />
       <h1 className={h.title}>{headline(d)}</h1>
 
@@ -156,7 +157,17 @@ export function SlimHeader({
         <Flame size={16} />
         {streak}
       </span>
+      <ProfileButton name={d.firstName} />
     </header>
+  );
+}
+
+/** Her profile, top right as iOS keeps it. The account screens aren't part of this build, so it only shows. */
+function ProfileButton({ name }: { name: string }) {
+  return (
+    <button type="button" className={h.profile} aria-label={`Profile, ${name}`}>
+      <span aria-hidden>{name.charAt(0)}</span>
+    </button>
   );
 }
 
