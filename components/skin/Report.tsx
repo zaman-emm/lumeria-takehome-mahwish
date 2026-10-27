@@ -29,10 +29,9 @@ import { TrendsTab } from "./TrendsTab";
 import r from "./report.module.css";
 
 // The 2e report. At a glance opens on the gold hero; every other tab opens on
-// a slim header that keeps the score in view. Switching tabs morphs the hero
-// into the slim header (score and photo travel) and slides the panel in the
-// direction of the tab. Details open in one bottom sheet; the month plays as
-// a full-screen story.
+// a slim header (back, "Report", profile). Switching tabs swaps the header and
+// slides the panel in the direction of the tab. Details open in one bottom
+// sheet; the month plays as a full-screen story.
 //
 // The report is the app's Trends destination; the floating tab bar at the
 // bottom switches between it, Home and Scan, crossfading the page.
@@ -176,7 +175,7 @@ export function Report({ d }: { d: Derived }) {
                 {tab === "glance" ? (
                   <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} splash={splash} />
                 ) : (
-                  <SlimHeader d={d} lens={lens} streak={streak.pill} onScan={() => api.openScan(d.latest)} />
+                  <SlimHeader d={d} />
                 )}
 
                 <Tabs tabs={TABS} active={tab} onChange={changeTab} />

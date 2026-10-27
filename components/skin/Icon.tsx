@@ -71,16 +71,3 @@ export function Icon({
     </svg>
   );
 }
-
-/** The streak flame, two-tone like the pill it sits in. */
-export function Flame({ size = 16 }: { size?: number }) {
-  return (
-    <svg viewBox="0 0 10 16" width={(size * 10) / 16} height={size} aria-hidden focusable="false">
-      <path
-        d="M5 .6C5.6 3.4 9.4 5.4 9.4 10A4.4 4.4 0 01.6 10c0-2.4 1.3-3.7 2.2-4.6.2 1.5.8 2.4 1.6 2.8C4 5.6 4.3 3 5 .6z"
-        fill="var(--evergreen)"
-      />
-      <path d="M5 8.6c.9 1 2 1.8 2 3.3a2 2 0 01-4 0c0-1.2.8-2 2-3.3z" fill="var(--gold)" />
-    </svg>
-  );
-}

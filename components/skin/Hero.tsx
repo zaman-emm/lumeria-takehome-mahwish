@@ -6,7 +6,7 @@ import { band, dayOf as localDayOf, daysBetween, fmtDay, scanTz, type Derived } 
 import type { Scan } from "@/lib/types";
 import { useFirstTime } from "./hooks";
 import { Gauge } from "./Gauge";
-import { Flame, Icon } from "./Icon";
+import { Icon } from "./Icon";
 import { headline, sinceStart } from "@/lib/voice";
 import { Photo } from "./ui";
 import h from "./hero.module.css";
@@ -129,34 +129,12 @@ export function Hero({
   );
 }
 
-/** The other tabs open on this: score, streak and the recap, in one row. */
-export function SlimHeader({
-  d,
-  lens,
-  streak,
-  onScan,
-}: {
-  d: Derived;
-  lens: Scan;
-  streak: string;
-  onScan: () => void;
-}) {
-  const tz = scanTz(lens) ?? d.tz;
+/** The other tabs open on this, like the iOS Health bar: back, a centred title, profile. */
+export function SlimHeader({ d }: { d: Derived }) {
   return (
     <header className={h.slim}>
       <BackButton />
-      <button className={h.slimLens} onClick={onScan} aria-label={`Open your scan from ${fmtDay(lens.takenAt, tz)}`}>
-        <Photo scan={lens} alt="" style={{ viewTransitionName: "skin-photo" }} />
-      </button>
-      <span className={h.slimScore}>
-        <b style={{ viewTransitionName: "skin-score" }}>{d.latest.scores.overall}</b>
-        <span>overall</span>
-        {d.trend && <em>{d.trend.delta > 0 ? `+${d.trend.delta}` : d.trend.delta < 0 ? `−${-d.trend.delta}` : "±0"}</em>}
-      </span>
-      <span className={h.streak} aria-label={`Weekly streak: ${streak}`}>
-        <Flame size={16} />
-        {streak}
-      </span>
+      <h1 className={h.slimTitle}>Report</h1>
       <ProfileButton name={d.firstName} />
     </header>
   );

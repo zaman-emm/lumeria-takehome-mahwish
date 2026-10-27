@@ -498,7 +498,8 @@
 
 .slim {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
   align-items: center;
   gap: 14px;
   height: calc(72px + var(--top-inset));
@@ -514,70 +515,15 @@
   view-transition-name: skin-head;
 }
 
-.slimLens {
-  position: relative;
-  width: 48px;
-  height: 48px;
-  padding: 2px;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 2px var(--bronze);
-  flex: none;
-  transition: transform 160ms var(--ease-out);
-}
-
-.slimLens:active {
-  transform: scale(0.96);
-}
-
-.slimLens img,
-.slimLens > span {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--bone);
-}
-
-/* The score takes the middle, with room either side before the photo and the streak. */
-.slimScore {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  flex: 1;
+/* The title is centred on the screen, not between the buttons: the side
+   columns are the same width. */
+.slimTitle {
   min-width: 0;
-  padding: 0 4px;
-}
-
-.slimScore b {
-  font-size: 22px;
-  font-weight: 400;
-  font-variant-numeric: tabular-nums;
-}
-
-.slimScore span {
-  font-size: 14px;
-}
-
-.slimScore em {
-  margin-left: 4px;
-  font-style: normal;
-  font-size: 14px;
+  text-align: center;
+  font-size: 17px;
+  line-height: 22px;
   font-weight: 600;
-}
-
-.streak {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px 6px 10px;
-  border-radius: 14px;
-  background: var(--lg-sheen), rgba(251, 246, 236, 0.4);
-  box-shadow: var(--lg-rim);
-  -webkit-backdrop-filter: var(--lg-blur);
-  backdrop-filter: var(--lg-blur);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--bark);
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-transparency: reduce) {

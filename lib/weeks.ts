@@ -11,8 +11,6 @@ export interface WeekStreak {
   /** One entry per week of the period: did it have a scan? */
   weeks: boolean[];
   milestones: { weeks: number; earned: boolean }[];
-  /** Short pill label: "5 wk", or "Best 2 wk" when the run has paused. */
-  pill: string;
 }
 
 const MILESTONES = [4, 8, 12];
@@ -39,6 +37,5 @@ export function weekStreak(d: Derived): WeekStreak {
     best,
     weeks,
     milestones: MILESTONES.map((n) => ({ weeks: n, earned: best >= n })),
-    pill: current ? `${current} wk` : `Best ${best} wk`,
   };
 }
