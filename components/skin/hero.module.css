@@ -280,6 +280,9 @@
 .month[data-static] {
   gap: 6px;
   min-width: 304px;
+  /* A paragraph: drop its default bottom margin, and sit as far under the
+     greeting as the progress card does. */
+  margin: 16px 0 0;
   cursor: default;
 }
 
