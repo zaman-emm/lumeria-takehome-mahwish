@@ -19,12 +19,12 @@ import h from "./hero.module.css";
 
 /**
  * Then and now for the card: the first and newest real photos of the spot,
- * else the two scans the trend compares. Never a real photo beside a stand-in.
+ * else the two scans the trend compares.
  */
 function beforeAfter(d: Derived, lens: Scan): [Scan, Scan] | null {
   const real = d.realPhotos.filter((s) => s.area === lens.area);
   if (real.length >= 2) return [real[0], real[real.length - 1]];
-  if (real.length || !d.trend?.from.photoUrl || !d.trend.to.photoUrl) return null;
+  if (!d.trend?.from.photoUrl || !d.trend.to.photoUrl) return null;
   return [d.trend.from, d.trend.to];
 }
 
