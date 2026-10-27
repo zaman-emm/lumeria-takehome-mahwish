@@ -9,6 +9,7 @@ import { buildRecap } from "@/lib/recap";
 import { weekStreak } from "@/lib/weeks";
 import { CalendarTab } from "./CalendarTab";
 import { ReportContext, type ReportApi, type SheetState } from "./context";
+import type { Light } from "./ui";
 import { Glance } from "./Glance";
 import { Hero, SlimHeader } from "./Hero";
 import { withViewTransition } from "./hooks";
@@ -78,7 +79,7 @@ export function Report({ d }: { d: Derived }) {
   const api: ReportApi = useMemo(
     () => ({
       d,
-      openScan: (scan: Scan) => open({ kind: "scan", scan }),
+      openScan: (scan: Scan, light?: Light) => open({ kind: "scan", scan, light }),
       openMetric: (key: ScoreKey, area?: string) => open({ kind: "metric", key, area: area ?? d.area }),
       openLumi: () => open({ kind: "lumi", tab }),
     }),
@@ -214,7 +215,7 @@ export function Report({ d }: { d: Derived }) {
               container={root}
               edge={sheet?.kind !== "lumi"}
             >
-              {sheet?.kind === "scan" && <ScanSheet scan={sheet.scan} />}
+              {sheet?.kind === "scan" && <ScanSheet scan={sheet.scan} light={sheet.light} />}
               {sheet?.kind === "metric" && (
   <MetricSheet metric={sheet.key} area={sheet.area} />
               )}

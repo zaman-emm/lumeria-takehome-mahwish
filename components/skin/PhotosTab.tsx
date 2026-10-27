@@ -107,7 +107,7 @@ function Polaroid({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
   const { openScan } = useReportApi();
   const tz = scanTz(scan) ?? d.tz;
   return (
-    <button className={ph.polaroid} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}`}>
+    <button className={ph.polaroid} onClick={() => openScan(scan, lightFor(scan, light))} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}`}>
       <i className={ph.tape} aria-hidden />
       <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.thumb} say />
       <span className={ph.pMeta}>
@@ -128,7 +128,7 @@ function PhotoRow({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
   // note sits above that button so its pencil can be pressed on its own.
   return (
     <div className={ph.row}>
-      <button className={ph.rowHit} onClick={() => openScan(scan)} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}. Open scan`} />
+      <button className={ph.rowHit} onClick={() => openScan(scan, lightFor(scan, light))} aria-label={`${scan.area}, ${fmtDay(scan.takenAt, tz)}, ${scan.scores.overall}. Open scan`} />
       <Photo scan={scan} light={lightFor(scan, light)} alt="" className={ph.rowPhoto} />
       <span className={ph.rowText}>
         <span className={ph.rowWhen} aria-hidden>

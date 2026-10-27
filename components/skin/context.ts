@@ -4,16 +4,18 @@ import { createContext, useContext } from "react";
 import type { Derived, ScoreKey } from "@/lib/insights";
 import type { LumiTab } from "@/lib/lumi";
 import type { Scan } from "@/lib/types";
+import type { Light } from "./ui";
 
 export type SheetState =
-  | { kind: "scan"; scan: Scan }
+  /** light: the light the Photos tab was showing, so the scan opens in it. */
+  | { kind: "scan"; scan: Scan; light?: Light }
   | { kind: "metric"; key: ScoreKey; area: string }
   /** Lumi opens on the tab it was called from, so it can talk about it. */
   | { kind: "lumi"; tab: LumiTab };
 
 export interface ReportApi {
   d: Derived;
-  openScan: (scan: Scan) => void;
+  openScan: (scan: Scan, light?: Light) => void;
   openMetric: (key: ScoreKey, area?: string) => void;
   openLumi: () => void;
 }

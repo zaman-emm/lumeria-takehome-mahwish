@@ -1,24 +1,24 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
 import { METRICS, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, score, shortTip, signed, spansOn } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { LIGHTS, LightTag, Photo, ScheduleChip, TickAxis, Ticks, hasLights, photoFor, type Light } from "./ui";
+import { LIGHTS, LightTag, Photo, ScheduleChip, TickAxis, Ticks, photoFor, type Light } from "./ui";
 import m from "./sheets.module.css";
 
-// Everything about one scan: the photo under each light, every score against
+// Everything about one scan: its photo, in the light it was opened in (the
+// Photos tab's choice, else daylight) and labelled with it, every score against
 // the last scan of the same spot, what it saw, what was noted, and the day's
 // context.
 
 /** Self-reported stress, 1 to 5, in a word. */
 const stressWord = (n: number) => (n >= 4 ? "High" : n === 3 ? "Medium" : "Low");
 
-export function ScanSheet({ scan }: { scan: Scan }) {
+export function ScanSheet({ scan, light: asked }: { scan: Scan; light?: Light }) {
   const { d } = useReportApi();
-  const [light, setLight] = useState<Light>("ambient");
+  const light: Light = asked && photoFor(scan, asked) ? asked : "ambient";
   const tz = scanTz(scan) ?? d.tz;
   const prev = previousSameArea(d, scan);
   const delta = prev ? scan.scores.overall - prev.scores.overall : null;
@@ -26,7 +26,6 @@ export function ScanSheet({ scan }: { scan: Scan }) {
   const h = scan.health;
   const env = scan.location?.environment;
   const products = spansOn(d, dayOf(d, scan)).filter((s) => s.kind === "product" && s.product);
-  const li = LIGHTS.findIndex((l) => l.key === light);
 
   const context: [string, string][] = h
     ? [
@@ -66,13 +65,11 @@ export function ScanSheet({ scan }: { scan: Scan }) {
       </header>
 
       <div className={m.photo}>
-        {photoFor(scan, "ambient") && <LightTag light={hasLights(scan) ? light : "ambient"} className={m.photoTag} />}
-        {hasLights(scan) ? (
-          LIGHTS.map((l) => (
-            <Photo key={l.key} scan={scan} light={l.key} className={m.photoImg} on={l.key === light} alt={`${scan.area}, ${l.label.toLowerCase()} light`} />
-          ))
-        ) : photoFor(scan, "ambient") ? (
-          <Photo scan={scan} className={m.photoImg} />
+        {photoFor(scan, "ambient") ? (
+          <>
+            <LightTag light={light} className={m.photoTag} />
+            <Photo scan={scan} light={light} className={m.photoImg} alt={`${scan.area}, ${LIGHTS.find((l) => l.key === light)!.label.toLowerCase()} light`} />
+          </>
         ) : (
           // The upload failed (photoUrl is null); the scan's reading is fine. Offer
           // another go. Shows the action only; not wired up in this prototype.
@@ -85,16 +82,6 @@ export function ScanSheet({ scan }: { scan: Scan }) {
           </div>
         )}
       </div>
-      {hasLights(scan) && (
-        <div className={m.lights} role="radiogroup" aria-label="Light" style={{ "--i": li } as CSSProperties}>
-          <i className={m.lightKnob} aria-hidden />
-          {LIGHTS.map((l) => (
-            <button key={l.key} role="radio" aria-checked={l.key === light} onClick={() => setLight(l.key)}>
-              {l.label}
-            </button>
-          ))}
-        </div>
-      )}
 
       <i className={m.band} aria-hidden />
       <p className={m.eyebrow}>{scan.area}</p>
