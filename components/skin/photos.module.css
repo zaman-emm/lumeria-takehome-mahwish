@@ -20,6 +20,7 @@
 }
 
 .compareEmpty {
+  position: relative;
   border-radius: 20px;
   overflow: hidden;
   background: var(--sand);
@@ -78,22 +79,18 @@
   height: 40px;
   margin-top: -20px;
   border-radius: 50%;
-  background: var(--bone);
+  background: #fff;
+  display: grid;
+  place-items: center;
+  color: var(--evergreen);
   box-shadow:
-    inset 0 0 0 1px var(--bronze-deep),
+    inset 0 0 0 1px rgba(20, 36, 26, 0.18),
     0 4px 12px rgba(20, 36, 26, 0.25);
 }
 
-.divider i::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 2px;
-  background: var(--evergreen);
+.divider svg {
+  width: 19px;
+  height: 19px;
 }
 
 .knobHit {
@@ -106,43 +103,32 @@
   border-radius: 50%;
 }
 
-.tag {
+.knobHit:focus-visible {
+  outline: 2px solid var(--evergreen);
+  outline-offset: 3px;
+}
+
+.areaLabel,
+.sideLabel {
   position: absolute;
-  padding: 5px 10px;
-  border-radius: 13.5px;
-  background: rgba(215, 180, 111, 0.8);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  font-size: 11px;
+  padding: 6px 11px;
+  border-radius: 14px;
+  background: rgba(255, 250, 242, 0.52);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+  backdrop-filter: blur(12px) saturate(1.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.48);
+  color: var(--bark);
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 600;
-  color: var(--evergreen);
   white-space: nowrap;
   pointer-events: none;
 }
 
-.tag[data-at="top"] {
-  top: 12px;
-  left: 12px;
-  /* The spot and light, in the same light frosted label as the opened scan. */
-  padding: 3px 7px;
-  border-radius: 6px;
-  background: rgba(255, 250, 238, 0.82);
-  color: var(--bark);
-  font-size: 9px;
-  line-height: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.tag[data-at="left"] {
-  bottom: 12px;
-  left: 12px;
-}
-
-.tag[data-at="right"] {
-  right: 12px;
-  bottom: 12px;
-}
+.areaLabel { bottom: 12px; left: 12px; }
+.sideLabel { top: 12px; }
+.sideLabel[data-side="before"] { left: 12px; }
+.sideLabel[data-side="now"] { right: 12px; }
 
 /* ------------------------------------------------ switches */
 
@@ -407,17 +393,6 @@
   font-size: 12px;
   line-height: 15px;
   color: var(--bark-2);
-}
-
-.rowSaw {
-  margin-top: 3px;
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--bark);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 /* Above the row's button, so the pencil and the editor take their own taps;

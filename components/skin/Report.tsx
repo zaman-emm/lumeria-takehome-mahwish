@@ -12,7 +12,6 @@ import { ReportContext, type ReportApi, type SheetState } from "./context";
 import type { Light } from "./ui";
 import { Glance } from "./Glance";
 import { Hero, SlimHeader } from "./Hero";
-import { withViewTransition } from "./hooks";
 import { LumiSheet } from "./LumiSheet";
 import { MetricSheet } from "./MetricSheet";
 import { NotesProvider } from "./notes";
@@ -51,9 +50,11 @@ const sheetKey = (s: SheetState) => (s.kind === "scan" ? s.scan.id : s.kind === 
 
 export function Report({ d }: { d: Derived }) {
   const [tab, setTab] = useState<TabId>("glance");
+  const direction = useRef<"forward" | "back" | "none">("none");
   // The splash opens the first load of a page, never again, and never for
   // people who asked for less motion (splashState.ts).
   const [splash, setSplash] = useState<"wait" | "go" | "done">(() => (willSplash() ? "wait" : "done"));
+  const [barReady, setBarReady] = useState(() => splash === "done");
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [recap, setRecap] = useState(false);
   const [root, setRoot] = useState<HTMLDivElement | null>(null);
@@ -89,13 +90,9 @@ export function Report({ d }: { d: Derived }) {
     if (id === tab) return;
     const from = TABS.findIndex((t) => t.id === tab);
     const to = TABS.findIndex((t) => t.id === id);
-    withViewTransition(
-      () => {
-        setTab(id);
-        if (window.scrollY > 0) window.scrollTo({ top: 0 });
-      },
-      to > from ? "forward" : "back",
-    );
+    direction.current = to > from ? "forward" : "back";
+    setTab(id);
+    if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   // The recap lives in history, so the phone's back gesture closes it.
@@ -180,7 +177,7 @@ export function Report({ d }: { d: Derived }) {
 
                 <Tabs tabs={TABS} active={tab} onChange={changeTab} />
 
-                <main className={r.panel} id="skin-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
+                <main key={tab} className={r.panel} data-direction={direction.current} id="skin-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
                   {tab === "glance" && <Glance streak={streak} />}
                   {tab === "products" && <ProductsTab />}
                   {tab === "trends" && <TrendsTab />}
@@ -200,7 +197,7 @@ export function Report({ d }: { d: Derived }) {
             </Drawer.Indent>
 
             <TabBar
-              hidden={recap || splash !== "done"}
+              hidden={recap || !barReady}
               onLumi={api.openLumi}
               lumiCount={d.factors.length}
               lumiPaused={Boolean(sheet) || recap}
@@ -225,7 +222,7 @@ export function Report({ d }: { d: Derived }) {
               <Splash value={d.latest.scores.overall} onGo={() => {
                   markSplashed();
                   setSplash("go");
-                }} onDone={() => setSplash("done")} />
+                }} onRevealBar={() => setBarReady(true)} onDone={() => { setBarReady(true); setSplash("done"); }} />
             )}
 
             <AnimatePresence>

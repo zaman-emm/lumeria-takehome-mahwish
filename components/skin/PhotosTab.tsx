@@ -137,7 +137,6 @@ function PhotoRow({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
         <span className={ph.rowArea} aria-hidden>
           {scan.area}
         </span>
-        <span className={ph.rowSaw}>{scan.summary.headline}</span>
         <NoteCard scan={scan} compact className={ph.rowNote} />
       </span>
       <span className={ph.rowScore} aria-hidden>
@@ -169,7 +168,7 @@ function Compare({ d, light, area }: { d: Derived; light: Light; area: string })
   if (!before || !after || before === after) {
     return (
       <div className={ph.compareEmpty}>
-        {after ? <Photo scan={after} light={light} alt={`${area} close-up`} className={ph.single} /> : null}
+        {after ? <><Photo scan={after} light={light} alt={`${area} close-up`} className={ph.single} /><span className={ph.areaLabel}>{area}</span></> : null}
       </div>
     );
   }
@@ -180,10 +179,11 @@ function Compare({ d, light, area }: { d: Derived; light: Light; area: string })
     setPos(Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100)));
   };
   const key = (e: KeyboardEvent) => {
-    if (e.key === "ArrowLeft") setPos((p) => Math.max(0, p - 5));
-    if (e.key === "ArrowRight") setPos((p) => Math.min(100, p + 5));
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      setPos((p) => Math.max(0, Math.min(100, p + (e.key === "ArrowLeft" ? -5 : 5))));
+    }
   };
-  const lightLabel = LIGHTS.find((l) => l.key === light)!.label;
 
   return (
     <div
@@ -204,7 +204,7 @@ function Compare({ d, light, area }: { d: Derived; light: Light; area: string })
         <Photo key={`a-${after.id}-${light}`} scan={after} light={light} alt={`${area}, ${fmtDay(after.takenAt, tz(after))}`} className={ph.cmpImg} />
       </div>
       <div className={ph.divider} aria-hidden>
-        <i />
+        <i><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 6-6 6 6 6M15 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></i>
       </div>
       <div
         className={ph.knobHit}
@@ -217,15 +217,9 @@ function Compare({ d, light, area }: { d: Derived; light: Light; area: string })
         aria-valuetext={`${Math.round(100 - pos)}% ${fmtDay(dayOf(d, after))}`}
         onKeyDown={key}
       />
-      <span className={ph.tag} data-at="top">
-        {area} · {lightLabel}
-      </span>
-      <span className={ph.tag} data-at="left">
-        {fmtDay(before.takenAt, tz(before))} · {before.scores.overall}
-      </span>
-      <span className={ph.tag} data-at="right">
-        {fmtDay(after.takenAt, tz(after))} · {after.scores.overall}
-      </span>
+      <span className={ph.sideLabel} data-side="before" style={{ opacity: Math.min(1, pos / 18) }}>Before</span>
+      <span className={ph.sideLabel} data-side="now" style={{ opacity: Math.min(1, (100 - pos) / 18) }}>Now</span>
+      <span className={ph.areaLabel}>{area}</span>
     </div>
   );
 }

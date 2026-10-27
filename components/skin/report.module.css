@@ -110,7 +110,16 @@
 
 .panel {
   padding: 0 16px;
-  view-transition-name: skin-panel;
+}
+
+.panel[data-direction="forward"] { animation: tabEnterForward 240ms var(--ease-out); }
+.panel[data-direction="back"] { animation: tabEnterBack 240ms var(--ease-out); }
+
+@keyframes tabEnterForward { from { opacity: 0; transform: translateX(18px); } }
+@keyframes tabEnterBack { from { opacity: 0; transform: translateX(-18px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .panel[data-direction] { animation: none; }
 }
 
 .foot {

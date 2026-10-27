@@ -448,17 +448,21 @@
    it lands, then the logo, greeting and headline rise, and the card, the month
    button and the then-and-now photos follow. The gauge itself just appears,
    exactly where the splash's copy lands. */
-.hero[data-splash="wait"] :is(.logo, .hi, .title, .card, .month),
+.hero[data-splash="wait"] :is(.logo, .hi, .title, .card, .month, .back, .profile),
 .hero:is([data-splash="wait"], [data-splash="go"]) .gaugeBox {
   opacity: 0;
 }
 
-.hero[data-splash="go"] :is(.logo, .hi, .title, .card, .month) {
+.hero[data-splash="go"] :is(.logo, .hi, .title, .card, .month, .back, .profile) {
   animation: rise 520ms var(--ease-out) both;
   animation-delay: var(--at, 0ms);
 }
 
 .hero[data-splash="go"] .logo {
+  --at: 120ms;
+}
+
+.hero[data-splash="go"] :is(.back, .profile) {
   --at: 120ms;
 }
 
