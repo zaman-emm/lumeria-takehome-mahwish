@@ -350,6 +350,13 @@
 
 /* The legend row above the chart (Legend in TrendView.tsx): swatch and name,
    left-aligned, wrapping. Each item is a button that picks its range out. */
+.caption {
+  margin: 18px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--bark-2);
+}
+
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -578,18 +585,6 @@
   line-height: 32px;
   font-weight: 300;
   font-variant-numeric: tabular-nums;
-}
-
-.cardDelta {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 1px 6px;
-  border-radius: 8px;
-  background: var(--gold);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--evergreen);
 }
 
 .cardChevron {

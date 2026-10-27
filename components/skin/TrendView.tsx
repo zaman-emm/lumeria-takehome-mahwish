@@ -24,7 +24,7 @@ import { useReportApi } from "./context";
 import { useReveal, useWidth } from "./hooks";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { Photo, Ring } from "./ui";
+import { ChangeSince, Photo, Ring } from "./ui";
 import { tick } from "./DayCurve";
 import t from "./trends.module.css";
 
@@ -117,6 +117,11 @@ export function TrendView({
 
       {scans.length > 1 ? (
         <>
+          {/* What the chart plots, in words: the score, the spot, how many scans and when. */}
+          <p className={t.caption}>
+            {metricMeta(metric).label} score on your {area.toLowerCase()} · {scans.length} scans,{" "}
+            {fmtRange(dayOf(d, scans[0]), dayOf(d, scans[scans.length - 1]))}
+          </p>
           <Legend d={d} focus={focus} onFocus={setFocus} />
           <Chart key={`${area}-${metric}`} d={d} scans={scans} metric={metric} picked={shown} onPick={setPicked} revealKey={revealKey} focus={focus} />
         </>
@@ -434,15 +439,11 @@ export function ScanCard({ scan, metric = "overall" }: { scan: Scan; metric?: Sc
             {fmtDay(scan.takenAt, tz)} · {fmtTime(scan.takenAt, tz)}
           </span>
           <span className={t.cardSaw}>{scan.summary.headline}</span>
+          {/* Under the words, not the number, so the text keeps its width. */}
+          {delta != null && delta !== 0 && prev && <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />}
         </span>
         <span className={t.cardScore}>
           <b>{v ?? "–"}</b>
-          {delta != null && delta !== 0 && (
-            <span className={t.cardDelta}>
-              <Icon name={delta > 0 ? "up" : "down"} size={9} stroke={2} />
-              {Math.abs(delta)}
-            </span>
-          )}
         </span>
         <Icon name="chevronR" size={12} stroke={1.8} className={t.cardChevron} />
       </div>

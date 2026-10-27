@@ -438,11 +438,6 @@
   line-height: 24px;
 }
 
-.rowDelta {
-  font-size: 12px;
-  color: var(--bark-2);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .cmpImg {
     animation-name: lightFade;

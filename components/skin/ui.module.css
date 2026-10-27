@@ -307,6 +307,22 @@
   font-variant-numeric: tabular-nums;
 }
 
+.since {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+}
+
+.since .delta {
+  font-weight: 600;
+  color: var(--bark);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ringValue[data-draw="true"] {
     animation: ringFade 400ms ease both;

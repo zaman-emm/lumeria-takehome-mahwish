@@ -38,15 +38,17 @@ export function trial(d: Derived, p: Product): { day: number; of: number } | nul
 
 export interface DayValue {
   day: string;
-  /** The day's average across every area scanned. null on days without a scan. */
+  /** The day's average (across every area scanned, or the one asked for). null on days without a scan. */
   value: number | null;
 }
 
 /** One metric, one bar per day of the period. */
-export function dailySeries(d: Derived, key: ScoreKey): DayValue[] {
+export function dailySeries(d: Derived, key: ScoreKey, area?: string): DayValue[] {
   const n = daysBetween(d.start, d.end) + 1;
   const byDay = new Map<string, number[]>();
   for (const s of d.scans) {
+    // One spot only, when asked: different spots score on different scales.
+    if (area && s.area !== area) continue;
     const v = score(s, key);
     if (v == null) continue;
     const day = dayOf(d, s);

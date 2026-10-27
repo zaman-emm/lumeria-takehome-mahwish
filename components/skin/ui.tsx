@@ -217,6 +217,19 @@ export function ScheduleChip({ product }: { product: Product }) {
   );
 }
 
+/**
+ * A scan's change from the last scan of the same spot, said with what it's
+ * measured from, so a bare "−3" never has to be guessed at: "↓ 3 since Sep 25".
+ */
+export function ChangeSince({ n, since, className }: { n: number; since: string; className?: string }) {
+  return (
+    <span className={`${u.since} ${className ?? ""}`}>
+      <Delta n={n} />
+      <span>since {since}</span>
+    </span>
+  );
+}
+
 /** A change as an arrow and a number. The arrow already says which way, so no sign. */
 export function Delta({ n, className }: { n: number; className?: string }) {
   return (

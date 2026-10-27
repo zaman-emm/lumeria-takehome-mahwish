@@ -540,7 +540,9 @@
 .coverName {
   position: relative;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: min(30px, 21cqw);
+  /* About half an em per letter in this serif, kept within the card's inner 80%. */
+  font-size: min(30px, 21cqw, calc(80cqw / (var(--len, 7) * 0.5)));
+  white-space: nowrap;
   line-height: 1;
   text-align: center;
   color: var(--card-ink);

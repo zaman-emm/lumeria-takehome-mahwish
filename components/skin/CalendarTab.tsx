@@ -2,12 +2,12 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { addDays, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, signed, type Derived } from "@/lib/insights";
+import { addDays, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { Photo } from "./ui";
+import { ChangeSince, Photo } from "./ui";
 import c from "./calendar.module.css";
 
 // The month as a calendar: each scan day is a dot shaded by its score, with
@@ -207,7 +207,7 @@ function DayRow({ d, scan, ghost }: { d: Derived; scan: Scan; ghost?: boolean })
       </span>
       <span className={c.rowScore}>
         <b>{scan.scores.overall}</b>
-        {delta != null && <span>{signed(delta)}</span>}
+        {delta != null && prev && <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />}
       </span>
       <Icon name="chevronR" size={12} stroke={1.8} className={c.rowChevron} />
     </button>

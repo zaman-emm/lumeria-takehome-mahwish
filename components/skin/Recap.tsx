@@ -370,7 +370,10 @@ function ShowedUp({ slide }: { slide: Extract<Slide, { kind: "showedUp" }> }) {
                 </span>
               ))}
             </span>
-            <span className={s.coverName}>{slide.cover}</span>
+            {/* Long names ("September") set smaller so they stay inside the card. */}
+            <span className={s.coverName} style={{ "--len": slide.cover.length } as CSSProperties}>
+              {slide.cover}
+            </span>
           </span>
         </button>
       </In>
