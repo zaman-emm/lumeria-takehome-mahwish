@@ -231,11 +231,20 @@ export function Recap({
       </section>
 
       <footer className={s.controls}>
-        <div className={s.progress} aria-hidden>
+        {/* Each bar jumps to its slide, so any page can be gone back to. */}
+        <div className={s.progress} role="group" aria-label="Slides">
           {slides.map((_, n) => (
-            <span key={n}>
-              <i style={{ transform: `scaleX(${n <= i ? 1 : 0})` }} />
-            </span>
+            <button
+              key={n}
+              type="button"
+              onClick={() => go(n)}
+              aria-label={`Slide ${n + 1} of ${slides.length}`}
+              aria-current={n === i ? "step" : undefined}
+            >
+              <span>
+                <i style={{ transform: `scaleX(${n <= i ? 1 : 0})` }} />
+              </span>
+            </button>
           ))}
         </div>
         {last ? (

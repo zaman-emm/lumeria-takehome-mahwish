@@ -248,7 +248,16 @@
 
 .progress {
   display: flex;
-  gap: 4px;
+  /* The bars' 4px gaps live inside each button, so the whole strip is tappable. */
+  margin: 0 -2px;
+}
+
+/* A tall, invisible tap area around each thin bar. */
+.progress button {
+  display: grid;
+  place-items: center;
+  height: 44px;
+  padding: 0 2px;
 }
 
 .progress span {
