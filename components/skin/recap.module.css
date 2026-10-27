@@ -339,7 +339,7 @@
 .highsRing circle {
   fill: none;
   stroke: var(--evergreen);
-  stroke-width: 5;
+  stroke-width: 8;
   stroke-linecap: round;
   animation: ring 1100ms var(--ease-out) 300ms both;
 }
