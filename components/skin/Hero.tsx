@@ -62,7 +62,6 @@ export function Hero({
     <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-iteration={fitnessLayout || undefined} data-skin-hero>
       <BackButton />
       <ProfileButton name={d.firstName} />
-      <span className={h.logo} role="img" aria-label="Lumeria" />
 
       <div className={h.hi}>
         <h1>
