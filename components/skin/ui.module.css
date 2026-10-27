@@ -11,7 +11,7 @@
 .lightTag {
   position: absolute;
   z-index: 1;
-  padding: 3px 7px;
+  padding: 4px 8px;
   border-radius: 6px;
   background: rgba(255, 250, 238, 0.82);
   -webkit-backdrop-filter: blur(6px);
@@ -29,7 +29,7 @@
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 6px;
+  gap: 8px;
   background: var(--sand);
   color: var(--bark-3);
 }
@@ -103,7 +103,7 @@
 .range {
   position: relative;
   display: block;
-  height: 10px;
+  height: 12px;
 }
 
 .range::before {
@@ -117,7 +117,7 @@
 .rangeSeg {
   position: absolute;
   top: 2px;
-  height: 6px;
+  height: 8px;
   left: var(--lo);
   width: var(--w);
   border-radius: 3px;
@@ -152,9 +152,9 @@
   position: absolute;
   top: 50%;
   left: 0;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
+  width: 12px;
+  height: 12px;
+  margin: -4px 0 0 -4px;
   border-radius: 50%;
   background: var(--forest);
   box-shadow: 0 0 0 2px var(--paper);
@@ -181,7 +181,7 @@
 .fromTo {
   display: inline-flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 8px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -209,14 +209,14 @@
   display: grid;
   grid-template-columns: repeat(20, 1fr);
   align-items: center;
-  height: 22px;
+  height: 24px;
 }
 
 .ticks i {
   position: relative;
   justify-self: center;
-  width: 3px;
-  height: 10px;
+  width: 4px;
+  height: 12px;
   border-radius: 1px;
   background: rgba(47, 74, 53, 0.16);
 }
@@ -249,7 +249,7 @@
 .tickAxis {
   position: relative;
   display: block;
-  height: 14px;
+  height: 16px;
   font-size: 11px;
   color: var(--bark-2);
 }
@@ -293,13 +293,13 @@
 /* Morning and night as two separate pills; an unused slot keeps its space. */
 .when {
   display: inline-flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .when > span {
   display: grid;
   place-items: center;
-  width: 30px;
+  width: 32px;
   height: 24px;
   border-radius: 6px;
   background: var(--forest-soft);
@@ -327,7 +327,7 @@
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  padding: 1px 6px;
+  padding: 1px 8px;
   border-radius: 8px;
   background: var(--gold);
   font-size: 11px;

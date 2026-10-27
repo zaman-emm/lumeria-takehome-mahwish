@@ -22,7 +22,7 @@
   justify-content: space-between;
   width: min(100%, var(--phone));
   height: var(--chrome-top);
-  padding: 0 30px 0 38px;
+  padding: 0 32px 0 40px;
   transform: translateX(-50%);
   color: #000;
   pointer-events: none;
@@ -32,7 +32,7 @@
 }
 
 .time {
-  width: 54px;
+  width: 56px;
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.2px;
@@ -45,8 +45,8 @@
   position: absolute;
   top: 11px;
   left: 50%;
-  width: 126px;
-  height: 37px;
+  width: 128px;
+  height: 36px;
   border-radius: 20px;
   background: #000;
   transform: translateX(-50%);
@@ -55,7 +55,7 @@
 .icons {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .icons svg {
@@ -64,8 +64,8 @@
 
 .battery {
   position: relative;
-  width: 27px;
-  height: 13px;
+  width: 28px;
+  height: 12px;
   padding: 1.5px;
   border: 1px solid rgba(0, 0, 0, 0.4);
   border-radius: 4.5px;
@@ -89,3 +89,5 @@
   border-radius: 2px;
   background: currentColor;
 }
+
+:global(body:has([data-skin-variant="fitness"])) .status { color: #14241a; }

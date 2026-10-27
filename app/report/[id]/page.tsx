@@ -26,7 +26,9 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
 }
 
 function ReportRoute({ id }: { id: string }) {
-  const fail = useSearchParams().get("fail") === "1";
+  const params = useSearchParams();
+  const fail = params.get("fail") === "1";
+  const fitnessLayout = params.get("layout") === "fitness";
   const state = useReport(id, fail);
   // A first load plays the loader through once before the splash takes over.
   const [held, setHeld] = useState(() => willSplash());
@@ -37,5 +39,5 @@ function ReportRoute({ id }: { id: string }) {
   }, [held]);
   if (held && (state.status === "loading" || state.status === "ready")) return <StateScreen state={{ status: "loading" }} />;
   if (state.status !== "ready") return <StateScreen state={state} />;
-  return <Report d={state.data} />;
+  return <Report d={state.data} fitnessLayout={fitnessLayout} />;
 }

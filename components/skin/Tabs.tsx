@@ -13,10 +13,12 @@ export function Tabs<T extends string>({
   tabs,
   active,
   onChange,
+  fitnessLayout = false,
 }: {
   tabs: readonly { id: T; label: string }[];
   active: T;
   onChange: (id: T) => void;
+  fitnessLayout?: boolean;
 }) {
   const row = useRef<HTMLDivElement>(null);
   const copy = useRef<HTMLDivElement>(null);
@@ -44,7 +46,7 @@ export function Tabs<T extends string>({
     if (!list || !el || !copy.current) return;
     const left = el.offsetLeft;
     const right = copy.current.offsetWidth - (left + el.offsetWidth);
-    setClip({ clipPath: `inset(0 ${right}px 0 ${left}px round 12px)` });
+    setClip({ clipPath: `inset(0 ${right}px 0 ${left}px round ${fitnessLayout ? 22 : 12}px)` });
     // The first placement is instant; only later moves slide.
     if (!ready) requestAnimationFrame(() => setReady(true));
     const { scrollLeft, clientWidth } = list;
@@ -56,8 +58,8 @@ export function Tabs<T extends string>({
 
   return (
     <>
-      <div className={t.cap} data-on={stuck} aria-hidden />
-      <div className={t.bar} ref={bar} data-stuck={stuck} data-page-chrome>
+      {!fitnessLayout && <div className={t.cap} data-on={stuck} aria-hidden />}
+      <div className={t.bar} ref={bar} data-stuck={stuck} data-iteration={fitnessLayout || undefined} data-page-chrome>
         <div className={t.row} ref={row} role="tablist" aria-label="Report sections">
           {tabs.map((tab) => (
             <button

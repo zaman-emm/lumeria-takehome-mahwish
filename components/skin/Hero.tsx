@@ -2,7 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
-import { band, dayOf as localDayOf, daysBetween, fmtDay, scanTz, type Derived } from "@/lib/insights";
+import { band, fmtDay, scanTz, type Derived } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
 import { useFirstTime } from "./hooks";
 import { Gauge } from "./Gauge";
@@ -35,12 +35,14 @@ export function Hero({
   onScan,
   onPlay,
   splash,
+  fitnessLayout = false,
 }: {
   d: Derived;
   lens: Scan;
   onScan: () => void;
   /** Where the splash is: held back until it flies in, then rising around the gauge. */
   splash?: "wait" | "go" | "done";
+  fitnessLayout?: boolean;
   onPlay?: (from: HTMLElement) => void;
 }) {
   const value = d.latest.scores.overall;
@@ -51,39 +53,36 @@ export function Hero({
   // Greeted by the hour where she's reading it; the report renders in the
   // browser, so this is her own clock.
   const [greeting] = useState(() => greetingFor(new Date().getHours()));
-  const scanDays = new Set(d.scans.map((s) => localDayOf(d, s))).size;
-  const days = daysBetween(d.start, d.end) + 1;
 
   const pair = beforeAfter(d, lens);
   const tz = scanTz(d.latest) ?? d.tz;
   const dayOf = (s: Scan) => fmtDay(s.takenAt, scanTz(s) ?? d.tz);
 
   return (
-    <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-skin-hero>
+    <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-iteration={fitnessLayout || undefined} data-skin-hero>
       <BackButton />
       <ProfileButton name={d.firstName} />
       <span className={h.logo} role="img" aria-label="Lumeria" />
-      <h1 className={h.title}>{headline(d)}</h1>
+
+      <div className={h.hi}>
+        <h1>
+          {greeting}, <span>{d.firstName}</span>
+        </h1>
+      </div>
 
       <div className={h.gaugeBox} data-skin-gauge>
         <Gauge value={value} play={play} named />
       </div>
 
+      <h2 className={h.title}>{headline(d).replace(/[.!?]+$/, "")}</h2>
+
       {onPlay && (
         <button className={h.month} onClick={(e) => onPlay(e.currentTarget)}>
-          {d.isMonthly ? "Check your month’s highlights" : "Check your highlights"}
-          <Icon name="chevronR" size={12} stroke={2} />
+          Check your highlights
+          <Icon name="chevronR" size={16} stroke={2} />
         </button>
       )}
 
-      <div className={h.hi}>
-        <h2>
-          {greeting} <span>{d.firstName}</span>
-        </h2>
-        <p>
-          You made time for your skin on {scanDays} of {days} days.
-        </p>
-      </div>
       <div className={h.card}>
         <div className={h.cardText}>
           {d.trend?.delta ? (
@@ -141,7 +140,7 @@ export function SlimHeader({ d }: { d: Derived }) {
 }
 
 /** Her profile, top right as iOS keeps it. The account screens aren't part of this build, so it only shows. */
-function ProfileButton({ name }: { name: string }) {
+export function ProfileButton({ name }: { name: string }) {
   return (
     <button type="button" className={h.profile} aria-label={`Profile, ${name}`}>
       <span aria-hidden>{name.charAt(0)}</span>
@@ -150,7 +149,7 @@ function ProfileButton({ name }: { name: string }) {
 }
 
 /** Back to the app the report opens from. That app isn't part of this build, so it only shows. */
-function BackButton() {
+export function BackButton() {
   return (
     <button type="button" className={h.back} aria-label="Back">
       <Icon name="chevronL" size={18} stroke={2} />

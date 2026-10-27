@@ -40,7 +40,7 @@ export function headline(d: Derived): string {
     }).sort((a, b) => b.climb - a.climb);
     if (highs[0]) {
       const [more, most] = highs[0].words;
-      return d.isMonthly ? `Your skin’s ${more} than it’s been all month.` : `Your skin’s ${most} it’s been yet.`;
+      return d.isMonthly && highs[0].words === HIGH.redness ? "Calm skin this month" : d.isMonthly ? `Your skin’s ${more} this month` : `Your skin’s ${most} yet`;
     }
     const slip = [...d.changes].sort((a, b) => a.delta - b.delta)[0];
     if (d.trend.delta < 0 && slip && slip.delta <= -5 && LOW[slip.key]) return LOW[slip.key]!;

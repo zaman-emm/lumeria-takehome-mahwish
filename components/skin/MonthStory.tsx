@@ -6,6 +6,7 @@ import { dailySeries } from "@/lib/routine";
 import { monthStory } from "@/lib/voice";
 import { DayCurve, type CurveBand, type CurvePoint } from "./DayCurve";
 import { useReveal } from "./hooks";
+import { SunOrb } from "./SunOrb";
 import g from "./glance.module.css";
 
 // The month in one picture, right under the hero: the overall score day by
@@ -41,6 +42,7 @@ export function MonthStory({ d, n }: { d: Derived; n: number }) {
 
   return (
     <section ref={ref} className={g.story} aria-label="Your month" style={{ "--n": n } as CSSProperties}>
+      {story && <div className={g.storyAttribution}><span className={g.storyOrb}><SunOrb paused /></span><span>Lumi AI summary</span></div>}
       <p className={g.storyLine}>{caption}</p>
       <DayCurve
         days={days}

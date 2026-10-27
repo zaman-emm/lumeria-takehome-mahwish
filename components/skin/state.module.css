@@ -72,7 +72,7 @@
 .logo {
   display: block;
   width: 180px;
-  height: 34px;
+  height: 36px;
   /* The brand file itself (public/brand/lumeria-horizontal.svg) as a stencil,
      so the page sets its colour. */
   background-color: currentColor;
@@ -105,7 +105,7 @@
 }
 
 .text {
-  max-width: 290px;
+  max-width: 292px;
   margin: 0;
   font-size: 15px;
   line-height: 22px;

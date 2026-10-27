@@ -10,7 +10,7 @@
   bottom: max(12px, calc(var(--bottom-inset) - 14px));
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: min(100%, var(--phone));
   padding: 0 20px;
   transform: translateX(-50%);
@@ -137,8 +137,8 @@
 .orb {
   position: relative;
   display: block;
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   /* A bright warm glow lifts her off gold backgrounds. */
   filter: drop-shadow(0 0 10px rgba(255, 196, 90, 0.85)) drop-shadow(0 6px 10px rgba(128, 96, 31, 0.3));
 }

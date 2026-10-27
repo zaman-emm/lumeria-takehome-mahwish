@@ -44,8 +44,8 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  row-gap: 6px;
-  margin-top: 6px;
+  row-gap: 8px;
+  margin-top: 8px;
 }
 
 /* A new month slides in from the side of the arrow that was tapped. */
@@ -73,7 +73,7 @@
   position: relative;
   display: grid;
   place-items: center;
-  height: 45px;
+  height: 44px;
   font-size: 13px;
   color: var(--bark-2);
 }
@@ -92,9 +92,9 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 35px;
-  height: 35px;
-  margin: -17.5px 0 0 -17.5px;
+  width: 36px;
+  height: 36px;
+  translate: -50% -50%;
   border-radius: 50%;
   background: var(--fill);
   transition: transform 160ms var(--ease-out);
@@ -113,9 +113,9 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 45px;
-  height: 45px;
-  margin: -22.5px 0 0 -22.5px;
+  width: 44px;
+  height: 44px;
+  translate: -50% -50%;
   border-radius: 50%;
   box-shadow: inset 0 0 0 2px var(--bark);
 }
@@ -125,7 +125,7 @@
   bottom: -1px;
   left: 50%;
   width: 16px;
-  height: 3px;
+  height: 4px;
   margin-left: -8px;
   border-radius: 2px;
   background: var(--clay);
@@ -136,8 +136,8 @@
   z-index: 2;
   top: 4px;
   right: calc(50% - 19px);
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--gold);
   box-shadow: 0 0 0 1.5px var(--bone);
@@ -147,16 +147,16 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 4px;
-  margin-top: 14px;
+  gap: 8px 4px;
+  margin-top: 16px;
   padding: 0 4px;
   font-size: 11px;
   color: var(--bark-2);
 }
 
 .legend > i {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
 }
 
@@ -171,7 +171,7 @@
 .key {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   margin-left: 12px;
 }
 
@@ -183,8 +183,8 @@
 }
 
 .keyBar {
-  width: 14px;
-  height: 3px;
+  width: 16px;
+  height: 4px;
   border-radius: 2px;
   background: var(--clay);
 }
@@ -204,8 +204,8 @@
   align-items: flex-start;
   justify-content: center;
   gap: 2px;
-  min-height: 77px;
-  padding: 10px;
+  min-height: 76px;
+  padding: 12px;
   border-radius: 18px;
   text-align: left;
   box-shadow: inset 0 0 0 2px transparent;
@@ -259,7 +259,7 @@ button.stat:active {
 }
 
 .dayCard h2 {
-  margin: 0 4px 6px;
+  margin: 0 4px 8px;
   font-size: 18px;
   font-weight: 400;
 }
@@ -333,7 +333,7 @@ button.stat:active {
 }
 
 .note {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

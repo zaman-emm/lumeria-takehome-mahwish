@@ -51,7 +51,7 @@
   align-items: flex-start;
   width: var(--card-w);
   min-height: 188px;
-  padding: 16px 16px 14px;
+  padding: 16px 16px 16px;
   border-radius: 24px;
   scroll-snap-align: center;
   text-align: left;
@@ -95,7 +95,7 @@
 }
 
 .value {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 56px;
   line-height: 1;
   font-weight: 300;
@@ -121,7 +121,7 @@
 .ticks {
   align-self: stretch;
   margin-top: auto;
-  padding-top: 14px;
+  padding-top: 16px;
 }
 
 .dots {
@@ -139,8 +139,8 @@
 }
 
 .dots i {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 3px;
   background: var(--sand-deep);
   transition:
@@ -149,7 +149,7 @@
 }
 
 .dots button[aria-selected="true"] i {
-  width: 18px;
+  width: 20px;
   background: var(--bark-2);
 }
 

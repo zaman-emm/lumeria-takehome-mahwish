@@ -11,7 +11,7 @@ import { CalendarTab } from "./CalendarTab";
 import { ReportContext, type ReportApi, type SheetState } from "./context";
 import type { Light } from "./ui";
 import { Glance } from "./Glance";
-import { Hero, SlimHeader } from "./Hero";
+import { BackButton, Hero, ProfileButton, SlimHeader } from "./Hero";
 import { LumiSheet } from "./LumiSheet";
 import { MetricSheet } from "./MetricSheet";
 import { NotesProvider } from "./notes";
@@ -38,7 +38,7 @@ import r from "./report.module.css";
 const TABS = [
   { id: "glance", label: "At a glance" },
   { id: "products", label: "Products" },
-  { id: "trends", label: "Trends" },
+  { id: "trends", label: "Progress" },
   { id: "calendar", label: "Calendar" },
   { id: "photos", label: "Photos" },
 ] as const;
@@ -48,12 +48,13 @@ const sheetLabel = (s: SheetState) =>
   s.kind === "scan" ? "Scan details" : s.kind === "metric" ? `${metricMeta(s.key).label} trend` : "Lumi AI";
 const sheetKey = (s: SheetState) => (s.kind === "scan" ? s.scan.id : s.kind === "metric" ? `${s.key}-${s.area}` : "lumi");
 
-export function Report({ d }: { d: Derived }) {
+export function Report({ d, fitnessLayout = false }: { d: Derived; fitnessLayout?: boolean }) {
   const [tab, setTab] = useState<TabId>("glance");
   const direction = useRef<"forward" | "back" | "none">("none");
   // The splash opens the first load of a page, never again, and never for
   // people who asked for less motion (splashState.ts).
-  const [splash, setSplash] = useState<"wait" | "go" | "done">(() => (willSplash() ? "wait" : "done"));
+  const [splash, setSplash] = useState<"wait" | "go" | "done">(() => (!fitnessLayout && willSplash() ? "wait" : "done"));
+  const [compactHeader, setCompactHeader] = useState(false);
   const [barReady, setBarReady] = useState(() => splash === "done");
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [recap, setRecap] = useState(false);
@@ -160,22 +161,38 @@ export function Report({ d }: { d: Derived }) {
 
   const latestTz = scanTz(d.latest) ?? d.tz;
 
+  useEffect(() => {
+    if (!fitnessLayout) return;
+    const update = () => setCompactHeader(window.scrollY > 40);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, [fitnessLayout]);
+
 
   return (
     <ReportContext.Provider value={api}>
       <NotesProvider>
         <Drawer.Provider>
-          <div className={r.root} data-skin ref={setRoot}>
+          <div className={r.root} data-skin data-skin-variant={fitnessLayout ? "fitness" : undefined} ref={setRoot}>
             <Drawer.IndentBackground className={r.indentBg} />
             <Drawer.Indent className={r.indent} style={{ "--origin": `${origin}px` } as CSSProperties}>
-              <div className={r.page} data-tab={tab} data-head={headAway ? "away" : "shown"} data-splash={splash === "done" ? undefined : splash}>
+              <div className={r.page} data-iteration={fitnessLayout || undefined} data-tab={tab} data-head={headAway ? "away" : "shown"} data-splash={splash === "done" ? undefined : splash}>
+                {fitnessLayout && <div className={r.exploreHeader} data-compact={compactHeader} data-page-chrome>
+                  <div className={r.exploreBrandRow}>
+                    <BackButton />
+                    <span className={r.exploreBrand} role="img" aria-label="Lumeria" />
+                    <ProfileButton name={d.firstName} />
+                  </div>
+                  <Tabs tabs={TABS} active={tab} onChange={changeTab} fitnessLayout />
+                </div>}
                 {tab === "glance" ? (
-                  <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} splash={splash} />
+                  <Hero d={d} lens={lens} onScan={() => api.openScan(d.latest)} onPlay={slides ? playRecap : undefined} splash={splash} fitnessLayout={fitnessLayout} />
                 ) : (
-                  <SlimHeader d={d} />
+                  !fitnessLayout && <SlimHeader d={d} />
                 )}
 
-                <Tabs tabs={TABS} active={tab} onChange={changeTab} />
+                {!fitnessLayout && <Tabs tabs={TABS} active={tab} onChange={changeTab} />}
 
                 <main key={tab} className={r.panel} data-direction={direction.current} id="skin-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
                   {tab === "glance" && <Glance streak={streak} />}

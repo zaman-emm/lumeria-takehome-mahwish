@@ -5,7 +5,7 @@
   position: sticky;
   top: var(--tabs-top, 0px);
   z-index: 5;
-  padding: 15px 0 16px;
+  padding: 16px 0 16px;
   view-transition-name: skin-tabs;
 }
 
@@ -105,7 +105,7 @@
 }
 
 button.chip:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .chip:focus-visible {
@@ -149,4 +149,31 @@ button.chip:active {
     -webkit-mask-image: none;
     mask-image: none;
   }
+}
+
+.bar[data-iteration="true"] {
+  position: relative;
+  top: auto;
+  padding: 0 0 16px;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.bar[data-iteration="true"] .chip {
+  color: #14241a;
+  font-weight: 600;
+  line-height: 20px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(20, 36, 26, 0.18);
+}
+.bar[data-iteration="true"] .active .chip {
+  color: #fff;
+  background: #14241a;
+  box-shadow: none;
+}
+.bar[data-iteration="true"] .chip:focus-visible { outline-color: #14241a; }
+@media (prefers-reduced-transparency: reduce) {
+  .bar[data-iteration="true"] .chip { background: #fff; box-shadow: inset 0 0 0 1px rgba(20,36,26,0.18); }
+  .bar[data-iteration="true"] .active .chip { background: #14241a; box-shadow: none; }
 }

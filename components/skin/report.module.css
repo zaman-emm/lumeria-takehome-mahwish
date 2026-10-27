@@ -53,7 +53,7 @@
   background: var(--canvas);
   color: var(--bark);
   /* Room for the floating tab bar and Lumi above it. */
-  padding-bottom: calc(max(12px, calc(var(--bottom-inset) - 14px)) + 62px + 40px);
+  padding-bottom: calc(max(12px, calc(var(--bottom-inset) - 16px)) + 64px + 40px);
 }
 
 /* The slim header slides up out of view while you scroll down and drops
@@ -138,7 +138,7 @@
 .cues li {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   height: 52px;
   padding: 0 16px;
   border-radius: 20px;
@@ -161,4 +161,53 @@
     transform: none;
     border-radius: 0;
   }
+}
+
+/* An alternate report shell inspired by a compact, persistent iOS header. */
+.exploreHeader {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  padding-top: var(--top-inset);
+  margin-bottom: -48px;
+  isolation: isolate;
+}
+
+.exploreHeader::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -64px;
+  z-index: -1;
+  pointer-events: none;
+  background: #F5F0E6;
+  -webkit-backdrop-filter: blur(20px) saturate(1.25);
+  backdrop-filter: blur(20px) saturate(1.25);
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 64px), rgba(0, 0, 0, 0.85) calc(100% - 52px), rgba(0, 0, 0, 0.35) calc(100% - 28px), transparent 100%);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 64px), rgba(0, 0, 0, 0.85) calc(100% - 52px), rgba(0, 0, 0, 0.35) calc(100% - 28px), transparent 100%);
+}
+
+.exploreBrandRow { position: relative; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+.exploreBrandRow button { position: relative; z-index: 1; }
+.exploreBrandRow button:first-child { color: #14241a; background: rgba(255, 255, 255, 0.5); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(20,36,26,0.18); }
+.exploreBrand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 184px;
+  height: 36px;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  background: #14241a;
+  -webkit-mask: url('/brand/lumeria-horizontal.svg') center / contain no-repeat;
+  mask: url('/brand/lumeria-horizontal.svg') center / contain no-repeat;
+  transition: left 300ms var(--ease-out), width 300ms var(--ease-out), transform 300ms var(--ease-out);
+}
+.exploreHeader[data-compact="true"] .exploreBrand { left: 50%; width: 124px; transform: translate(-50%, -50%); }
+.page[data-iteration="true"] { --tabs-top: 0px; }
+.page[data-iteration="true"][data-tab="glance"] { background: var(--canvas); }
+.page[data-iteration="true"]:not([data-tab="glance"]) .panel { padding-top: 64px; }
+@media (prefers-reduced-motion: reduce) { .exploreBrand { transition: none; } }
+@media (prefers-reduced-transparency: reduce) {
+  .exploreHeader::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .exploreBrandRow button:first-child { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }

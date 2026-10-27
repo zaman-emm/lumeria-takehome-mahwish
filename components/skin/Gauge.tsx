@@ -11,7 +11,8 @@ import h from "./hero.module.css";
 const CX = 171;
 const CY = 185;
 const R = 118;
-const RAYS = 25;
+const RAYS = 16;
+const RAY_STEP = 12;
 /** The arc's cubic ease-out, shared by the count so both land together. */
 const ease = (p: number) => 1 - (1 - p) ** 3;
 
@@ -88,7 +89,7 @@ export function Gauge({
           </linearGradient>
         </defs>
         {Array.from({ length: RAYS }, (_, i) => {
-          const deg = 180 - i * 7.5;
+          const deg = 180 - i * RAY_STEP;
           const [x1, y1] = polar(deg, 146);
           const [x2, y2] = polar(deg, i % 2 ? 158 : 167);
           return (
