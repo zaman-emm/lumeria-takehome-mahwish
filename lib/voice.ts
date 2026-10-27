@@ -51,7 +51,7 @@ export function headline(d: Derived): string {
 
 /** The hero card: how far the overall score has come, or what a first scan is for. */
 export function sinceStart(d: Derived): string {
-  if (!d.trend) return "Your first scan. Every one from here shows what’s changing.";
+  if (!d.trend) return "Your first scan. Keep scanning to see how your skin changes.";
   const n = Math.abs(d.trend.delta);
   if (!n) return "Holding steady since you started.";
   return `${d.trend.delta > 0 ? "Up" : "Down"} ${n} since you started.`;

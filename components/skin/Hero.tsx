@@ -59,6 +59,32 @@ export function Hero({
   const tz = scanTz(d.latest) ?? d.tz;
   const dayOf = (s: Scan) => fmtDay(s.takenAt, scanTz(s) ?? d.tz);
 
+  // The before and after photos (or the one scan), shared by both card layouts.
+  const photos = pair ? (
+    <span className={h.pairInner}>
+      {pair.map((sc, i) => (
+        <span key={sc.id} className={h.pairItem} data-now={i === 1}>
+          <Photo scan={sc} priority alt="" className={h.scanPhoto} style={i === 1 ? { viewTransitionName: "skin-photo" } : undefined} />
+          <span>{dayOf(sc)}</span>
+        </span>
+      ))}
+    </span>
+  ) : (
+    <>
+      <Photo scan={lens} priority alt="" className={h.scanPhoto} style={{ viewTransitionName: "skin-photo" }} />
+      <span>Your scan</span>
+    </>
+  );
+  const progress = d.trend?.delta ? (
+    <>
+      <Icon name={d.trend.delta > 0 ? "up" : "down"} size={14} stroke={2} />
+      <b>{Math.abs(d.trend.delta)}</b>
+      <span>since your first scan</span>
+    </>
+  ) : (
+    sinceStart(d)
+  );
+
   return (
     <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-skin-hero>
       <BackButton />
@@ -69,10 +95,21 @@ export function Hero({
         <Gauge value={value} play={play} named />
       </div>
 
+      {/* With a story, the card under the score is the way into the month's
+          highlights, the before and after photos as its cover, and the
+          progress follows the greeting as a small pill. Without one, the card
+          shows the progress as before. */}
       {onPlay && (
-        <button className={h.month} onClick={(e) => onPlay(e.currentTarget)}>
-          {d.isMonthly ? "Check your month’s highlights" : "Check your highlights"}
-          <Icon name="chevronR" size={12} stroke={2} />
+        <button className={h.card} data-story onClick={(e) => onPlay(e.currentTarget)}>
+          <span className={h.storyText}>
+            {/* Same words as the story's own header: one month for noor, a longer stretch otherwise. */}
+            <span className={h.storyLabel}>{d.isMonthly ? "Your month" : "Your story"}</span>
+            <span className={h.storyTitle}>
+              See the highlights
+              <Icon name="chevronR" size={12} stroke={2} />
+            </span>
+          </span>
+          {photos}
         </button>
       )}
 
@@ -84,47 +121,32 @@ export function Hero({
           You made time for your skin on {scanDays} of {days} days.
         </p>
       </div>
-      <div className={h.card}>
-        <div className={h.cardText}>
-          {d.trend?.delta ? (
-            <>
-              <span className={h.delta}>
-                <Icon name={d.trend.delta > 0 ? "up" : "down"} size={22} stroke={2} />
-                {Math.abs(d.trend.delta)}
-              </span>
-              {/* The first scan's date sits under its photo, so the words don't repeat it. */}
-              <span className={h.change}>since your first scan</span>
-            </>
-          ) : (
-            <span className={h.change}>{sinceStart(d)}</span>
-          )}
-        </div>
-        {pair ? (
+      {onPlay && <p className={h.month} data-static>{progress}</p>}
+      {!onPlay && (
+        <div className={h.card}>
+          <div className={h.cardText}>
+            {d.trend?.delta ? (
+              <>
+                <span className={h.delta}>
+                  <Icon name={d.trend.delta > 0 ? "up" : "down"} size={22} stroke={2} />
+                  {Math.abs(d.trend.delta)}
+                </span>
+                {/* The first scan's date sits under its photo, so the words don't repeat it. */}
+                <span className={h.change}>since your first scan</span>
+              </>
+            ) : (
+              <span className={h.change}>{sinceStart(d)}</span>
+            )}
+          </div>
           <button
-            className={h.pair}
+            className={pair ? h.pair : h.scan}
             onClick={onScan}
-            aria-label={`Your skin on ${dayOf(pair[0])} and ${dayOf(pair[1])}. Open your latest scan`}
+            aria-label={pair ? `Your skin on ${dayOf(pair[0])} and ${dayOf(pair[1])}. Open your latest scan` : `Open your scan from ${fmtDay(lens.takenAt, tz)}`}
           >
-            {pair.map((s, i) => (
-              <span key={s.id} className={h.pairItem} data-now={i === 1}>
-                <Photo
-                  scan={s}
-                  priority
-                  alt=""
-                  className={h.scanPhoto}
-                  style={i === 1 ? { viewTransitionName: "skin-photo" } : undefined}
-                />
-                <span>{dayOf(s)}</span>
-              </span>
-            ))}
+            {photos}
           </button>
-        ) : (
-          <button className={h.scan} onClick={onScan} aria-label={`Open your scan from ${fmtDay(lens.takenAt, tz)}`}>
-            <Photo scan={lens} priority alt="" className={h.scanPhoto} style={{ viewTransitionName: "skin-photo" }} />
-            <span>Your scan</span>
-          </button>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 }
