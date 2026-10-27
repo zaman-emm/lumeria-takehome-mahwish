@@ -41,10 +41,9 @@
 }
 
 /* The inverted arc: level in the middle; outward the cards tip away from the
-   centre and drop, smaller and quieter. --p is set per frame from the scroll. */
+   centre and drop, smaller and quieter. MetricCarousel sets each card's
+   transform and opacity per frame from the scroll. */
 .card {
-  --p: 0;
-  --ap: 0;
   position: relative;
   flex: none;
   display: flex;
@@ -64,9 +63,7 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.6),
     0 12px 28px -18px rgba(46, 38, 32, 0.4);
   transform-origin: 50% 120%;
-  transform: translateY(calc(var(--ap) * 16px)) rotate(calc(var(--p) * 7deg)) scale(calc(1 - var(--ap) * 0.07));
-  opacity: calc(1 - var(--ap) * 0.25);
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .card:active {
@@ -157,10 +154,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card {
-    transform: none;
-  }
-
   .dots i {
     transition: none;
   }

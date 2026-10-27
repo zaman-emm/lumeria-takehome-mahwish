@@ -39,23 +39,37 @@ export function MetricCarousel({ onOpen }: { onOpen: (key: ScoreKey) => void }) 
   const [active, setActive] = useState(0);
   const since = d.trend ? fmtDay(d.trend.from.takenAt, scanTz(d.trend.from) ?? d.tz) : null;
 
-  // Each card learns how far it sits from the middle (-1 left … 0 centred … 1
-  // right) on every scroll frame; the arc itself is all CSS.
+  // On every scroll frame each card is placed on the arc by how far it sits
+  // from the middle (-1 left … 0 centred … 1 right): it tips, drops, shrinks
+  // and fades outward. Set straight on each card, not through inherited CSS
+  // variables, so nothing inside the cards has to be restyled per frame.
   useEffect(() => {
     const el = track.current;
     if (!el) return;
     let frame = 0;
+    // Card positions don't change while scrolling, so measure them once (and
+    // again on resize), then each frame only writes: reading layout between
+    // writes made the browser lay the row out again for every card.
+    const flat = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let centres: number[] = [];
+    let width = 1;
+    const measure = () => {
+      const cards = Array.from(el.children) as HTMLElement[];
+      centres = cards.map((c) => c.offsetLeft + c.offsetWidth / 2);
+      width = cards[0]?.offsetWidth || 1;
+    };
     const update = () => {
       frame = 0;
       const mid = el.scrollLeft + el.clientWidth / 2;
       let best = 0;
       let bestDist = Infinity;
-      Array.from(el.children).forEach((child, i) => {
-        const card = child as HTMLElement;
-        const at = card.offsetLeft + card.offsetWidth / 2;
-        const p = Math.max(-1.5, Math.min(1.5, (at - mid) / card.offsetWidth));
-        card.style.setProperty("--p", p.toFixed(3));
-        card.style.setProperty("--ap", Math.abs(p).toFixed(3));
+      const cards = el.children;
+      centres.forEach((at, i) => {
+        const p = Math.max(-1.5, Math.min(1.5, (at - mid) / width));
+        const ap = Math.abs(p);
+        const card = cards[i] as HTMLElement;
+        if (!flat) card.style.transform = `translateY(${(ap * 16).toFixed(2)}px) rotate(${(p * 7).toFixed(2)}deg) scale(${(1 - ap * 0.07).toFixed(4)})`;
+        card.style.opacity = (1 - ap * 0.25).toFixed(3);
         if (Math.abs(p) < bestDist) {
           bestDist = Math.abs(p);
           best = i;
@@ -66,13 +80,18 @@ export function MetricCarousel({ onOpen }: { onOpen: (key: ScoreKey) => void }) 
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
+    const onResize = () => {
+      measure();
+      onScroll();
+    };
+    measure();
     update();
     el.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
     return () => {
       cancelAnimationFrame(frame);
       el.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
