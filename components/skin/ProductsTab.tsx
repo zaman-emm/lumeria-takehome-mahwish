@@ -1,10 +1,11 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { addDays, dayOf, daysBetween, fmtDay, fmtRange, metricMeta, score, type Derived, type ScoreKey } from "@/lib/insights";
 import { BUDGET_TIER, factorFor, swapsFor } from "@/lib/routine";
 import type { Product } from "@/lib/types";
 import { useReportApi } from "./context";
+import { tick } from "./DayCurve";
 import { useWidth } from "./hooks";
 import { Icon, type IconName } from "./Icon";
 import p from "./products.module.css";
@@ -318,7 +319,9 @@ const RIGHT = 8;
 /**
  * The scans across the product's stretch: dashed before she started it, solid
  * from the day she did (marked with a dashed rule and its date), each scan's
- * value over its dot where there's room, and any trip shaded behind.
+ * value over its dot where there's room, and any trip shaded behind. It reads
+ * the way the Progress chart does: hover, or press and drag, for a scan's day
+ * and score.
  */
 function Chart({
   pts,
@@ -364,6 +367,35 @@ function Chart({
   }
   const showStart = start > from;
 
+  // The scan being read, as on the Progress chart: a mouse reads by hovering,
+  // a finger by pressing and dragging; only the first finger counts.
+  const [sel, setSel] = useState(-1);
+  const finger = useRef<number | null>(null);
+  const [touching, setTouching] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const [keyed, setKeyed] = useState(false);
+  const reading = (touching || hovering || keyed) && sel >= 0 && sel < pts.length;
+  const live = !empty && pts.length > 0;
+  const pick = (e: PointerEvent<HTMLDivElement>) => {
+    const px = e.clientX - e.currentTarget.getBoundingClientRect().left;
+    let best = 0;
+    xy.forEach(([qx], i) => {
+      if (Math.abs(qx - px) < Math.abs(xy[best][0] - px)) best = i;
+    });
+    if (best !== sel) {
+      setSel(best);
+      tick();
+    }
+  };
+  const release = (e: PointerEvent<HTMLDivElement>) => {
+    if (finger.current !== e.pointerId) return;
+    finger.current = null;
+    setTouching(false);
+  };
+  const pillText = reading ? `${fmtDay(pts[sel].day)} · ${pts[sel].value}` : "";
+  const half = pillText.length * 3.4 + 12;
+  const pillAt = reading ? Math.max(half, Math.min(w - half, xy[sel][0])) : 0;
+
   // Labels where they fit: never closer than 20px to the last one shown.
   let lastX = -Infinity;
   const labelled = xy.map(([px], i) => {
@@ -373,7 +405,48 @@ function Chart({
   });
 
   return (
-    <div className={p.chart} ref={box} data-empty={empty ? true : undefined}>
+    <div
+      className={p.chart}
+      ref={box}
+      data-empty={empty ? true : undefined}
+      data-live={live || undefined}
+      data-base-ui-swipe-ignore={live ? "x" : undefined}
+      role={live ? "slider" : undefined}
+      tabIndex={live ? 0 : undefined}
+      aria-label={live ? `${pts.length} scans from ${pts[0].value} to ${pts[pts.length - 1].value}` : undefined}
+      aria-valuemin={live ? 0 : undefined}
+      aria-valuemax={live ? pts.length - 1 : undefined}
+      aria-valuenow={live ? Math.max(0, sel) : undefined}
+      aria-valuetext={live && sel >= 0 && sel < pts.length ? `${fmtDay(pts[sel].day)}: ${pts[sel].value}` : undefined}
+      onPointerDown={(e) => {
+        if (!live || finger.current != null) return;
+        finger.current = e.pointerId;
+        e.currentTarget.setPointerCapture(e.pointerId);
+        setTouching(true);
+        pick(e);
+      }}
+      onPointerMove={(e) => {
+        if (!live) return;
+        if (finger.current === e.pointerId) pick(e);
+        else if (e.pointerType === "mouse" && finger.current == null) {
+          setHovering(true);
+          pick(e);
+        }
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "mouse") setHovering(false);
+      }}
+      onPointerUp={release}
+      onPointerCancel={release}
+      onBlur={() => setKeyed(false)}
+      onKeyDown={(e) => {
+        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        setKeyed(true);
+        if (sel < 0) return setSel(pts.length - 1);
+        if (e.key === "ArrowLeft" && sel > 0) setSel(sel - 1);
+        if (e.key === "ArrowRight" && sel < pts.length - 1) setSel(sel + 1);
+      }}
+    >
       {w > 0 && (
         <svg width={w} height={H} aria-hidden>
           {trips.map((t) => (
@@ -395,11 +468,12 @@ function Chart({
             </g>
           ))}
           {showStart && <line x1={x(start)} x2={x(start)} y1={TOP - 6} y2={H - BOTTOM} className={p.startRule} />}
+          {reading && <line x1={xy[sel][0]} x2={xy[sel][0]} y1={TOP - 6} y2={H - BOTTOM} className={p.cursor} />}
           {dashed && <path d={dashed} className={p.lineBefore} />}
           {solid && <path d={solid} className={p.line} />}
           {xy.map(([px, py], i) => (
             <g key={pts[i].day}>
-              <circle cx={px} cy={py} r={i === xy.length - 1 ? 3.5 : 2.5} className={p.dot} />
+              <circle cx={px} cy={py} r={reading && i === sel ? 4.5 : i === xy.length - 1 ? 3.5 : 2.5} className={p.dot} data-on={reading && i === sel} />
               {labelled[i] && (
                 <text x={px} y={py - 8} textAnchor="middle" className={p.valueLabel}>
                   {pts[i].value}
@@ -420,6 +494,11 @@ function Chart({
             <Icon name="plane" size={11} />
           </span>
         ))}
+      {reading && (
+        <span className={p.pill} style={{ left: pillAt }} aria-hidden>
+          {fmtDay(pts[sel].day)} · <b>{pts[sel].value}</b>
+        </span>
+      )}
       {empty && (
         <p className={p.chartEmpty} style={{ height: H }}>
           <span>{empty}</span>

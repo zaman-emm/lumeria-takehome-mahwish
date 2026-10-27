@@ -306,6 +306,76 @@
 
 .dot {
   fill: var(--evergreen);
+  transition: r 160ms var(--ease-out);
+}
+
+/* Read like the Progress chart: hover, or press and drag. */
+.chart[data-live] {
+  touch-action: pan-y;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.chart[data-live]:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.dot[data-on="true"] {
+  stroke: var(--white);
+  stroke-width: 2;
+}
+
+.cursor {
+  stroke: var(--bark);
+  stroke-width: 1;
+  opacity: 0.45;
+}
+
+/* The reading follows the finger, iOS style, and leaves when it lifts. */
+.pill {
+  position: absolute;
+  z-index: 1;
+  top: -32px;
+  translate: -50% 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), 0 6px 14px -6px rgba(46, 38, 32, 0.3);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  animation: pillIn 140ms var(--ease-out);
+  /* Glides from scan to scan under a mouse instead of jumping. */
+  transition: left 140ms var(--ease-out);
+}
+
+.pill b {
+  font-weight: 600;
+  color: var(--bark);
+}
+
+@keyframes pillIn {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .pill {
+    transition: none;
+    animation: none;
+  }
 }
 
 .valueLabel {
