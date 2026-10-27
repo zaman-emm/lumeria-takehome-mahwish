@@ -10,7 +10,21 @@
   --tint-radiance: #f3e3bf;
   --tint-pores: #e4e1d6;
   /* Bleeds past the panel's 16px gutter so the side cards reach the edges. */
+  position: relative;
   margin: 0 -16px;
+}
+
+/* Soft colour behind the row, for the glass cards to catch: gold, sage and
+   blush from the scores' own tints. */
+.carousel::before {
+  content: "";
+  position: absolute;
+  inset: 8px 0 40px;
+  background:
+    radial-gradient(44% 70% at 22% 45%, rgba(224, 185, 98, 0.4), transparent 72%),
+    radial-gradient(40% 65% at 55% 60%, rgba(176, 196, 168, 0.36), transparent 72%),
+    radial-gradient(42% 68% at 84% 40%, rgba(226, 170, 150, 0.34), transparent 72%);
+  pointer-events: none;
 }
 
 .track {
@@ -56,12 +70,17 @@
   scroll-snap-align: center;
   text-align: left;
   color: var(--bark);
+  /* Glass: the score's tint, see-through over the soft colour behind (already
+     blurred, so no live blur on cards that move every frame), with a thin
+     glint of light across it and a bright rim. */
   background:
-    radial-gradient(120% 90% at 20% 0%, var(--tint), transparent 70%),
-    linear-gradient(180deg, var(--tint), var(--card) 85%);
+    linear-gradient(115deg, transparent 0 24%, rgba(255, 255, 255, 0.55) 28%, transparent 33%, transparent 38%, rgba(255, 255, 255, 0.3) 40%, transparent 43%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 40%, rgba(255, 255, 255, 0.05) 100%),
+    color-mix(in srgb, var(--tint) 55%, transparent);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
-    0 12px 28px -18px rgba(46, 38, 32, 0.4);
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.95),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 12px 28px -18px rgba(46, 38, 32, 0.35);
   transform-origin: 50% 120%;
   will-change: transform, opacity;
 }
