@@ -7,6 +7,10 @@ next-env.d.ts
 *.tsbuildinfo
 .DS_Store
 .env*
+.agent/
+.agents/
+.claude/
+.codex/
 
 # Real scan photos are shared privately. Never commit them.
 public/scans/*.jpg
