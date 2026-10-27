@@ -21,14 +21,30 @@ const SHOW_SWAPS = false;
 /** How many days before a product starts its chart reaches back. */
 const LEAD_DAYS = 2;
 
-/** What an ingredient is, from a source she can check. Only ones we can cite. */
+/** What an ingredient is, in one line, from a source she can check. Only ones we can cite. */
 const ABOUT: Record<string, { text: string; source: string; href: string }> = {
   "azelaic acid": {
     text: "Helps remove dead skin and reduce bacteria.",
     source: "NHS",
     href: "https://www.nhs.uk/medicines/azelaic-acid/",
   },
+  retinol: {
+    text: "Speeds up how fast new skin cells are made and helps unclog pores.",
+    source: "Cleveland Clinic",
+    href: "https://my.clevelandclinic.org/health/treatments/23293-Retinol",
+  },
+  ceramides: {
+    text: "Fats that hold skin cells together as a barrier that keeps moisture in.",
+    source: "Cleveland Clinic",
+    href: "https://health.clevelandclinic.org/ceramides",
+  },
 };
+
+/** A product's first key ingredient we can say something about. */
+function aboutFor(prod: Product) {
+  const name = prod.keyIngredients.find((k) => ABOUT[k.toLowerCase()]);
+  return name ? { name, ...ABOUT[name.toLowerCase()] } : null;
+}
 
 export function ProductsTab() {
   const { d } = useReportApi();
@@ -43,27 +59,28 @@ export function ProductsTab() {
       </div>
     );
   }
-  // The newest product still in use gets a word on what it is.
-  const lead = products.find((x) => !x.endDate && x.startDate > d.start);
-  const about = lead && lead.keyIngredients.map((k) => ABOUT[k.toLowerCase()]).find(Boolean);
   const factors = otherFactors(d);
 
   return (
     <div className={p.list}>
-      {products.map((prod) => (
-        <div key={prod.id} className={p.group}>
-          <ProductCard d={d} product={prod} />
-          {prod === lead && about && (
-            <Fold title={`About ${shortName(d, prod).toLowerCase()}`}>
-              <p className={p.about}>{about.text}</p>
-              <a className={p.source} href={about.href} target="_blank" rel="noreferrer">
-                {about.source}
-                <Icon name="arrowUR" size={12} stroke={1.6} />
-              </a>
-            </Fold>
-          )}
-        </div>
-      ))}
+      {products.map((prod) => {
+        // Each product gets one line on its key ingredient, where we can cite one.
+        const about = aboutFor(prod);
+        return (
+          <div key={prod.id} className={p.group}>
+            <ProductCard d={d} product={prod} />
+            {about && (
+              <Fold title={`About ${about.name.toLowerCase()}`}>
+                <p className={p.about}>{about.text}</p>
+                <a className={p.source} href={about.href} target="_blank" rel="noreferrer">
+                  {about.source}
+                  <Icon name="arrowUR" size={12} stroke={1.6} />
+                </a>
+              </Fold>
+            )}
+          </div>
+        );
+      })}
 
       {/* After the products: what else was going on that month that the cards don't cover. */}
       {factors.length > 0 && (
@@ -89,8 +106,6 @@ export function ProductsTab() {
     </div>
   );
 }
-
-const shortName = (d: Derived, prod: Product) => d.spans.find((s) => s.id === prod.id)?.short ?? prod.name;
 
 /** Everything in the month that isn't a product (the cards cover those): trips and periods, in date order. */
 function otherFactors(d: Derived) {
