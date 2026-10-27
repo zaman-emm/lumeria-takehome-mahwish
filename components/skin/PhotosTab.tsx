@@ -7,7 +7,8 @@ import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
 import { NoteCard } from "./notes";
-import { ChangeSince, LIGHTS, Photo, photoFor, type Light } from "./ui";
+import { ChangeSince, Delta, LIGHTS, Photo, photoFor, type Light } from "./ui";
+import { monthStory } from "@/lib/voice";
 import ph from "./photos.module.css";
 
 // Photos: first against latest under a drag-to-compare slider, then about a
@@ -129,7 +130,10 @@ function PhotoRow({ d, scan, light }: { d: Derived; scan: Scan; light: Light }) 
       </span>
       <span className={ph.rowScore} aria-hidden>
         <b data-tone={tone(scan.scores.overall)}>{scan.scores.overall}</b>
-        {delta != null && delta !== 0 && prev && <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />}
+        {delta != null &&
+          delta !== 0 &&
+          prev &&
+          (monthStory(d) ? <Delta n={delta} className={ph.rowDelta} /> : <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />)}
       </span>
     </div>
   );

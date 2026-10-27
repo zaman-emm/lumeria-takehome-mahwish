@@ -15,8 +15,11 @@ import g from "./glance.module.css";
 
 export function MonthStory({ d, n }: { d: Derived; n: number }) {
   const [ref, reveal] = useReveal<HTMLElement>("glance-story");
-  // Her main spot only, the one the hero's "since you started" compares.
-  const series = dailySeries(d, "overall", d.area);
+  // A month with a story keeps its chart as designed: every spot, day by day,
+  // under the story's bands. Without one, the chart has only the line to go on,
+  // so it sticks to the main spot (the one "since you started" compares).
+  const story = monthStory(d);
+  const series = dailySeries(d, "overall", story ? undefined : d.area);
   const days = series.length;
   const idx = (day: string) => Math.max(0, Math.min(days - 1, daysBetween(d.start, day)));
   const points: CurvePoint[] = series.flatMap((v, i) => (v.value == null ? [] : [{ i, value: v.value, label: fmtDay(v.day) }]));
@@ -33,12 +36,12 @@ export function MonthStory({ d, n }: { d: Derived; n: number }) {
   const first = points[0];
   const last = points[points.length - 1];
   const up = last.value >= first.value;
-  // Noor's month has a story to tell; otherwise the line says what the chart is.
-  const story = monthStory(d) ?? `Your overall score on your ${d.area.toLowerCase()}, scan by scan.`;
+  // With no story to tell, the line above says what the chart is.
+  const caption = story ?? `Your overall score on your ${d.area.toLowerCase()}, scan by scan.`;
 
   return (
     <section ref={ref} className={g.story} aria-label="Your month" style={{ "--n": n } as CSSProperties}>
-      <p className={g.storyLine}>{story}</p>
+      <p className={g.storyLine}>{caption}</p>
       <DayCurve
         days={days}
         points={points}

@@ -20,6 +20,7 @@ import {
   type ScoreKey,
 } from "@/lib/insights";
 import type { Scan } from "@/lib/types";
+import { monthStory } from "@/lib/voice";
 import { useReportApi } from "./context";
 import { useReveal, useWidth } from "./hooks";
 import { Icon } from "./Icon";
@@ -61,6 +62,7 @@ export function TrendView({
   const { d } = useReportApi();
   const scans = useMemo(() => d.scans.filter((s) => s.area === area && score(s, metric) != null), [d, area, metric]);
   const change = areaChange(d, area, metric);
+  const hasStory = monthStory(d) != null;
   const [picked, setPicked] = useState<Scan | null>(null);
   const shown = picked && scans.includes(picked) ? picked : scans[scans.length - 1];
   useEffect(() => setPicked(null), [area, metric]);
@@ -117,11 +119,13 @@ export function TrendView({
 
       {scans.length > 1 ? (
         <>
-          {/* What the chart plots, in words: the score, the spot, how many scans and when. */}
-          <p className={t.caption}>
-            {metricMeta(metric).label} score on your {area.toLowerCase()} · {scans.length} scans,{" "}
-            {fmtRange(dayOf(d, scans[0]), dayOf(d, scans[scans.length - 1]))}
-          </p>
+          {/* Without a story's legend (products, trips), say in words what the chart plots. */}
+          {!hasStory && (
+            <p className={t.caption}>
+              {metricMeta(metric).label} score on your {area.toLowerCase()} · {scans.length} scans,{" "}
+              {fmtRange(dayOf(d, scans[0]), dayOf(d, scans[scans.length - 1]))}
+            </p>
+          )}
           <Legend d={d} focus={focus} onFocus={setFocus} />
           <Chart key={`${area}-${metric}`} d={d} scans={scans} metric={metric} picked={shown} onPick={setPicked} revealKey={revealKey} focus={focus} />
         </>

@@ -2,7 +2,8 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { addDays, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, type Derived } from "@/lib/insights";
+import { addDays, dayOf, fmtDay, fmtTime, previousSameArea, scanTz, signed, type Derived } from "@/lib/insights";
+import { monthStory } from "@/lib/voice";
 import type { Scan } from "@/lib/types";
 import { useReportApi } from "./context";
 import { Icon } from "./Icon";
@@ -207,7 +208,10 @@ function DayRow({ d, scan, ghost }: { d: Derived; scan: Scan; ghost?: boolean })
       </span>
       <span className={c.rowScore}>
         <b>{scan.scores.overall}</b>
-        {delta != null && prev && <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />}
+        {delta != null &&
+          prev &&
+          // With a story the month reads in context; without one, the change says what it's since.
+          (monthStory(d) ? <span>{signed(delta)}</span> : <ChangeSince n={delta} since={fmtDay(prev.takenAt, scanTz(prev) ?? d.tz)} />)}
       </span>
       <Icon name="chevronR" size={12} stroke={1.8} className={c.rowChevron} />
     </button>
