@@ -356,8 +356,11 @@
 .highsPhoto,
 .highs > span[role="img"] {
   position: relative;
+  /* Square by its width: a portrait photo's own height would otherwise
+     stretch the circle into an oval and pull it off the ring's centre. */
   width: 79%;
-  height: 79%;
+  height: auto;
+  aspect-ratio: 1;
   border-radius: 50%;
   object-fit: cover;
 }
