@@ -118,7 +118,9 @@ export function ScanSheet({ scan }: { scan: Scan }) {
               <span className={m.tickLabel}>{mm.label}</span>
               {v == null ? <span className={m.tickNone}>Couldn’t read this time</span> : <Ticks value={v} order={i} />}
               <b className={m.tickValue}>{v ?? "–"}</b>
-              <span className={m.tickDelta}>{v != null && pv != null ? signed(v - pv) : ""}</span>
+              <span className={m.tickDelta} data-dir={v != null && pv != null ? Math.sign(v - pv) : undefined}>
+                {v != null && pv != null ? signed(v - pv) : ""}
+              </span>
               <span className="sr-only">{v != null && pv != null ? `, ${signed(v - pv)} since last time` : ""}</span>
             </div>
           );

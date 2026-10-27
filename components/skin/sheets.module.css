@@ -254,6 +254,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Higher is always healthier: green when it rose, clay when it fell, grey when it held. */
+.tickDelta[data-dir="1"] {
+  font-weight: 600;
+  color: var(--forest);
+}
+
+.tickDelta[data-dir="-1"] {
+  font-weight: 600;
+  color: var(--clay-ink);
+}
+
 /* A full-bleed band between sections. */
 .band {
   height: 8px;
