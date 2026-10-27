@@ -8,7 +8,6 @@ import { useFirstTime } from "./hooks";
 import { Gauge } from "./Gauge";
 import { Flame, Icon } from "./Icon";
 import { headline, sinceStart } from "@/lib/voice";
-import { Logo } from "./Logo";
 import { Photo } from "./ui";
 import h from "./hero.module.css";
 
@@ -62,7 +61,7 @@ export function Hero({
   return (
     <header className={h.hero} data-play={play} data-reduce={first && reduce} data-splash={splash} data-skin-hero>
       <BackButton />
-      <Logo className={h.logo} />
+      <span className={h.logo} role="img" aria-label="Lumeria" />
       <h1 className={h.title}>{headline(d)}</h1>
 
       <div className={h.gaugeBox} data-skin-gauge>

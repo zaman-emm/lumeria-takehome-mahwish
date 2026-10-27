@@ -17,9 +17,15 @@
 }
 
 .logo {
+  display: block;
   width: 184px;
   height: 34px;
   color: var(--evergreen);
+  /* The brand file itself (public/brand/lumeria-horizontal.svg) as a stencil,
+     so the page sets its colour. */
+  background-color: currentColor;
+  -webkit-mask: url("/brand/lumeria-horizontal.svg") center / contain no-repeat;
+  mask: url("/brand/lumeria-horizontal.svg") center / contain no-repeat;
 }
 
 /* The greeting opens the part of the page that's about her, under the gold. */

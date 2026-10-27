@@ -3,7 +3,6 @@
 import Link from "next/link";
 import type { ReportState } from "@/lib/useReport";
 import { Loader } from "./Loader";
-import { Logo } from "./Logo";
 import st from "./state.module.css";
 
 // Error and empty, in the report's own gold (loading is only the empty home background), written for a person
@@ -32,7 +31,7 @@ export function StateScreen({
   return (
     <div className={st.home} data-skin aria-live="polite">
       <div className={st.state}>
-        <Logo className={st.logo} />
+        <span className={st.logo} role="img" aria-label="Lumeria" />
         <div className={st.body}>
           {state.status === "error" && state.kind === "failed" && (
             <>

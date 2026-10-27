@@ -70,8 +70,14 @@
 }
 
 .logo {
+  display: block;
   width: 180px;
   height: 34px;
+  /* The brand file itself (public/brand/lumeria-horizontal.svg) as a stencil,
+     so the page sets its colour. */
+  background-color: currentColor;
+  -webkit-mask: url("/brand/lumeria-horizontal.svg") center / contain no-repeat;
+  mask: url("/brand/lumeria-horizontal.svg") center / contain no-repeat;
 }
 
 .body {
