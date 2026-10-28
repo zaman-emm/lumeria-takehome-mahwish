@@ -1,0 +1,93 @@
+/* The pretend phone: only on a laptop (fine pointer), where there's no real
+   status bar. --chrome-top (globals.css) gives the page
+   the same room a real phone's safe area would. */
+
+.chrome {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chrome {
+    display: block;
+  }
+}
+
+.status {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100%, var(--phone));
+  height: var(--chrome-top);
+  padding: 0 32px 0 40px;
+  transform: translateX(-50%);
+  color: #000;
+  pointer-events: none;
+  /* Its own layer in a tab-change view transition, so the header's morph never
+     paints over the clock and island (globals.css holds it still). */
+  view-transition-name: skin-status;
+}
+
+.time {
+  width: 56px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The Dynamic Island: a 126 × 37 pill, 11pt from the top edge. */
+.island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 128px;
+  height: 36px;
+  border-radius: 20px;
+  background: #000;
+  transform: translateX(-50%);
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icons svg {
+  fill: currentColor;
+}
+
+.battery {
+  position: relative;
+  width: 28px;
+  height: 12px;
+  padding: 1.5px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 4.5px;
+}
+
+.battery::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: -3.5px;
+  width: 1.5px;
+  height: 4.5px;
+  border-radius: 0 1px 1px 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.battery i {
+  display: block;
+  width: 80%;
+  height: 100%;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+:global(body:has([data-skin-variant="fitness"])) .status { color: #14241a; }

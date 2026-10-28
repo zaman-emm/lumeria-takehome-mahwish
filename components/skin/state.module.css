@@ -1,0 +1,191 @@
+/* Error and empty sit on that same backdrop, so loading, failing and
+   retrying never change the ground, only what's written on it. */
+.state {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: var(--hero-h);
+  padding: calc(24px + var(--top-inset)) 32px 40px;
+  color: var(--evergreen);
+  text-align: center;
+}
+
+/* Loading: the home page's own backdrop with nothing on it, so the splash
+   opens on the same gold the hero will have. */
+.home {
+  position: relative;
+  width: 100%;
+  max-width: var(--phone);
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--canvas);
+}
+
+.home::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--hero-h);
+  background:
+    radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
+    var(--sunrise-fade);
+}
+
+/* The splash's glass, already on while the report loads, so the gold and the
+   glass arrive together and the splash picks up without a seam. */
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 45%),
+    rgba(255, 250, 238, 0.05);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  /* Flex, so the canvas stays centred even where it's wider than the screen. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.logo {
+  display: block;
+  width: 180px;
+  height: 36px;
+  /* The brand file itself (public/brand/lumeria-horizontal.svg) as a stencil,
+     so the page sets its colour. */
+  background-color: currentColor;
+  -webkit-mask: url("/brand/lumeria-horizontal.svg") center / contain no-repeat;
+  mask: url("/brand/lumeria-horizontal.svg") center / contain no-repeat;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  animation: in 400ms var(--ease-out) both;
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.title {
+  margin: 12px 0 0;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 300;
+}
+
+.text {
+  max-width: 292px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--bark);
+}
+
+.button {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  margin-top: 12px;
+  padding: 0 24px;
+  border-radius: 14px;
+  background: var(--forest);
+  color: var(--bone);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.button:active {
+  transform: scale(0.96);
+}
+
+.scope circle {
+  fill: none;
+  stroke: var(--evergreen);
+  stroke-width: 1.4;
+  transform-origin: 60px 60px;
+}
+
+.core {
+  fill: rgba(244, 239, 230, 0.6) !important;
+}
+
+.r1 {
+  animation: spin 9s linear infinite;
+}
+
+.r2 {
+  animation: spin 6s linear infinite reverse;
+}
+
+.r3 {
+  animation: spin 4s linear infinite;
+}
+
+.scope[data-still="true"] circle {
+  animation: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .r1,
+  .r2,
+  .r3 {
+    animation: none;
+  }
+  .core {
+    animation: breathe 1.6s ease-in-out infinite alternate;
+  }
+  .body {
+    animation-name: fadeOnly;
+  }
+}
+
+@keyframes breathe {
+  to {
+    opacity: 0.4;
+  }
+}
+
+@keyframes fadeOnly {
+  from {
+    opacity: 0;
+  }
+}

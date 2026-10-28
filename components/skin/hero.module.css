@@ -1,0 +1,611 @@
+/* The gold hero (At a glance) and the slim header the other tabs open on. */
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(16px + var(--top-inset)) 24px 20px;
+  /* Gold at the top, easing into the page's canvas at the bottom: no hard edge
+     between the hero and what follows it. */
+  background:
+    radial-gradient(130px 80px at 50% 0, rgba(243, 230, 200, 0.6), transparent 100%),
+    var(--sunrise-fade);
+  color: var(--evergreen);
+  view-transition-name: skin-head;
+  overflow: hidden;
+}
+
+.logo {
+  display: block;
+  width: 184px;
+  height: 36px;
+  color: var(--evergreen);
+  /* The brand file itself (public/brand/lumeria-horizontal.svg) as a stencil,
+     so the page sets its colour. */
+  background-color: currentColor;
+  -webkit-mask: url("/brand/lumeria-horizontal.svg") center / contain no-repeat;
+  mask: url("/brand/lumeria-horizontal.svg") center / contain no-repeat;
+}
+
+/* The greeting opens the part of the page that's about her, under the gold. */
+/* The greeting opens the part under the gold, set large and to the left: the
+   time of day in full ink, her name quieter, a line about her month below. */
+.hi {
+  align-self: stretch;
+  width: 100%;
+  max-width: 344px;
+  margin: 48px auto 0;
+  text-align: center;
+}
+
+.hi h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+  color: var(--evergreen);
+}
+
+.hi h1 span {
+  display: block;
+  font-weight: 400;
+  color: var(--evergreen);
+}
+
+.title {
+  margin: -16px 0 16px;
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 300;
+  letter-spacing: -0.6px;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ------------------------------------------------ gauge */
+
+.gaugeBox {
+  width: 100%;
+  max-width: 328px;
+  aspect-ratio: 342 / 240;
+  margin-top: 16px;
+}
+
+.gauge {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.gauge svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* A white sun arc on the gold: warm white at the start, pure white at the tip. */
+.gauge {
+  --arc-from: #fff6e4;
+  --arc-to: #ffffff;
+  --track: rgba(255, 255, 255, 0.3);
+  --ray: #fffaf0;
+}
+
+.arcFrom {
+  stop-color: var(--arc-from);
+}
+
+.arcTo {
+  stop-color: var(--arc-to);
+}
+
+/* Rays up to the score are fat and solid; the rest stay faint. */
+.ray {
+  stroke: var(--ray);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0.22;
+}
+
+.ray[data-lit="true"] {
+  stroke-width: 5;
+  opacity: 1;
+  filter: drop-shadow(0 0 5px rgba(255, 246, 222, 0.8));
+}
+
+/* A thick, soft band: same hue for the track, rounded ends, no knob. */
+.track {
+  fill: none;
+  stroke: var(--track);
+  stroke-width: 24;
+  stroke-linecap: round;
+}
+
+.arc {
+  fill: none;
+  stroke-width: 24;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 14px rgba(255, 246, 222, 0.75));
+}
+
+.score {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 46%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.value {
+  display: block;
+  font-size: 84px;
+  line-height: 0.9;
+  font-weight: 500;
+  letter-spacing: -3px;
+  color: var(--white);
+  text-shadow: 0 2px 18px rgba(128, 96, 31, 0.45), 0 1px 2px rgba(128, 96, 31, 0.3);
+  font-variant-numeric: tabular-nums;
+  /* A touch of left room so the negative tracking stays centred. */
+  padding-left: 4px;
+}
+
+.digits {
+  display: inline-block;
+}
+
+/* ------------------------------------------------ status card */
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+  max-width: 344px;
+  min-height: 104px;
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: 32px;
+  /* It sits where the gold has faded out, so it's a light card, not glass. */
+  background: var(--lg-sheen), rgba(255, 253, 249, 0.72);
+  box-shadow: var(--lg-rim), var(--lg-lift);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* The change since the first scan is the card's one fact, so it's the big thing. */
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--evergreen);
+  font-size: 40px;
+  line-height: 44px;
+  font-weight: 500;
+  letter-spacing: -0.8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.change {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--evergreen);
+}
+
+.scan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Never squeezed by a long line beside it, which pulled the photo into an oval. */
+  flex: none;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--bark);
+  transition: transform 160ms var(--ease-out);
+}
+
+.scan:active {
+  transform: scale(0.96);
+}
+
+.scanPhoto {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--bone);
+  box-shadow: 0 4px 12px rgba(128, 96, 31, 0.35);
+}
+
+/* Then and now: the first photo sits back, the newest overlaps it. */
+.pair {
+  display: flex;
+  align-items: flex-start;
+  flex: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.pair:active {
+  transform: scale(0.96);
+}
+
+.pairItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--bark);
+}
+
+.pairItem:not([data-now="true"]) {
+  margin-right: -12px;
+}
+
+.pairItem:not([data-now="true"]) .scanPhoto {
+  width: 52px;
+  height: 52px;
+  margin-top: 8px;
+  box-shadow: none;
+}
+
+.pairItem[data-now="true"] {
+  position: relative;
+}
+
+/* ------------------------------------------------ month highlights */
+
+/* A plain call to action on the gold: glass pill, words and a chevron. */
+.month {
+  position: relative;
+  /* Its own layer, so the glint can sit between the cream and the words. */
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  margin: 0 0 32px;
+  padding: 0 24px;
+  border-radius: 24px;
+  /* Flat cream with a soft wash at the top-left; the glint (::after) sweeps
+     across it now and then. No depth shading. */
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 45%),
+    #f8efdc;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.75),
+    0 4px 12px -8px rgba(128, 96, 31, 0.3);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  color: var(--evergreen);
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 160ms var(--ease-out);
+}
+
+/* The shine: a diagonal band of light that glides across behind the words,
+   then rests. */
+.month::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 18%,
+    rgba(255, 255, 255, 0.55) 30%,
+    rgba(255, 255, 255, 0.95) 40%,
+    rgba(255, 255, 255, 0.5) 48%,
+    rgba(255, 255, 255, 0.9) 56%,
+    rgba(255, 255, 255, 0.45) 64%,
+    transparent 76%
+  );
+  transform: translateX(-110%);
+  animation: shine 3.6s cubic-bezier(0.4, 0, 0.2, 1) 1.2s infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-110%);
+  }
+  30%,
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+.month:active {
+  transform: scale(0.96);
+}
+
+.month + .card,
+.hero[data-iteration="true"] .month + .card {
+  margin-top: 0;
+}
+
+/* ------------------------------------------------ first-load sequence */
+
+/* The rays fade in dim; each lit one swells as the arc's tip passes it. */
+.gauge[data-play="true"] .ray {
+  animation: rayIn 360ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 14ms);
+}
+
+.gauge[data-play="true"] .ray[data-lit="true"] {
+  animation:
+    rayIn 360ms var(--ease-out) both,
+    ignite 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 14ms), var(--at);
+}
+
+/* The arc's ease is a cubic ease-out; the ray timings in Hero.tsx assume it. */
+.gauge[data-play="true"] .arc {
+  animation: arcDraw var(--draw, 1100ms) cubic-bezier(0.33, 1, 0.68, 1) var(--lead, 150ms) both;
+}
+
+.gauge[data-play="true"] .digits {
+  animation: fade 300ms var(--ease-out) var(--lead, 150ms) both;
+}
+
+.hero[data-play="true"] :is(.hi, .card) {
+  animation: rise 500ms var(--ease-out) 1000ms both;
+}
+
+/* The newest photo slides out from behind the first, as the card lands. */
+.hero[data-play="true"] .pairItem[data-now="true"] {
+  animation: reveal 620ms var(--ease-out) 1350ms both;
+}
+
+.hero[data-play="true"] .month {
+  animation: rise 500ms var(--ease-out) 900ms both;
+}
+
+@keyframes rayIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ignite {
+  from {
+    stroke-width: 2.5;
+    opacity: 0.22;
+  }
+  45% {
+    stroke-width: 6.5;
+    opacity: 1;
+  }
+}
+
+@keyframes arcDraw {
+  from {
+    stroke-dashoffset: var(--v);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateX(-40px) scale(0.85);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* A backstop in case the reduced-motion setting reaches JS late. */
+@media (prefers-reduced-motion: reduce) {
+  .gauge[data-play="true"] .ray,
+  .gauge[data-play="true"] .arc {
+    animation: none;
+  }
+}
+
+/* Reduced motion: the gauge is simply there; the card fades in softly. */
+.hero[data-reduce="true"] .hi,
+.hero[data-reduce="true"] .card,
+.hero[data-reduce="true"] .month,
+.hero[data-reduce="true"] .gaugeBox {
+  animation: fade 400ms ease both;
+}
+
+/* ------------------------------------------------ after the splash */
+
+/* The splash flies its own gauge in, so the hero holds everything back until
+   it lands, then the logo, greeting and headline rise, and the card, the month
+   button and the then-and-now photos follow. The gauge itself just appears,
+   exactly where the splash's copy lands. */
+.hero[data-splash="wait"] :is(.logo, .hi, .title, .card, .month, .back, .profile),
+.hero:is([data-splash="wait"], [data-splash="go"]) .gaugeBox {
+  opacity: 0;
+}
+
+.hero[data-splash="go"] :is(.logo, .hi, .title, .card, .month, .back, .profile) {
+  animation: rise 520ms var(--ease-out) both;
+  animation-delay: var(--at, 0ms);
+}
+
+.hero[data-splash="go"] .logo {
+  --at: 120ms;
+}
+
+.hero[data-splash="go"] :is(.back, .profile) {
+  --at: 120ms;
+}
+
+.hero[data-splash="go"] .title {
+  --at: 180ms;
+}
+
+.hero[data-splash="go"] .month {
+  --at: 280ms;
+}
+
+.hero[data-splash="go"] .hi {
+  --at: 340ms;
+}
+
+.hero[data-splash="go"] .card {
+  --at: 400ms;
+}
+
+.hero[data-splash="go"] .pairItem[data-now="true"] {
+  animation: reveal 620ms var(--ease-out) 760ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero[data-splash] :is(.logo, .hi, .title, .card, .month, .pairItem) {
+    animation: none;
+  }
+
+  /* The glint rests in place instead of sweeping. */
+  .month::after {
+    animation: none;
+    transform: translateX(-8%);
+  }
+}
+
+/* ------------------------------------------------ slim header */
+
+.slim {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  gap: 16px;
+  height: calc(72px + var(--top-inset));
+  padding: var(--top-inset) 16px 0;
+  background:
+    radial-gradient(60px 45px at 50px 35px, rgba(244, 239, 230, 0.5), transparent 100%),
+    linear-gradient(90deg, rgba(238, 214, 155, 0.9) 0%, rgba(226, 189, 104, 0.9) 55%, rgba(208, 159, 55, 0.92) 100%);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: inset 0 -1px 0.5px rgba(255, 255, 255, 0.45);
+  border-radius: 0 0 20px 20px;
+  color: var(--evergreen);
+  view-transition-name: skin-head;
+}
+
+/* The title is centred on the screen, not between the buttons: the side
+   columns are the same width. */
+.slimTitle {
+  min-width: 0;
+  text-align: center;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .slim {
+    background:
+      radial-gradient(60px 45px at 50px 35px, rgba(244, 239, 230, 0.5), transparent 100%),
+      var(--sunrise-x);
+  }
+}
+
+/* ------------------------------------------------ back */
+
+/* Back to the app the report opened from: a small glass circle, top left. */
+.back {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--lg-btn);
+  -webkit-backdrop-filter: var(--lg-btn-blur);
+  backdrop-filter: var(--lg-btn-blur);
+  box-shadow: var(--lg-btn-rim);
+  color: var(--evergreen);
+  flex: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.back:active {
+  transform: scale(0.96);
+}
+
+.hero > .back {
+  position: absolute;
+  top: calc(var(--top-inset) + 14px);
+  left: 16px;
+  z-index: 1;
+}
+
+/* The profile: her initial on bark, with the same glass rim as the back button. */
+.profile {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bark);
+  box-shadow: var(--lg-btn-rim), 0 2px 8px -2px rgba(46, 38, 32, 0.35);
+  color: var(--bone);
+  font-size: 17px;
+  font-weight: 500;
+  flex: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.profile:active {
+  transform: scale(0.96);
+}
+
+.hero > .profile {
+  position: absolute;
+  top: calc(var(--top-inset) + 14px);
+  right: 16px;
+  z-index: 1;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .back {
+    background: var(--bone);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.hero[data-iteration="true"] {
+  padding-top: 48px;
+  background: linear-gradient(180deg, #d7b35f 0, #d7b35f 100px, #ddc17c 38%, #e8d4a4 62%, #f1e6cd 82%, var(--canvas) 100%);
+}
+.hero[data-iteration="true"] > :is(.logo, .back, .profile) { display: none; }
+.hero[data-iteration="true"] .title { line-height: 36px; }
+.hero[data-iteration="true"] .month { margin-top: 0; }
+.hero[data-iteration="true"] .hi { margin-top: 16px; }

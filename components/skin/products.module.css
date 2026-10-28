@@ -1,0 +1,645 @@
+/* The Products tab (ProductsTab.tsx): one card per product, then context
+   cards after the newest, then the disclaimer. */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ------------------------------------------------ product card */
+
+.card,
+.fold {
+  composes: card from "./surface.module.css";
+  border-radius: 20px;
+}
+
+.card {
+  padding: 16px 16px 4px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* The bottle, tinted by how the score moved while she used it. */
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+.icon[data-tone="down"] {
+  background: var(--clay-soft);
+  color: var(--clay-ink);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  padding-top: 8px;
+}
+
+.title h2 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--bark);
+}
+
+.stopped {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--clay-ink);
+}
+
+.overlap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 2px;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.summary span {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--bark);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary .delta {
+  margin-left: 0;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+/* Folded, the card closes up under its overview. */
+.card:has(.body[data-open="false"]) {
+  padding-bottom: 12px;
+}
+
+.toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -2px -12px 0 0;
+  color: var(--bark-2);
+}
+
+.toggle svg {
+  transform: rotate(180deg);
+  transition: transform 240ms var(--ease-out);
+}
+
+.toggle[aria-expanded="false"] svg {
+  transform: none;
+}
+
+.body {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 280ms var(--ease-out);
+}
+
+.body[data-open="false"] {
+  grid-template-rows: 0fr;
+}
+
+.bodyInner {
+  min-height: 0;
+  /* Room for the focus ring (2px, 3px out) on the controls at its edges,
+     which the overflow clip for folding would otherwise cut off. */
+  margin: 0 -8px;
+  padding: 0 8px;
+  overflow: hidden;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* The spot picker: a native select dressed as a pill, chevron on the right. */
+.spot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.spot select {
+  appearance: none;
+  height: 36px;
+  padding: 0 36px 0 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--canvas);
+  box-shadow: inset 0 0 0 1px var(--sand);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bark);
+}
+
+.spot svg {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: var(--bark-2);
+}
+
+.spotStatic {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.count {
+  font-size: 12px;
+  color: var(--bark-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.range {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--bark-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.metric {
+  margin: 20px 0 0;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.fromTo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 0;
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+  color: var(--bark);
+}
+
+/* No change to show for this spot: the same row, in blanks. */
+.fromTo[data-empty] {
+  color: var(--bark-3);
+}
+
+.arrow {
+  font-size: 30px;
+  color: var(--bark-2);
+}
+
+/* The change as a pill: forest when it rose, clay when it fell. */
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 8px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: var(--forest-soft);
+  color: var(--forest);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.card[data-tone="down"] .delta {
+  background: var(--clay-soft);
+  color: var(--clay-ink);
+}
+
+.card[data-tone="flat"] .delta {
+  background: var(--sand);
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ chart */
+
+.chart {
+  position: relative;
+  margin-top: 16px;
+}
+
+.chart svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Faded behind the message when there's too little to read. */
+.chart[data-empty] svg {
+  opacity: 0.35;
+}
+
+.grid {
+  stroke: var(--sand);
+  stroke-width: 1;
+}
+
+.gridLabel {
+  font-size: 10px;
+  fill: var(--bark-3);
+}
+
+.trip {
+  fill: var(--clay-soft);
+  opacity: 0.6;
+}
+
+.startRule {
+  stroke: var(--bark-3);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.line,
+.lineBefore {
+  fill: none;
+  stroke: var(--evergreen);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.lineBefore {
+  stroke: var(--bark-3);
+  stroke-dasharray: 3 4;
+}
+
+.dot {
+  fill: var(--evergreen);
+  transition: r 160ms var(--ease-out);
+}
+
+/* Read like the Progress chart: hover, or press and drag. */
+.chart[data-live] {
+  touch-action: pan-y;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.chart[data-live]:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.dot[data-on="true"] {
+  stroke: var(--white);
+  stroke-width: 2;
+}
+
+.cursor {
+  stroke: var(--bark);
+  stroke-width: 1;
+  opacity: 0.45;
+}
+
+/* The reading follows the finger, iOS style, and leaves when it lifts. */
+.pill {
+  position: absolute;
+  z-index: 1;
+  top: -32px;
+  translate: -50% 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), 0 6px 14px -6px rgba(46, 38, 32, 0.3);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  animation: pillIn 140ms var(--ease-out);
+  /* Glides from scan to scan under a mouse instead of jumping. */
+  transition: left 140ms var(--ease-out);
+}
+
+.pill b {
+  font-weight: 600;
+  color: var(--bark);
+}
+
+@keyframes pillIn {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .pill {
+    transition: none;
+    animation: none;
+  }
+}
+
+.valueLabel {
+  font-size: 10px;
+  fill: var(--bark-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Over the chart's frame when the spot has too few scans to draw a line. */
+.chartEmpty {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0 24px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--bark-2);
+  pointer-events: none;
+}
+
+.chartEmpty span {
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--sand-deep);
+}
+
+.startTag,
+.tripTag {
+  position: absolute;
+  top: -8px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--bark-3);
+  white-space: nowrap;
+}
+
+.tripTag {
+  color: var(--clay-ink);
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 8px 0 28px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bark-2);
+}
+
+.verdict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--sand);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--forest);
+}
+
+.card[data-tone="down"] .verdict {
+  color: var(--clay-ink);
+}
+
+.card[data-tone="flat"] .verdict {
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ context cards */
+
+.foldHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 4px 0 16px;
+  text-align: left;
+}
+
+.foldHead h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--bark);
+}
+
+.chev {
+  width: 44px;
+  color: var(--bark-2);
+  transform: rotate(180deg);
+  transition: transform 240ms var(--ease-out);
+}
+
+.fold[data-open="false"] .chev {
+  transform: none;
+}
+
+.foldBody {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 280ms var(--ease-out);
+}
+
+.fold[data-open="false"] .foldBody {
+  grid-template-rows: 0fr;
+}
+
+.foldInner {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 16px;
+}
+
+.fold[data-open="true"] .foldInner {
+  padding-bottom: 16px;
+}
+
+.changes {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.changes li {
+  display: grid;
+  grid-template-columns: 16px 64px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  font-size: 13px;
+  color: var(--bark);
+}
+
+.changes li:first-child {
+  padding-top: 2px;
+}
+
+.changes li:last-child {
+  padding-bottom: 0;
+}
+
+/* A hairline between factors, as between the products' rows. */
+.changes li + li {
+  border-top: 1px solid var(--sand-deep);
+}
+
+.changes svg {
+  color: var(--clay-ink);
+}
+
+.changeDay {
+  color: var(--bark-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.about {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--bark-2);
+}
+
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bronze-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ------------------------------------------------ foot */
+
+.foot {
+  padding: 8px 0 0;
+}
+
+.disclaimer {
+  margin: 8px 12px 0;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  color: var(--bark-2);
+}
+
+/* ------------------------------------------------ swaps (future scope) */
+
+.swaps h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.swaps ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.swaps li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--sand);
+  font-size: 12px;
+}
+
+.swaps li[data-match="true"] {
+  box-shadow: inset 0 0 0 1.5px var(--forest);
+}
+
+/* ------------------------------------------------ empty */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--bark-2);
+}
+
+.empty h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body,
+  .foldBody,
+  .toggle svg,
+  .chev {
+    transition: none;
+  }
+}

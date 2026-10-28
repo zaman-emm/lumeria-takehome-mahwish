@@ -1,0 +1,166 @@
+/* A note, the same everywhere it shows (notes.tsx): a thin sand border, a
+   small radius, the "Note" label and a pencil. The words are the person's
+   own, so they keep the light italic the report uses for quotes. */
+
+.note {
+  position: relative;
+  padding: 12px 12px 12px;
+  border: 1px solid var(--sand-deep);
+  border-radius: 12px;
+  text-align: left;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 20px;
+}
+
+.label {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bark-2);
+}
+
+/* A small pencil with a full-size hit area around it. */
+.edit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -8px -4px 0;
+  border-radius: 50%;
+  color: var(--bark-2);
+  transition:
+    background-color 160ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.edit::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+}
+
+.edit:active {
+  transform: scale(0.92);
+  background: var(--lg-well);
+}
+
+.edit:focus-visible,
+.add:focus-visible,
+.save:focus-visible,
+.cancel:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+.text {
+  margin: 4px 0 0;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--bark);
+  text-wrap: pretty;
+}
+
+.note[data-compact="true"] {
+  padding: 8px 12px 8px;
+  border-radius: 10px;
+}
+
+.note[data-compact="true"] .text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines, 2);
+  line-clamp: var(--lines, 2);
+  overflow: hidden;
+  margin-top: 2px;
+  font-size: 13.5px;
+  line-height: 18px;
+  font-weight: 400;
+}
+
+.add {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--forest);
+}
+
+.extra {
+  margin-top: 12px;
+}
+
+/* ------------------------------------------------ editing */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--sand-deep);
+  border-radius: 8px;
+  background: var(--white);
+  font: inherit;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--bark);
+  resize: none;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--forest);
+  box-shadow: 0 0 0 3px rgba(47, 74, 53, 0.12);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cancel,
+.save {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 17px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 140ms var(--ease-out);
+}
+
+.cancel {
+  color: var(--bark-2);
+}
+
+.save {
+  background: var(--forest);
+  color: var(--bone);
+}
+
+.cancel:active,
+.save:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-contrast: more) {
+  .note {
+    border-color: var(--bark-2);
+  }
+}

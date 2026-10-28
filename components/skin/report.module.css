@@ -1,0 +1,222 @@
+/* The report shell: a phone-width column, the sheet indent, the footer and
+   Lumi's button. View-transition rules for the tab morph live here too. */
+
+.root {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--evergreen);
+}
+
+.indentBg {
+  position: fixed;
+  inset: 0;
+  background: var(--evergreen);
+}
+
+/* The page scales back while a sheet is up, from the top of the screen. */
+.indent {
+  position: relative;
+  background: var(--sand);
+  transform-origin: 50% var(--origin, 0px);
+  transition:
+    transform 450ms var(--ease-drawer),
+    border-radius 300ms var(--ease-drawer);
+}
+
+.indent[data-active] {
+  transform: scale(calc(0.94 + 0.06 * var(--drawer-swipe-progress)));
+  border-radius: calc(16px * (1 - var(--drawer-swipe-progress)));
+  overflow: hidden;
+}
+
+/* While a sheet is up, the page behind it shows in the strip above the sheet,
+   under the status bar. Its header controls and tab pills fade out there, so
+   no glass circles or icons are left behind the clock and the island. The
+   header and the bar keep their own surfaces. (!important: the hero's entrance
+   animations hold their final opacity otherwise.) */
+.page > header > *,
+.page > [data-page-chrome] > * {
+  transition: opacity 200ms var(--ease-out);
+}
+
+.indent[data-active] .page > header > *,
+.indent[data-active] .page > [data-page-chrome] > * {
+  opacity: 0 !important;
+}
+
+.page {
+  position: relative;
+  width: 100%;
+  max-width: var(--phone);
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--canvas);
+  color: var(--bark);
+  /* Room for the floating tab bar and Lumi above it. */
+  padding-bottom: calc(max(12px, calc(var(--bottom-inset) - 16px)) + 64px + 40px);
+}
+
+/* The slim header slides up out of view while you scroll down and drops
+   back in when you scroll up; the glass tabs follow it. */
+.page:not([data-tab="glance"]) > header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  transition: transform 280ms var(--ease-out);
+}
+
+.page:not([data-tab="glance"])[data-head="away"] > header {
+  transform: translateY(calc(-100% - 2px));
+}
+
+.page {
+  --tabs-top: var(--top-inset);
+}
+
+.page:not([data-tab="glance"]) {
+  --tabs-top: calc(72px + var(--top-inset));
+}
+
+.page:not([data-tab="glance"])[data-head="away"] {
+  --tabs-top: var(--top-inset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page > header {
+    transition-duration: 0ms;
+  }
+}
+/* Under the splash the tabs and what's beneath them wait, then rise behind the hero. */
+.page[data-splash="wait"] > :not(header) {
+  opacity: 0;
+}
+
+.page[data-splash="go"] > :not(header) {
+  animation: pageIn 520ms var(--ease-out) 460ms both;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page[data-splash="go"] > :not(header) {
+    animation: none;
+  }
+}
+
+.panel {
+  padding: 0 16px;
+}
+
+.panel[data-direction="forward"] { animation: tabEnterForward 240ms var(--ease-out); }
+.panel[data-direction="back"] { animation: tabEnterBack 240ms var(--ease-out); }
+
+@keyframes tabEnterForward { from { opacity: 0; transform: translateX(18px); } }
+@keyframes tabEnterBack { from { opacity: 0; transform: translateX(-18px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .panel[data-direction] { animation: none; }
+}
+
+.foot {
+  padding: 24px 16px 0;
+}
+
+.cues {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cues li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: var(--card);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--bark);
+}
+
+.disclaimer {
+  margin: 24px 8px 0;
+  font-size: 13px;
+  line-height: 20.2px;
+  color: var(--bark-2);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indent[data-active] {
+    transform: none;
+    border-radius: 0;
+  }
+}
+
+/* An alternate report shell inspired by a compact, persistent iOS header. */
+.exploreHeader {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  padding-top: var(--top-inset);
+  margin-bottom: -48px;
+  isolation: isolate;
+}
+
+.exploreHeader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: #d7b35f;
+}
+
+.exploreHeader[data-scrolled="true"]::before {
+  background: rgba(215, 179, 95, 0.82);
+  -webkit-backdrop-filter: blur(20px) saturate(1.25);
+  backdrop-filter: blur(20px) saturate(1.25);
+}
+
+.exploreBrandRow { position: relative; height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 8px; }
+.exploreBrandRow button { position: relative; z-index: 1; }
+.exploreBrandRow button:first-child { color: #14241a; background: rgba(255, 255, 255, 0.5); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(20,36,26,0.18); }
+.exploreBrand {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  width: 128px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  background: #14241a;
+  -webkit-mask: url('/brand/lumeria-horizontal.svg') center / contain no-repeat;
+  mask: url('/brand/lumeria-horizontal.svg') center / contain no-repeat;
+}
+.exploreTitle {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  transform: translate(-50%, -50%);
+  color: #14241a;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.page[data-iteration="true"] { --tabs-top: 0px; }
+.page[data-iteration="true"][data-tab="glance"] { background: var(--canvas); }
+.page[data-iteration="true"]:not([data-tab="glance"]) .panel { padding-top: 64px; }
+@media (prefers-reduced-transparency: reduce) {
+  .exploreHeader::before,
+  .exploreHeader[data-scrolled="true"]::before { background: #d7b35f; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .exploreBrandRow button:first-child { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}

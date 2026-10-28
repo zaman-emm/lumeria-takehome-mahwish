@@ -1,0 +1,378 @@
+/* Lumi's conversation, in its sheet. The orb that opens it lives in the tab
+   bar (TabBar.tsx). */
+
+/* ------------------------------------------------ sheet */
+
+/* Tall from the start, so the sheet doesn't grow under your thumb as the
+   conversation does. The composer stays pinned to the bottom. */
+.lumi {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(88dvh - 64px);
+}
+
+/* The start screen centres the orb and the question; once you ask, the same
+   orb glides up into a compact header beside Lumi's name. */
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 8px 0;
+  text-align: center;
+}
+
+/* In conversation the header stays put while the thread scrolls under it. */
+.lumi[data-talking="true"] .head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  flex-direction: row;
+  gap: 12px;
+  margin: -36px -20px 0;
+  padding: 16px 68px 16px 20px;
+  text-align: left;
+}
+
+/* The thread softens as it slides under the header: a progressive blur
+   (ScrollEdge) behind the header's own content, running 18px below it. */
+.headEdge {
+  top: 0;
+  right: 0;
+  bottom: -18px;
+  left: 0;
+  z-index: -1;
+  /* The header meets the card's rounded top corners, so the blur rounds to them. */
+  --edge-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+}
+
+.orb {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 104px;
+  height: 104px;
+  filter: drop-shadow(0 10px 10px rgba(192, 145, 63, 0.22));
+}
+
+.lumi[data-talking="true"] .orb {
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 4px 5px rgba(192, 145, 63, 0.22));
+}
+
+/* While Lumi thinks, its glow swells a little. */
+.orb::after {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(215, 180, 111, 0.45), transparent 68%);
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 400ms var(--ease-out),
+    transform 400ms var(--ease-out);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.orb[data-busy="true"]::after {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.hello {
+  max-width: 320px;
+  margin: 0;
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 300;
+  letter-spacing: -0.3px;
+}
+
+.name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+/* ------------------------------------------------ start questions */
+
+.starters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.starters li {
+  display: flex;
+  animation: rise 420ms var(--ease-out) both;
+  animation-delay: calc(140ms + var(--i) * 60ms);
+}
+
+.starters button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  min-height: 120px;
+  padding: 16px 16px 16px;
+  border-radius: var(--radius-m);
+  background: var(--card);
+  color: var(--bark);
+  font-size: 16px;
+  line-height: 21px;
+  font-weight: 500;
+  text-align: left;
+  transition:
+    transform 160ms var(--ease-out),
+    box-shadow 200ms ease;
+}
+
+.starters button svg {
+  align-self: flex-end;
+  color: var(--bronze-deep);
+}
+
+.starters button:active {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .starters button:hover {
+    box-shadow: inset 0 0 0 1px var(--sand);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* ------------------------------------------------ conversation */
+
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.line {
+  max-width: 90%;
+}
+
+.line p {
+  margin: 0;
+}
+
+.line[data-from="lumi"] p {
+  font-size: 17px;
+  line-height: 25px;
+  color: var(--bark);
+}
+
+.line[data-from="you"] {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 20px 20px 6px 20px;
+  background: var(--forest);
+  color: var(--bone);
+}
+
+.line[data-from="you"] p {
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+/* The one disclaimer, small, on its own line under the composer's field. */
+.ai {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  font-size: 11px;
+  line-height: 14px;
+  text-align: center;
+  color: var(--bark-3);
+}
+
+/* Words arrive a few at a time, softly, like a reply being written. */
+.written span[aria-hidden] {
+  animation: word 360ms var(--ease-out) both;
+  animation-delay: calc(var(--w) * 22ms);
+}
+
+@keyframes word {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+
+.status {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* A light sweep across the words while Lumi works. */
+.shimmer {
+  background: linear-gradient(
+      100deg,
+      var(--bark-3) 0%,
+      var(--bark-3) 40%,
+      var(--bronze) 50%,
+      var(--bark-3) 60%,
+      var(--bark-3) 100%
+    )
+    0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -150% 0;
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips button {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--bark);
+  font-size: 14px;
+  font-weight: 500;
+  animation: rise 300ms var(--ease-out) both;
+  animation-delay: calc(240ms + var(--i) * 60ms);
+  transition: transform 160ms var(--ease-out);
+}
+
+.chips button:active {
+  transform: scale(0.96);
+}
+
+/* Room for the newest line to clear the pinned composer: the bleed and the
+   home indicator below it, its own 80px, and a 12px gap. */
+.end {
+  height: 1px;
+  scroll-margin-bottom: calc(var(--bleed, 0px) + var(--bottom-inset) + 92px);
+}
+
+/* ------------------------------------------------ composer */
+
+.composer {
+  position: sticky;
+  bottom: calc(var(--bleed, 0px) + var(--bottom-inset));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  /* Cancels the content's 28px bottom padding, so at the end of the thread the
+     composer rests exactly where it is pinned while you scroll. */
+  margin-bottom: -28px;
+  padding: 24px 0 4px;
+}
+
+/* The same under the composer: from 10px above it exactly to the popup's bottom edge, no
+   further, or it adds scroll room and the composer rests higher at the end of the thread
+   than where it is pinned. */
+.composerEdge {
+  inset: -10px -20px calc(-1 * (var(--bleed, 0px) + var(--bottom-inset)));
+  z-index: -1;
+}
+
+.composer input {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 26px;
+  background: var(--card);
+  color: var(--bark);
+  font: inherit;
+  font-size: 16px;
+  outline: 0;
+  transition: box-shadow 200ms ease;
+}
+
+.composer input::placeholder {
+  color: var(--bark-3);
+}
+
+.composer input:focus-visible {
+  box-shadow: inset 0 0 0 1.5px var(--bronze);
+}
+
+.composer button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--bone);
+  transition:
+    transform 160ms var(--ease-out),
+    opacity 200ms ease;
+}
+
+.composer button:disabled {
+  opacity: 0.35;
+}
+
+.composer button:not(:disabled):active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .written span[aria-hidden],
+  .chips button,
+  .starters li {
+    animation-name: fadeOnly;
+  }
+  .shimmer {
+    animation: none;
+    color: var(--bark-3);
+    background: none;
+  }
+}
+
+@keyframes fadeOnly {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock,
+  .dock[data-tucked="true"],
+  .dock[data-hidden="true"] {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+}

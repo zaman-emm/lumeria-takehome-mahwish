@@ -1,0 +1,476 @@
+.tab {
+  display: flex;
+  flex-direction: column;
+  padding-top: 12px;
+}
+
+/* ------------------------------------------------ compare */
+
+.compare {
+  position: relative;
+  display: grid;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--sand);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: ew-resize;
+}
+
+.compareEmpty {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--sand);
+}
+
+.single {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.cmpImg {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: lightIn 280ms var(--ease-out) both;
+}
+
+@keyframes lightIn {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+
+.after {
+  grid-area: 1 / 1;
+  display: grid;
+  clip-path: inset(0 0 0 var(--pos));
+}
+
+.divider {
+  position: absolute;
+  inset: 0;
+  transform: translateX(var(--pos));
+  pointer-events: none;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 2px;
+  background: var(--bone);
+  box-shadow: 0 0 6px rgba(20, 36, 26, 0.25);
+}
+
+.divider i {
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  border-radius: 50%;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  color: var(--evergreen);
+  box-shadow:
+    inset 0 0 0 1px rgba(20, 36, 26, 0.18),
+    0 4px 12px rgba(20, 36, 26, 0.25);
+}
+
+.divider svg {
+  width: 20px;
+  height: 20px;
+}
+
+.knobHit {
+  position: absolute;
+  top: 50%;
+  left: var(--pos);
+  width: 44px;
+  height: 44px;
+  margin: -24px 0 0 -24px;
+  border-radius: 50%;
+}
+
+.knobHit:focus-visible {
+  outline: 2px solid var(--evergreen);
+  outline-offset: 3px;
+}
+
+.areaLabel,
+.sideLabel {
+  position: absolute;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(255, 250, 242, 0.52);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+  backdrop-filter: blur(12px) saturate(1.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.48);
+  color: var(--bark);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.areaLabel { bottom: 12px; left: 12px; }
+.sideLabel { top: 12px; }
+.sideLabel[data-side="before"] { left: 12px; }
+.sideLabel[data-side="now"] { right: 12px; }
+
+/* ------------------------------------------------ switches */
+
+.lights,
+.areas {
+  display: flex;
+  gap: 16px;
+}
+
+.lights {
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.lights button,
+.areas button {
+  position: relative;
+  min-height: 40px;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bark-2);
+}
+
+.lights button[aria-checked="true"],
+.areas button[aria-checked="true"] {
+  color: var(--bark);
+}
+
+.lights button::after,
+.areas button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 1px;
+  background: rgba(94, 82, 72, 0.3);
+}
+
+.underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--bark);
+  z-index: 1;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.areas {
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  padding-right: 20px;
+}
+
+.areas button {
+  flex: none;
+  font-size: 13px;
+}
+
+.view {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: none;
+  width: 88px;
+  height: 44px;
+  padding: 4px;
+  border-radius: 21px;
+  background: var(--sand);
+}
+
+.viewKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 40px;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--white);
+  box-shadow: 0 2px 6px rgba(46, 38, 32, 0.08);
+  transition: transform 240ms var(--ease-in-out);
+}
+
+.view[data-view="rows"] .viewKnob {
+  transform: translateX(40px);
+}
+
+.view button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--bark-2);
+}
+
+.view button[aria-checked="true"] {
+  color: var(--bark);
+}
+
+/* ------------------------------------------------ wall */
+
+.wall {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wall[data-view="rows"] {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.wall > li {
+  min-width: 0;
+}
+
+.polaroid {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px 8px 8px;
+  border-radius: 3px;
+  background: var(--white);
+  box-shadow:
+    inset 0 0 0 1px var(--sand),
+    0 1px 2px rgba(46, 38, 32, 0.08),
+    0 8px 14px rgba(46, 38, 32, 0.08);
+  text-align: left;
+  transition: transform 160ms var(--ease-out);
+}
+
+.polaroid:active {
+  transform: scale(0.96);
+}
+
+.tape {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 36px;
+  height: 12px;
+  margin-left: -16px;
+  background: rgba(232, 223, 206, 0.72);
+  transform: rotate(-3deg);
+}
+
+.thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--sand);
+}
+
+.pMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark);
+}
+
+.pMeta b,
+.rowScore b {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--bark);
+  font-variant-numeric: tabular-nums;
+}
+
+.pMeta b[data-tone="good"],
+.rowScore b[data-tone="good"] {
+  color: var(--green);
+}
+
+.pMeta b[data-tone="low"],
+.rowScore b[data-tone="low"] {
+  color: var(--clay);
+}
+
+.pArea {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bark-2);
+}
+
+/* Details: the photo, when and where, what the scan saw, your note, and the
+   score with its move since the last scan of that spot. */
+.row {
+  composes: card from "./surface.module.css";
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px 12px 12px;
+  border-radius: 18px;
+  text-align: left;
+  transition: transform 160ms var(--ease-out);
+}
+
+/* The row's own button, stretched over it (PhotoRow). */
+.rowHit {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.rowHit:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+.row:has(.rowHit:active) {
+  transform: scale(0.98);
+}
+
+.rowPhoto {
+  width: 76px;
+  height: 76px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex: none;
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.rowWhen {
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--bark);
+}
+
+.rowArea {
+  font-size: 12px;
+  line-height: 15px;
+  color: var(--bark-2);
+}
+
+/* Above the row's button, so the pencil and the editor take their own taps;
+   a tap on the words still falls through and opens the scan. */
+.rowNote {
+  position: relative;
+  z-index: 1;
+  margin-top: 8px;
+  pointer-events: none;
+}
+
+.rowNote :is(button, textarea) {
+  pointer-events: auto;
+}
+
+.rowScore {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: none;
+  padding-top: 2px;
+}
+
+.rowScore b {
+  font-size: 22px;
+  line-height: 24px;
+}
+
+.rowDelta {
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+/* No photos at all: one plain message instead of filters over an empty wall. */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--bark-2);
+}
+
+.empty h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+}
+
+.empty p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--bark-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmpImg {
+    animation-name: lightFade;
+  }
+  .viewKnob {
+    transition-duration: 0ms;
+  }
+}
+
+@keyframes lightFade {
+  from {
+    opacity: 0;
+  }
+}

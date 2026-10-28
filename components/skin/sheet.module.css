@@ -1,0 +1,205 @@
+/* Bottom sheet. Opens on the iOS drawer curve, follows the finger while
+   swiped, and leaves faster than it came, scaled by how hard it was flicked. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(20, 36, 26);
+  opacity: calc(0.32 * (1 - var(--drawer-swipe-progress)));
+  transition: opacity 450ms var(--ease-drawer);
+}
+
+.backdrop[data-starting-style],
+.backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.backdrop[data-swiping] {
+  transition-duration: 0ms;
+}
+
+.backdrop[data-ending-style] {
+  transition-duration: calc(var(--drawer-swipe-strength) * 300ms);
+}
+
+.viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 41;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.popup {
+  --bleed: 48px;
+  /* The card's top corners; the blur strips round themselves to match (edge.module.css). */
+  --sheet-radius: 28px;
+  position: relative;
+  width: 100%;
+  max-width: var(--phone);
+  /* Stops below the status bar, like an iOS sheet, so the clock and the
+     island never sit over its content. */
+  max-height: calc(100dvh - var(--top-inset) - 8px + var(--bleed));
+  margin-bottom: calc(-1 * var(--bleed));
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+  /* A sheet is foreground, so it takes the paper; inside it the two swap, so
+     its own cards still sit one step darker, and its scroll edges blur to
+     the paper. */
+  --canvas: #fbf8f2;
+  --canvas-rgb: 251, 248, 242;
+  --card: var(--bone);
+  background: var(--canvas);
+  color: var(--bark);
+  box-shadow: 0 -8px 40px rgba(20, 36, 26, 0.16);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: 0;
+  pointer-events: auto;
+  scrollbar-width: none;
+  transform: translateY(var(--drawer-swipe-movement-y));
+  transition: transform 450ms var(--ease-drawer);
+  will-change: transform;
+}
+
+.popup::-webkit-scrollbar {
+  display: none;
+}
+
+.popup[data-starting-style],
+.popup[data-ending-style] {
+  transform: translateY(calc(100% - var(--bleed) + 2px));
+}
+
+.popup[data-swiping] {
+  transition-duration: 0ms;
+}
+
+.popup[data-ending-style] {
+  transition-duration: calc(var(--drawer-swipe-strength) * 300ms);
+}
+
+.chrome {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 0;
+}
+
+/* Where the scroll-edge blur (ScrollEdge) sits: the strip behind the grabber and
+   the close button (the controls end at 54px) and a fade below them. */
+.edgeBox {
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 88px;
+  --edge-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+}
+
+.grabber {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 36px;
+  height: 4px;
+  margin-left: -20px;
+  border-radius: 2px;
+  background: var(--sand-deep);
+}
+
+.close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--bark);
+  transition: transform 160ms var(--ease-out);
+}
+
+.close::before {
+  /* 44pt hit area around the 36pt circle */
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+
+.close:active {
+  transform: scale(0.96);
+}
+
+/* The room under the content (the bleed below the screen's edge, and the home
+   indicator) is padding on the content, not on the scrolling popup: a sticky
+   child (Lumi's composer) measures its offset from inside a scroller's own
+   padding, so padding there would stack on top of the offset. */
+.content {
+  padding: 36px 20px calc(28px + var(--bleed) + var(--bottom-inset));
+  animation: swap 260ms var(--ease-out) both;
+}
+
+/* The sheet's sections follow it up in a quick cascade. */
+.content > * > * {
+  animation: cascade 300ms var(--ease-out) both;
+}
+
+.content > * > :nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.content > * > :nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.content > * > :nth-child(4) {
+  animation-delay: 120ms;
+}
+
+.content > * > :nth-child(5) {
+  animation-delay: 160ms;
+}
+
+.content > * > :nth-child(n + 6) {
+  animation-delay: 200ms;
+}
+
+@keyframes cascade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes swap {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Fade rather than slide; a swipe still tracks the finger directly. */
+  .popup {
+    transition: opacity 250ms ease;
+  }
+  .popup[data-starting-style],
+  .popup[data-ending-style] {
+    transform: translateY(var(--drawer-swipe-movement-y));
+    opacity: 0;
+  }
+  .content,
+  .content > * > * {
+    animation-name: swapFade;
+  }
+}
+
+@keyframes swapFade {
+  from {
+    opacity: 0;
+  }
+}

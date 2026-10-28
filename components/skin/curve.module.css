@@ -1,0 +1,241 @@
+/* The day-by-day score curve on each product card (DayCurve.tsx). */
+
+.curve {
+  --tone: var(--bark-2);
+  position: relative;
+  height: 84px;
+  margin: 20px -2px 0;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.curve[data-tone="helped"] {
+  --tone: var(--forest);
+}
+
+.curve[data-tone="held"] {
+  --tone: var(--clay);
+}
+
+.curve svg {
+  display: block;
+  overflow: visible;
+}
+
+.band {
+  fill: rgba(217, 204, 180, 0.4);
+}
+
+.band[data-tone="helped"] {
+  fill: rgba(223, 230, 220, 0.85);
+}
+
+.band[data-tone="held"] {
+  fill: rgba(241, 221, 211, 0.85);
+}
+
+.trip {
+  opacity: 0.9;
+}
+
+.hatchBg {
+  fill: rgba(255, 255, 255, 0.3);
+}
+
+.hatchLine {
+  stroke: rgba(184, 83, 58, 0.26);
+  stroke-width: 1.5;
+}
+
+.washTop {
+  stop-color: var(--tone);
+  stop-opacity: 0.22;
+}
+
+.washEnd {
+  stop-color: var(--tone);
+  stop-opacity: 0;
+}
+
+.rest,
+.line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+}
+
+.rest {
+  stroke: rgba(46, 38, 32, 0.24);
+  stroke-width: 1.75;
+}
+
+.line {
+  stroke: var(--tone);
+  stroke-width: 2.25;
+}
+
+.from,
+.to {
+  stroke: var(--white);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.from {
+  fill: var(--paper);
+  stroke: var(--tone);
+}
+
+.to {
+  fill: var(--tone);
+}
+
+.scrub line {
+  stroke: rgba(46, 38, 32, 0.28);
+  stroke-width: 1;
+}
+
+.scrub circle {
+  fill: var(--bark);
+  stroke: var(--white);
+  stroke-width: 2;
+}
+
+/* Pins sit in small white discs at the top of their band. */
+.pin {
+  position: absolute;
+  top: 6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--sand);
+  color: var(--bark-2);
+  transition: transform 160ms var(--ease-out);
+}
+
+/* A 44pt target around the 22pt disc. */
+.pin::before {
+  content: "";
+  position: absolute;
+  inset: -11px;
+}
+
+.pin:active {
+  transform: scale(0.96);
+}
+
+.pin[data-tone="trip"] {
+  box-shadow: inset 0 0 0 1px var(--clay-soft);
+  color: var(--clay-ink);
+}
+
+.pin[data-tone="helped"] {
+  box-shadow: inset 0 0 0 1px var(--forest-soft);
+  color: var(--forest);
+}
+
+.pin[data-tone="held"] {
+  box-shadow: inset 0 0 0 1px var(--clay-soft);
+  color: var(--clay-ink);
+}
+
+.pin[data-on="true"] {
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+.value {
+  position: absolute;
+  margin-top: -28px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--bark-2);
+  font-variant-numeric: tabular-nums;
+  transform: translateX(-2px);
+  pointer-events: none;
+}
+
+.value[data-end="true"] {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--bark);
+  transform: translateX(calc(-100% + 2px));
+}
+
+.curve[data-reveal] .value {
+  transition: opacity 240ms ease 800ms;
+}
+
+.curve[data-reveal="out"] .value {
+  opacity: 0;
+}
+
+.pill {
+  position: absolute;
+  top: -26px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), 0 6px 14px -6px rgba(46, 38, 32, 0.3);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.pill b {
+  font-weight: 600;
+  color: var(--bark);
+}
+
+/* ------------------------------------------------ first reveal */
+
+.curve[data-reveal] .rest,
+.curve[data-reveal] .line {
+  transition: stroke-dashoffset 900ms var(--ease-out);
+}
+
+.curve[data-reveal] .fill,
+.curve[data-reveal] .band,
+.curve[data-reveal] .trip,
+.curve[data-reveal] .pin {
+  transition: opacity 500ms ease 150ms;
+}
+
+.curve[data-reveal] .from,
+.curve[data-reveal] .to {
+  transition:
+    opacity 240ms ease 700ms,
+    transform 320ms var(--ease-out) 700ms;
+}
+
+.curve[data-reveal="out"] .rest,
+.curve[data-reveal="out"] .line {
+  stroke-dashoffset: 1;
+}
+
+.curve[data-reveal="out"] .fill,
+.curve[data-reveal="out"] .band,
+.curve[data-reveal="out"] .trip,
+.curve[data-reveal="out"] .pin {
+  opacity: 0;
+}
+
+.curve[data-reveal="out"] .from,
+.curve[data-reveal="out"] .to {
+  opacity: 0;
+  transform: scale(0.5);
+}

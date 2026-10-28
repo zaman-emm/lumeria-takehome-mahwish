@@ -1,66 +1,43 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
-import type { SkinReport } from "@/lib/types";
+import { Suspense, use, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Report } from "@/components/skin/Report";
+import { StateScreen } from "@/components/skin/StateScreen";
+import { useReport } from "@/lib/useReport";
+import { DeviceChrome } from "@/components/skin/DeviceChrome";
+import { PhoneFrame } from "@/components/skin/PhoneFrame";
+import { LOADER_MS, loaderStart } from "@/components/skin/Loader";
+import { willSplash } from "@/components/skin/splashState";
 
-// The simplest possible version of the report: it proves the data flows end
-// to end and nothing more. Replace all of it. See README.md for the brief.
+// /report/:id. Fetches the report like a real client would (forwarding
+// ?fail=1), then shows either a friendly state screen or the report itself.
 
 export default function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [report, setReport] = useState<SkinReport | null>(null);
-
-  useEffect(() => {
-    fetch(`/api/reports/${id}`)
-      .then((res) => res.json())
-      .then(setReport);
-  }, [id]);
-
-  if (!report) return <p>Loading…</p>;
-
-  const latest = report.scans[report.scans.length - 1];
-
   return (
-    <main>
-      <h1>{report.person.firstName}&apos;s skin report</h1>
-
-      <h2>Latest scan</h2>
-      <p>
-        {latest.takenAt} · {latest.area}
-      </p>
-      <p>Overall: {latest.scores.overall}</p>
-      <p>{latest.summary.headline}</p>
-      <p>Tip: {latest.summary.tip}</p>
-
-      <h2>All scans</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Area</th>
-            <th>Overall</th>
-            <th>Hydration</th>
-            <th>Evenness</th>
-            <th>Redness</th>
-            <th>Pigmentation</th>
-            <th>Oiliness</th>
-          </tr>
-        </thead>
-        <tbody>
-          {report.scans.map((s) => (
-            <tr key={s.id}>
-              <td>{s.takenAt}</td>
-              <td>{s.area}</td>
-              <td>{s.scores.overall}</td>
-              <td>{s.scores.hydration}</td>
-              <td>{s.scores.evenness}</td>
-              <td>{s.scores.redness}</td>
-              <td>{s.scores.pigmentation}</td>
-              <td>{s.scores.oiliness}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </main>
+    <PhoneFrame>
+      <DeviceChrome />
+      <Suspense fallback={<StateScreen state={{ status: "loading" }} />}>
+        <ReportRoute id={id} />
+      </Suspense>
+    </PhoneFrame>
   );
+}
+
+function ReportRoute({ id }: { id: string }) {
+  const params = useSearchParams();
+  const fail = params.get("fail") === "1";
+  const fitnessLayout = params.get("layout") === "fitness";
+  const state = useReport(id, fail);
+  // A first load plays the loader through once before the splash takes over.
+  const [held, setHeld] = useState(() => willSplash());
+  useEffect(() => {
+    if (!held) return;
+    const timer = window.setTimeout(() => setHeld(false), LOADER_MS - (performance.now() - loaderStart()));
+    return () => window.clearTimeout(timer);
+  }, [held]);
+  if (held && (state.status === "loading" || state.status === "ready")) return <StateScreen state={{ status: "loading" }} />;
+  if (state.status !== "ready") return <StateScreen state={state} />;
+  return <Report d={state.data} fitnessLayout={fitnessLayout} />;
 }

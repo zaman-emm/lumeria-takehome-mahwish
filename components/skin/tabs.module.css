@@ -1,0 +1,179 @@
+/* Chip tabs, sticky under the header, with the active colour clipped from a
+   duplicate row (see Tabs.tsx). */
+
+.bar {
+  position: sticky;
+  top: var(--tabs-top, 0px);
+  z-index: 5;
+  padding: 16px 0 16px;
+  view-transition-name: skin-tabs;
+}
+
+/* At rest the bar is just the page. Stuck at the top it turns to frosted
+   glass, like an iOS navigation bar: the content blurs as it slides under,
+   with a hairline at the edge. The glass sits on the bar itself, because its
+   view-transition-name would stop a child from seeing what's behind it. */
+.bar {
+  transition:
+    top 280ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out);
+}
+
+.bar[data-stuck="true"],
+.cap[data-on="true"] {
+  background-color: rgba(var(--canvas-rgb), 0.78);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(24px) saturate(1.6);
+}
+
+.bar[data-stuck="true"] {
+  box-shadow: 0 0.5px 0 rgba(46, 38, 32, 0.14);
+}
+
+/* The strip behind the status bar, above a stuck bar, so the page never shows
+   behind the clock. It is the bar's own glass (the rule above is shared, so the
+   two can never drift apart) as a sibling, since a child of the bar can't see
+   what's behind it. */
+.cap {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 5;
+  width: min(100%, var(--phone));
+  height: var(--top-inset);
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.cap[data-on="true"] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .bar[data-stuck="true"],
+  .cap[data-on="true"] {
+    background-color: var(--canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.row {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  display: grid;
+  place-items: center;
+  flex: none;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  background: var(--card);
+  color: var(--bark);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: transform 160ms var(--ease-out);
+}
+
+/* Reserve the bold width so both rows line up exactly. */
+.chip > span,
+.chip::after {
+  grid-area: 1 / 1;
+}
+
+.chip::after {
+  content: attr(data-label);
+  font-weight: 600;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+button.chip:active {
+  transform: scale(0.97);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+.active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.active[data-ready="true"] {
+  transition: clip-path 240ms var(--ease-in-out);
+}
+
+.active .chip {
+  background: var(--forest);
+  color: var(--bone);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .active[data-ready="true"] {
+    transition-duration: 0ms;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .bar::before {
+    inset: 0;
+    background: var(--canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+.bar[data-iteration="true"] {
+  position: relative;
+  top: auto;
+  padding: 0 0 16px;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.bar[data-iteration="true"] .chip {
+  color: #14241a;
+  font-weight: 600;
+  line-height: 20px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(20, 36, 26, 0.18);
+}
+.bar[data-iteration="true"] .active .chip {
+  color: #fff;
+  background: #14241a;
+  box-shadow: none;
+}
+.bar[data-iteration="true"] .chip:focus-visible { outline-color: #14241a; }
+@media (prefers-reduced-transparency: reduce) {
+  .bar[data-iteration="true"] .chip { background: #fff; box-shadow: inset 0 0 0 1px rgba(20,36,26,0.18); }
+  .bar[data-iteration="true"] .active .chip { background: #14241a; box-shadow: none; }
+}

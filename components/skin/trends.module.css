@@ -1,0 +1,758 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  /* Product ranges in the brand's own colours, a fixed order (never cycled):
+     forest, bronze, bark. Each also has its own line (solid, dashed, dotted),
+     so they part by pattern, not just hue. */
+  --range-1: var(--forest);
+  --range-2: var(--bronze);
+  --range-3: var(--bark-2);
+}
+
+.delta {
+  margin: 0 0 8px;
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -2.6px;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+
+.delta[data-down="true"] {
+  color: var(--clay);
+}
+
+/* ------------------------------------------------ spot tabs */
+
+/* Each spot is its own chip; the picked one fills in. */
+.areas {
+  display: flex;
+  gap: 8px;
+  margin: 8px -2px 0;
+  padding: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.area {
+  position: relative;
+  flex: none;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bark-2);
+  box-shadow: inset 0 0 0 1px var(--sand-deep);
+  transition: color 200ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.area:active {
+  transform: scale(0.96);
+}
+
+.area[aria-selected="true"] {
+  color: var(--bone);
+  box-shadow: none;
+}
+
+.area > :not(.areaLine) {
+  position: relative;
+  z-index: 1;
+}
+
+.area b {
+  font-weight: 500;
+}
+
+.area span {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.areaLine {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: var(--forest);
+  z-index: 0;
+}
+
+/* ------------------------------------------------ score picker */
+
+.picker {
+  display: flex;
+  gap: 8px;
+  margin: 12px -16px 0;
+  padding: 8px 16px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.picker::-webkit-scrollbar {
+  display: none;
+}
+
+.pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 64px;
+  transition: transform 160ms var(--ease-out);
+}
+
+.pick:active {
+  transform: scale(0.96);
+}
+
+.pickRing {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.pickRing::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--bronze);
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.pick[data-on="true"] .pickRing::before {
+  opacity: 1;
+  transform: none;
+}
+
+.pickLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+}
+
+.pick[data-on="true"] .pickLabel {
+  font-weight: 600;
+  color: var(--bark);
+}
+
+.moved {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--evergreen);
+  box-shadow: 0 0 0 2px var(--paper);
+}
+
+/* ------------------------------------------------ chart */
+
+.chartWrap {
+  margin-top: 36px;
+}
+
+/* Under its legend the chart sits closer. */
+.legend + .chartWrap {
+  margin-top: 16px;
+}
+
+.chart {
+  position: relative;
+  height: 152px;
+  touch-action: pan-y;
+  cursor: crosshair;
+  border-radius: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.svg {
+  display: block;
+  overflow: visible;
+}
+
+.grid {
+  stroke: rgba(46, 38, 32, 0.1);
+  stroke-width: 1;
+}
+
+.gridLabel {
+  font-size: 11.5px;
+  fill: var(--bark-2);
+}
+
+.trip {
+  fill: var(--clay-soft);
+  opacity: 0.6;
+}
+
+.period {
+  opacity: 0.7;
+}
+
+.periodBg {
+  fill: rgba(215, 180, 111, 0.16);
+}
+
+.periodInk {
+  stroke: rgba(173, 130, 53, 0.4);
+  stroke-width: 1.5;
+}
+
+.line {
+  fill: none;
+  stroke: var(--gold-deep);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+}
+
+.dot {
+  fill: var(--evergreen);
+}
+
+.dot {
+  transition: r 160ms var(--ease-out);
+}
+
+.dot[data-on="true"] {
+  fill: var(--evergreen);
+  stroke: var(--white);
+  stroke-width: 2;
+}
+
+.cursor {
+  stroke: var(--bark);
+  stroke-width: 1;
+  opacity: 0.25;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.cursor[data-on="true"] {
+  opacity: 0.45;
+}
+
+.washTop {
+  stop-color: var(--gold-deep);
+  stop-opacity: 0.2;
+}
+
+.washEnd {
+  stop-color: var(--gold-deep);
+  stop-opacity: 0;
+}
+
+/* The reading follows the finger, iOS style, and leaves when it lifts. */
+.pill {
+  position: absolute;
+  top: -32px;
+  translate: -50% 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--lg-sheen), var(--lg-fill-strong);
+  -webkit-backdrop-filter: var(--lg-blur);
+  backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-rim), 0 6px 14px -6px rgba(46, 38, 32, 0.3);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--bark-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  animation: pillIn 140ms var(--ease-out);
+  /* Glides from scan to scan under a mouse instead of jumping. */
+  transition: left 140ms var(--ease-out);
+}
+
+.pill b {
+  font-weight: 600;
+  color: var(--bark);
+}
+
+@keyframes pillIn {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0 0 32px;
+  font-size: 11.5px;
+  color: var(--bark-2);
+}
+
+/* First view: the line draws, then the dots settle. Later swaps crossfade. */
+.chartWrap[data-reveal="out"] .line {
+  stroke-dashoffset: 1;
+}
+
+.chartWrap[data-reveal="in"] .line {
+  transition: stroke-dashoffset 900ms var(--ease-out);
+}
+
+.chartWrap[data-reveal="out"] .dot,
+.chartWrap[data-reveal="out"] .wash {
+  opacity: 0;
+}
+
+.chartWrap[data-reveal="in"] .wash {
+  transition: opacity 500ms ease 150ms;
+}
+
+.chartWrap[data-reveal="in"] .dot {
+  transition: opacity 300ms var(--ease-out);
+  transition-delay: calc(200ms + var(--i) * 22ms);
+}
+
+.chartWrap[data-reveal="done"] .svg {
+  animation: swapIn 260ms var(--ease-out) both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes swapIn {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+/* ------------------------------------------------ legend and ranges */
+
+/* The legend row above the chart (Legend in TrendView.tsx): swatch and name,
+   left-aligned, wrapping. Each item is a button that picks its range out. */
+.caption {
+  margin: 20px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--bark-2);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendItem {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--bark);
+  white-space: nowrap;
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 140ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A taller target than the text. */
+.legendItem::before {
+  content: "";
+  position: absolute;
+  inset: -8px -6px;
+}
+
+.legendItem:active {
+  transform: scale(0.96);
+}
+
+.legendItem[aria-pressed="true"] {
+  font-weight: 600;
+}
+
+.legendItem[data-dim="true"] {
+  opacity: 0.4;
+}
+
+.legendItem:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Swatches match the marks: a product's lane bar, the trip's band, the
+   period's hatch. */
+.swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.swatch[data-kind="product"] {
+  width: 16px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--c);
+}
+
+.swatch[data-kind="product"][data-slot="1"] {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 7px);
+}
+
+.swatch[data-kind="product"][data-slot="2"] {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--c) 0 2px, transparent 2px 4px);
+}
+
+.swatch[data-kind="travel"] {
+  background: var(--clay-soft);
+  box-shadow: inset 0 0 0 1px rgba(184, 83, 58, 0.25);
+}
+
+.swatch[data-kind="period"] {
+  background: repeating-linear-gradient(-45deg, rgba(215, 180, 111, 0.6) 0 1.5px, rgba(215, 180, 111, 0.2) 1.5px 4px);
+  box-shadow: inset 0 0 0 1px rgba(173, 130, 53, 0.4);
+}
+
+/* In the chart: product lanes under the plot; a picked range stays, the rest fade. */
+.lane,
+.trip,
+.period {
+  transition: opacity 200ms var(--ease-out);
+}
+
+.lane[data-dim="true"] {
+  opacity: 0.22;
+}
+
+.trip[data-dim="true"],
+.period[data-dim="true"] {
+  opacity: 0.18;
+}
+
+.focusBand {
+  opacity: 0.1;
+  pointer-events: none;
+  animation: fadeIn 200ms var(--ease-out);
+}
+
+/* ------------------------------------------------ scan card */
+
+/* This card sits at the end of a view whose chart you scrub, and in a bottom
+   sheet that is anchored to the screen's edge, so it is one fixed size: a
+   different note, or a scan with no change badge, must never resize it and
+   move what is around it. What the scan saw clamps to two lines, the note to
+   one (the scan opens in full on tap), and the score keeps room for its badge. */
+.card {
+  position: relative;
+  background: var(--canvas);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px 16px 12px 12px;
+  border-radius: 20px;
+  text-align: left;
+  transition: transform 160ms var(--ease-out);
+}
+
+/* The card's own button, stretched over it (ScanCard). */
+.cardHit {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.cardHit:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+.card:has(.cardHit:active) {
+  transform: scale(0.98);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+}
+
+/* The note's slot is one size, note or not, so scrubbing never resizes the
+   card; it grows only while the note is being edited. It sits above the
+   card's button: the pencil takes its own taps, the words fall through. */
+.cardNote {
+  position: relative;
+  z-index: 1;
+  height: 56px;
+  margin-left: 0;
+  pointer-events: none;
+}
+
+.cardNote :is(button, textarea) {
+  pointer-events: auto;
+}
+
+.cardNote[data-editing="true"] {
+  height: auto;
+}
+
+/* The card's own space, when there is no scan to show in it. */
+.cardVoid {
+  height: 88px;
+  margin-top: 16px;
+}
+
+.cardPhoto {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: cover;
+  flex: none;
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cardWhen {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark-2);
+}
+
+.cardSaw {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  /* Always two lines tall, so one line doesn't re-centre the text. */
+  min-height: 40px;
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--bark);
+}
+
+.cardScore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The number's place never depends on whether there is a change badge under it. */
+  justify-content: flex-start;
+  gap: 2px;
+  min-height: 52px;
+}
+
+.cardScore b {
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+.cardDelta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 8px;
+  border-radius: 8px;
+  background: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--evergreen);
+}
+
+.cardChevron {
+  color: var(--bark-2);
+  flex: none;
+}
+
+/* ------------------------------------------------ Trends tab */
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 12px;
+}
+
+.panelCard {
+  composes: card from "./surface.module.css";
+  padding: 16px;
+  border-radius: 20px;
+}
+
+.linedUp {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.factors {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.factor {
+  composes: card from "./surface.module.css";
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  column-gap: 16px;
+  padding: 16px;
+  border-radius: 20px;
+}
+
+.fIcon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+.factor[data-dir="held"] .fIcon {
+  background: var(--clay-soft);
+  color: var(--clay-ink);
+}
+
+.fBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fHead h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 600;
+}
+
+.fHead span {
+  flex: none;
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+.fMetric {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.fEnds {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+.fFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--bark-2);
+}
+
+.caveat {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 12px 12px;
+  border-radius: 12px;
+  background: var(--lg-well);
+  font-size: 13px;
+  line-height: 18.9px;
+  color: var(--bark);
+}
+
+.caveat svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--bark-2);
+}
+
+/* Where the chart would be, when a spot has no line to draw yet: the same
+   170px the chart takes (36 above, 150 line, 6 + 14 axis), so picking a spot or
+   a score never changes the view's height. */
+.chartVoid {
+  display: grid;
+  place-items: center;
+  height: 172px;
+  margin-top: 36px;
+  padding: 0 24px;
+  border-radius: 8px;
+  background: var(--lg-well);
+}
+
+.emptyTrend {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--bark-2);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chartWrap[data-reveal="done"] .svg {
+    animation-name: fadeIn;
+  }
+}

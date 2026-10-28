@@ -1,0 +1,184 @@
+/* The floating tab bar (TabBar.tsx), sized like iOS 26's: a 62pt Liquid Glass
+   capsule 20pt in from the edges with a 62pt round button beside it, their
+   bottom 20pt off the screen's. */
+
+.bar {
+  --tabbar-h: 62px;
+  position: fixed;
+  z-index: 30;
+  left: 50%;
+  bottom: max(12px, calc(var(--bottom-inset) - 14px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, var(--phone));
+  padding: 0 20px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition:
+    transform 420ms var(--ease-drawer),
+    opacity 220ms var(--ease-out);
+}
+
+/* Under a story or the splash it sinks out of the way. */
+.bar[data-hidden="true"] {
+  opacity: 0;
+  transform: translate(-50%, 24px);
+}
+
+/* Liquid Glass: mostly clear, so the page shows through; a blur that lifts
+   saturation, a bright specular edge on top, a fainter one below, a hairline
+   and a soft shadow to float it. */
+.capsule {
+  position: relative;
+  height: var(--tabbar-h);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.32));
+  -webkit-backdrop-filter: blur(14px) saturate(1.8);
+  backdrop-filter: blur(14px) saturate(1.8);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+    0 0 0 0.5px rgba(46, 38, 32, 0.08),
+    0 8px 24px -8px rgba(46, 38, 32, 0.22);
+  pointer-events: auto;
+}
+
+.capsule {
+  display: flex;
+  flex: 1;
+  padding: 4px;
+  border-radius: calc(var(--tabbar-h) / 2);
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border-radius: calc(var(--tabbar-h) / 2 - 4px);
+  color: var(--bark);
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 200ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.item svg,
+.item span {
+  position: relative;
+}
+
+/* The tint, as iOS colours the selected tab. */
+.item[aria-current="page"] {
+  color: var(--forest);
+}
+
+/* The selected tab's lighter glass: a soft grey lens with its own top edge. */
+.pill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(120, 120, 128, 0.14);
+  box-shadow: inset 0 0.5px 0.5px rgba(255, 255, 255, 0.8);
+}
+
+/* Lumi, where Music keeps Search: the orb itself is the button, no glass
+   around it. */
+.lumi {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tabbar-h);
+  height: var(--tabbar-h);
+  border-radius: 50%;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 140ms var(--ease-out);
+}
+
+/* Lumi's aura: a warm glow behind the orb that breathes slowly, so she
+   still stands out on the gold hero and the pale page alike. */
+.lumi::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 226, 150, 0.9) 0%,
+    rgba(255, 205, 110, 0.55) 38%,
+    rgba(240, 180, 80, 0.22) 58%,
+    transparent 72%
+  );
+  pointer-events: none;
+  animation: aura 3.2s ease-in-out infinite;
+}
+
+@keyframes aura {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.orb {
+  position: relative;
+  display: block;
+  width: 60px;
+  height: 60px;
+  /* A bright warm glow lifts her off gold backgrounds. */
+  filter: drop-shadow(0 0 10px rgba(255, 196, 90, 0.85)) drop-shadow(0 6px 10px rgba(128, 96, 31, 0.3));
+}
+
+/* Feedback on the press, not the release. Home and Scan are placeholders,
+   so only Lumi gives it. */
+.lumi:active {
+  transform: scale(0.95);
+}
+
+.item[aria-disabled="true"] {
+  cursor: default;
+}
+
+.item:focus-visible,
+.lumi:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar,
+  .item,
+  .lumi {
+    transition-duration: 0ms;
+  }
+
+  .lumi::before {
+    animation: none;
+  }
+}
+
+/* Reduced transparency or more contrast: solid surfaces, as iOS does. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .capsule {
+    background: var(--paper);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+      inset 0 0 0 1px var(--sand-deep),
+      0 8px 24px -8px rgba(46, 38, 32, 0.22);
+  }
+}

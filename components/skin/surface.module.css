@@ -1,0 +1,12 @@
+/* Surfaces for the report. Cards are flat: white on the canvas, no shadow,
+   the way Health does it. `deep` is the forest card. Glass is kept for what
+   floats over content (the tab bar, the slim header, Lumi's controls), using
+   the --lg-* tokens in app/globals.css. */
+
+.card {
+  background: var(--card);
+}
+
+.deep {
+  background: var(--forest);
+}

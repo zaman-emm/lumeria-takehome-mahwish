@@ -1,0 +1,376 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+/* First load only: the sections rise in one after another as the hero's card
+   lands. They stay tappable throughout. */
+.stack[data-enter="true"] > * {
+  animation: sectionIn 420ms var(--ease-out) both;
+  animation-delay: calc(1000ms + var(--n) * 70ms);
+}
+
+@keyframes sectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* ------------------------------------------------ month story */
+
+.story {
+  composes: card from "./surface.module.css";
+  padding: 32px 12px 12px;
+  border-radius: 20px;
+}
+
+/* The month in one sentence; the curve's pins sit under it, so it leaves them room. */
+.story:has(.storyLine) {
+  padding-top: 20px;
+}
+
+.storyAttribution {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 8px 12px;
+  color: var(--bark-2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.storyOrb { width: 20px; height: 20px; flex: none; }
+:global([data-iteration="true"]) .storyAttribution { display: none; }
+
+.storyLine {
+  margin: 0 8px 32px;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 400;
+  color: var(--bark);
+  text-wrap: pretty;
+}
+
+.storyDates {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 4px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark-3);
+}
+
+/* ------------------------------------------------ labels */
+
+.metricLabel {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bark);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------ the read */
+
+.read {
+  composes: card from "./surface.module.css";
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px 16px;
+  border-radius: 20px;
+}
+
+/* Her own note on the latest scan. */
+.echoNote {
+  margin: 0 0 4px;
+}
+
+.ai {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+.tip {
+  composes: deep from "./surface.module.css";
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 16px 16px;
+  border-radius: 16px;
+  color: var(--bone);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.tip svg {
+  flex: none;
+  color: var(--gold);
+}
+
+.full {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--forest);
+  transition: transform 160ms var(--ease-out);
+}
+
+.full:active {
+  transform: scale(0.96);
+}
+
+/* ------------------------------------------------ streak */
+
+.streak {
+  composes: deep from "./surface.module.css";
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 16px 20px;
+  border-radius: 20px;
+  color: var(--bone);
+}
+
+.streakHead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0;
+}
+
+.streakHead b {
+  font-size: 48px;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.streakHead span {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(244, 239, 230, 0.8);
+}
+
+.weeks {
+  display: flex;
+  gap: 8px;
+}
+
+.weeks i {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgba(244, 239, 230, 0.3);
+}
+
+.weeks i[data-on="true"] {
+  background: var(--gold);
+  box-shadow: none;
+}
+
+.weeks i[data-next] {
+  box-shadow: none;
+  border: 1.5px dashed rgba(215, 180, 111, 0.8);
+}
+
+.badges {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badges li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(244, 239, 230, 0.3);
+  color: rgba(244, 239, 230, 0.55);
+  line-height: 1;
+}
+
+.badges li b {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.badges li span {
+  font-size: 12px;
+}
+
+.badges li[data-earned="true"] {
+  border-color: transparent;
+  background: var(--gold);
+  color: var(--evergreen);
+}
+
+/* The weeks light up one after another, then the earned badge lands. */
+.streak[data-reveal] .weeks i,
+.streak[data-reveal] .badges li {
+  transition:
+    opacity 320ms var(--ease-out),
+    transform 320ms var(--ease-out);
+}
+
+.streak[data-reveal] .weeks i {
+  transition-delay: calc(var(--i) * 70ms);
+}
+
+.streak[data-reveal] .badges li {
+  transition-delay: calc(380ms + var(--i) * 70ms);
+}
+
+.streak[data-reveal="out"] .weeks i,
+.streak[data-reveal="out"] .badges li {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streak[data-reveal="out"] .weeks i,
+  .streak[data-reveal="out"] .badges li {
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------ more metrics */
+
+.more {
+  composes: card from "./surface.module.css";
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.moreHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 56px;
+  padding: 0 20px 0 16px;
+  font-size: 15px;
+  color: var(--bark);
+  text-align: left;
+}
+
+.moreHead:active {
+  background: rgba(46, 38, 32, 0.03);
+}
+
+.count {
+  color: var(--bark-2);
+}
+
+.moreChevron {
+  color: var(--bark-2);
+  transition: transform 240ms var(--ease-out);
+}
+
+.more[data-open="true"] .moreChevron {
+  transform: rotate(90deg);
+}
+
+.moreBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms var(--ease-out);
+}
+
+.more[data-open="true"] .moreBody {
+  grid-template-rows: 1fr;
+}
+
+.moreInner {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.more[data-open="true"] .moreInner {
+  opacity: 1;
+  transition-delay: 60ms;
+}
+
+.extras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+  padding: 4px 8px 16px;
+}
+
+.extra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Longer names wrap under their ring rather than crowd the row. */
+.extraLabel {
+  max-width: 104px;
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--bark);
+}
+
+.soon {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bronze-deep);
+}
+
+.profile {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 16px 20px;
+  border-top: 1px solid var(--sand);
+}
+
+.profile dt {
+  font-size: 12px;
+  color: var(--bark-2);
+}
+
+.profile dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  color: var(--bark);
+}
+
+/* Skin type isn't set: a quiet link-style invitation to add it. */
+.addType {
+  min-height: 32px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--forest);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .moreBody {
+    transition-duration: 0ms;
+  }
+}
